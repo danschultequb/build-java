@@ -1,0 +1,22 @@
+{
+  "publisher": "qub",
+  "project": "qub-build",
+  "version": "4",
+  "java": {
+    "mainClass": "qub.Build",
+    "shortcutName": "qub-build",
+    "sources": {
+      "version": "1.8"
+    },
+    "tests": {
+      "version": "1.8"
+    },
+    "dependencies": [
+      {
+        "publisher": "qub",
+        "project": "qub-java",
+        "version": "13"
+      }
+    ]
+  }
+}
