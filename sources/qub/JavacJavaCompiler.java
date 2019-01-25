@@ -6,57 +6,46 @@ package qub;
 public class JavacJavaCompiler implements JavaCompiler
 {
     @Override
-    public Result<JavaCompilationResult> compile(Folder sourceFolder, String javaVersion, Folder outputFolder, Console console)
+    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder sourceFolder, Folder outputFolder, String javaVersion, Console console)
     {
+        PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
         PreCondition.assertNotNull(sourceFolder, "sourceFolder");
-        PreCondition.assertEqual("1.8", javaVersion, "javaVersion");
         PreCondition.assertNotNull(outputFolder, "outputFolder");
+        PreCondition.assertNotNull(console, "console");
 
-        final Stopwatch stopwatch = console.getStopwatch();
-        stopwatch.start();
+        return console.getProcessBuilder("javac")
+            .then((ProcessBuilder javac) ->
+            {
+                final Value<Boolean> wroteNewLineBeforeOutputOrError = new Value<>();
 
-        console.write("Compiling " + sourceFolder.getName() + "...");
+                javac.redirectOutput(new NewLineBeforeFirstWriteByteWriteStream(console.getOutputAsByteWriteStream(), wroteNewLineBeforeOutputOrError));
+                javac.redirectError(new NewLineBeforeFirstWriteByteWriteStream(console.getErrorAsByteWriteStream(), wroteNewLineBeforeOutputOrError));
 
-        final Value<Iterable<File>> javaSourceFiles = Value.create();
-        return Build.getJavaSourceFiles(sourceFolder, javaSourceFiles)
-                .thenResult(() -> console.getProcessBuilder("javac"))
-                .then((ProcessBuilder javac) ->
+                javac.addArguments("-d", outputFolder.getPath().toString());
+                javac.addArgument("-Xlint:unchecked");
+                javac.addArgument("-Xlint:deprecation");
+
+                if (!Strings.isNullOrEmpty(javaVersion))
                 {
-                    final Value<Boolean> wroteNewLineBeforeOutputOrError = new Value<>();
+                    javac.addArguments("-source", javaVersion);
+                    javac.addArguments("-target", javaVersion);
 
-                    javac.redirectOutput(new NewLineBeforeFirstWriteByteWriteStream(console.getOutputAsByteWriteStream(), wroteNewLineBeforeOutputOrError));
-                    javac.redirectError(new NewLineBeforeFirstWriteByteWriteStream(console.getErrorAsByteWriteStream(), wroteNewLineBeforeOutputOrError));
-
-                    javac.addArguments("-d", outputFolder.getPath().toString());
-                    javac.addArgument("-Xlint:unchecked");
-                    javac.addArgument("-Xlint:deprecation");
-
-                    if (!Strings.isNullOrEmpty(javaVersion))
+                    if (javaVersion.equals("1.8") || javaVersion.equals("8"))
                     {
-                        javac.addArguments("-source", javaVersion);
-                        javac.addArguments("-target", javaVersion);
-
-                        if (javaVersion.equals("1.8") || javaVersion.equals("8"))
-                        {
-                            final Folder javaFolder = console.getFileSystem().getFolder("C:/Program Files/Java/").throwErrorOrGetValue();
-                            javac.addArguments("-bootclasspath",
-                                    javaFolder.getPath()
-                                            .concatenateSegment("jre1.8.0_192/lib/rt.jar")
-                                            .toString());
-                        }
+                        final Folder javaFolder = console.getFileSystem().getFolder("C:/Program Files/Java/").throwErrorOrGetValue();
+                        final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().throwErrorOrGetValue();
+                        final Iterable<Folder> jre18Folders = jreAndJdkFolders.where((Folder jreOrJdkFolder) -> jreOrJdkFolder.getName().startsWith("jre1.8.0_"));
+                        final Folder jre18Folder = jre18Folders.maximum((Folder lhs, Folder rhs) -> Comparison.from(lhs.getName().compareTo(rhs.getName())));
+                        javac.addArguments("-bootclasspath", jre18Folder.getPath().concatenateSegment("lib/rt.jar").toString());
                     }
+                }
 
-                    javac.addArguments(javaSourceFiles.get().map(FileSystemEntry::toString));
+                javac.addArguments(sourceFiles.map(FileSystemEntry::toString));
 
-                    outputFolder.create().throwError();
+                final JavaCompilationResult result = new JavaCompilationResult();
+                result.setExitCode(javac.run());
 
-                    final JavaCompilationResult result = new JavaCompilationResult();
-                    result.setExitCode(javac.run());
-
-                    final Duration compilationDuration = stopwatch.stop().toSeconds();
-                    console.writeLine(" Done (" + compilationDuration.toString("0.0") + ")");
-
-                    return result;
-                });
+                return result;
+            });
     }
 }

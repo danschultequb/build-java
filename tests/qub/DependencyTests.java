@@ -11,7 +11,7 @@ public class DependencyTests
                 final Dependency dependency = new Dependency();
                 test.assertNull(dependency.getPublisher());
                 test.assertNull(dependency.getProject());
-                test.assertNull(dependency.getVersionRange());
+                test.assertNull(dependency.getVersion());
             });
 
             runner.testGroup("setPublisher(String)", () ->
@@ -62,27 +62,27 @@ public class DependencyTests
                 });
             });
 
-            runner.testGroup("setVersionRange(String)", () ->
+            runner.testGroup("setVersion(String)", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
                     final Dependency dependency = new Dependency();
-                    test.assertSame(dependency, dependency.setVersionRange(null));
-                    test.assertEqual(null, dependency.getVersionRange());
+                    test.assertSame(dependency, dependency.setVersion(null));
+                    test.assertEqual(null, dependency.getVersion());
                 });
 
                 runner.test("with empty", (Test test) ->
                 {
                     final Dependency dependency = new Dependency();
-                    test.assertSame(dependency, dependency.setVersionRange(""));
-                    test.assertEqual("", dependency.getVersionRange());
+                    test.assertSame(dependency, dependency.setVersion(""));
+                    test.assertEqual("", dependency.getVersion());
                 });
 
                 runner.test("with non-empty", (Test test) ->
                 {
                     final Dependency dependency = new Dependency();
-                    test.assertSame(dependency, dependency.setVersionRange("oranges"));
-                    test.assertEqual("oranges", dependency.getVersionRange());
+                    test.assertSame(dependency, dependency.setVersion("oranges"));
+                    test.assertEqual("oranges", dependency.getVersion());
                 });
             });
 
@@ -90,47 +90,47 @@ public class DependencyTests
             {
                 runner.test("with null", (Test test) ->
                 {
-                    final Dependency dependency = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
+                    final Dependency dependency = new Dependency().setPublisher("a").setProject("b").setVersion("c");
                     test.assertFalse(dependency.equals((Object)null));
                 });
 
                 runner.test("with String", (Test test) ->
                 {
-                    final Dependency dependency = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
+                    final Dependency dependency = new Dependency().setPublisher("a").setProject("b").setVersion("c");
                     test.assertFalse(dependency.equals((Object)"hello"));
                 });
 
                 runner.test("with different publisher", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("x").setProject("b").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("x").setProject("b").setVersion("c");
                     test.assertFalse(lhs.equals((Object)rhs));
                 });
 
                 runner.test("with different project", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("a").setProject("y").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("a").setProject("y").setVersion("c");
                     test.assertFalse(lhs.equals((Object)rhs));
                 });
 
                 runner.test("with different versionRange", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("z");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersion("z");
                     test.assertFalse(lhs.equals((Object)rhs));
                 });
 
                 runner.test("with equal Dependency", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
                     test.assertTrue(lhs.equals((Object)rhs));
                 });
 
                 runner.test("with same Dependency", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
                     test.assertTrue(lhs.equals((Object)lhs));
                 });
             });
@@ -139,41 +139,41 @@ public class DependencyTests
             {
                 runner.test("with null", (Test test) ->
                 {
-                    final Dependency dependency = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
+                    final Dependency dependency = new Dependency().setPublisher("a").setProject("b").setVersion("c");
                     test.assertFalse(dependency.equals((Dependency)null));
                 });
 
                 runner.test("with different publisher", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("x").setProject("b").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("x").setProject("b").setVersion("c");
                     test.assertFalse(lhs.equals(rhs));
                 });
 
                 runner.test("with different project", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("a").setProject("y").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("a").setProject("y").setVersion("c");
                     test.assertFalse(lhs.equals(rhs));
                 });
 
                 runner.test("with different versionRange", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("z");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersion("z");
                     test.assertFalse(lhs.equals(rhs));
                 });
 
                 runner.test("with equal Dependency", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
-                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
+                    final Dependency rhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
                     test.assertTrue(lhs.equals(rhs));
                 });
 
                 runner.test("with same Dependency", (Test test) ->
                 {
-                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersionRange("c");
+                    final Dependency lhs = new Dependency().setPublisher("a").setProject("b").setVersion("c");
                     test.assertTrue(lhs.equals(lhs));
                 });
             });

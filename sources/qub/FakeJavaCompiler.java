@@ -4,43 +4,34 @@ public class FakeJavaCompiler implements JavaCompiler
 {
     private int exitCode;
 
+    public int getExitCode()
+    {
+        return exitCode;
+    }
+
     public void setExitCode(int exitCode)
     {
         this.exitCode = exitCode;
     }
 
     @Override
-    public Result<JavaCompilationResult> compile(Folder sourceFolder, String javaVersion, Folder outputFolder, Console console)
+    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder sourceFolder, Folder outputFolder, String javaVersion, Console console)
     {
+        PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
         PreCondition.assertNotNull(sourceFolder, "sourceFolder");
-        PreCondition.assertEqual("1.8", javaVersion, "javaVersion");
         PreCondition.assertNotNull(outputFolder, "outputFolder");
+        PreCondition.assertNotNull(console, "console");
 
-        final Stopwatch stopwatch = console.getStopwatch();
-        stopwatch.start();
+        for (final File sourceFile : sourceFiles)
+        {
+            final Path sourceFileRelativePath = sourceFile.relativeTo(sourceFolder);
+            final File classFile = outputFolder.getFile(sourceFileRelativePath.changeFileExtension(".class")).throwErrorOrGetValue();
+            sourceFile.copyTo(classFile.getPath());
+        }
 
-        console.write("Compiling " + sourceFolder.getName() + "...");
+        final JavaCompilationResult result = new JavaCompilationResult();
+        result.setExitCode(getExitCode());
 
-        final Value<Iterable<File>> javaSourceFiles = Value.create();
-        return Build.getJavaSourceFiles(sourceFolder, javaSourceFiles)
-            .then(() ->
-            {
-                outputFolder.create();
-                for (final File javaSourceFile : javaSourceFiles.get())
-                {
-                    final Path javaSourceFileSourcePath = javaSourceFile.getPath();
-                    final Path javaSourceFileRelativeToSourceFolder = javaSourceFileSourcePath.relativeTo(sourceFolder);
-                    final Path javaSourceFileOutputPath = outputFolder.getPath().concatenateSegment(javaSourceFileRelativeToSourceFolder).changeFileExtension(".class");
-                    javaSourceFile.copyTo(javaSourceFileOutputPath);
-                }
-
-                final JavaCompilationResult result = new JavaCompilationResult();
-                result.setExitCode(exitCode);
-
-                final Duration compilationDuration = stopwatch.stop().toSeconds();
-                console.writeLine(" Done (" + compilationDuration.toString("0.0") + ")");
-
-                return result;
-            });
+        return Result.success(result);
     }
 }

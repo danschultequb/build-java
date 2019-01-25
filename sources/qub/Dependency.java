@@ -7,7 +7,7 @@ public class Dependency
 {
     private String publisher;
     private String project;
-    private String versionRange;
+    private String version;
 
     /**
      * Get the publisher of this dependency.
@@ -53,18 +53,18 @@ public class Dependency
      * Get the range of versions that are allowed for this dependency.
      * @return The range of versions that are allowed for this dependency.
      */
-    public String getVersionRange()
+    public String getVersion()
     {
-        return versionRange;
+        return version;
     }
 
     /**
      * Set the range of versions that are allowed for this dependency.
-     * @param versionRange The range of versions that are allowed for this dependency.
+     * @param version The range of versions that are allowed for this dependency.
      */
-    public Dependency setVersionRange(String versionRange)
+    public Dependency setVersion(String version)
     {
-        this.versionRange = versionRange;
+        this.version = version;
 
         return this;
     }
@@ -80,6 +80,17 @@ public class Dependency
         return rhs != null &&
             Comparer.equal(publisher, rhs.publisher) &&
             Comparer.equal(project, rhs.project) &&
-            Comparer.equal(versionRange, rhs.versionRange);
+            Comparer.equal(version, rhs.version);
+    }
+
+    @Override
+    public String toString()
+    {
+        return JSON.object(object ->
+        {
+            object.stringProperty("publisher", Objects.toString(publisher));
+            object.stringProperty("project", Objects.toString(project));
+            object.stringProperty("version", Objects.toString(version));
+        }).toString();
     }
 }

@@ -54,28 +54,79 @@ public class Build
             final Stopwatch stopwatch = console.getStopwatch();
             stopwatch.start();
 
-            final Folder currentFolder = console.getCurrentFolder().throwErrorOrGetValue();
-            final Folder outputsFolder = currentFolder.getFolder("outputs").throwErrorOrGetValue();
-            final File projectJsonFile = currentFolder.getFile("project.json").throwErrorOrGetValue();
-            final Value<ProjectJSON> projectJson = Value.create();
-            ProjectJSON.parse(projectJsonFile)
-                .then(projectJson::set)
-                .thenResult(() ->
-                {
-                    final Folder sourcesFolder = currentFolder.getFolder("sources").throwErrorOrGetValue();
-                    final Folder sourcesOutputFolder = outputsFolder.getFolder(sourcesFolder.getName()).throwErrorOrGetValue();
-                    final String javaSourcesVersion = projectJson.get().getJavaSourcesVersion();
-                    final JavaCompiler javaCompiler = getJavaCompiler(JavacJavaCompiler::new);
-                    return javaCompiler.compile(sourcesFolder, javaSourcesVersion, sourcesOutputFolder, console);
-                })
-                .then((JavaCompilationResult sourcesCompilationResult) ->
-                {
-                    if (sourcesCompilationResult.getExitCode() == 0)
-                    {
+            console.write("Compiling...");
 
+            final Folder currentFolder = console.getCurrentFolder().throwErrorOrGetValue();
+            final File projectJsonFile = currentFolder.getFile("project.json").throwErrorOrGetValue();
+            final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile).throwErrorOrGetValue();
+            final Folder sourceFolder = currentFolder.getFolder("sources").throwErrorOrGetValue();
+            final Iterable<File> javaSourceFiles = getJavaSourceFiles(sourceFolder).throwErrorOrGetValue();
+
+            final Folder outputsFolder = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+            final File parseJsonFile = outputsFolder.getFile("parse.json").throwErrorOrGetValue();
+            final List<File> newJavaSourceFiles = List.create();
+            final List<File> deletedJavaSourceFiles = List.create();
+            final List<File> modifiedJavaSourceFiles = List.create();
+            final List<File> nonModifiedJavaSourceFiles = List.create();
+            outputsFolder.create().then(() ->
+            {
+                newJavaSourceFiles.addAll(javaSourceFiles);
+            })
+            .catchError(FolderAlreadyExistsException.class, () ->
+            {
+                ParseJSON.parse(parseJsonFile).then((ParseJSON parseJson) ->
+                {
+                    for (final File javaSourceFile : javaSourceFiles)
+                    {
+                        final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(currentFolder);
+
+                        parseJson.getSourceFile(javaSourceFileRelativePath)
+                            .then((ParseJSONSourceFile parseJsonSource) ->
+                            {
+                                if (!javaSourceFile.getLastModified().throwErrorOrGetValue().equals(parseJsonSource.getLastModified()))
+                                {
+                                    modifiedJavaSourceFiles.add(javaSourceFile);
+                                }
+                                else
+                                {
+                                    nonModifiedJavaSourceFiles.add(javaSourceFile);
+                                }
+                            })
+                            .catchError(NotFoundException.class, () ->
+                            {
+                                newJavaSourceFiles.add(javaSourceFile);
+                            });
+                    }
+
+                    for (final ParseJSONSourceFile parseJsonSource : parseJson.getSourceFiles())
+                    {
+                        final Path parseJsonSourceFilePath = parseJsonSource.getRelativePath();
+                        if (parseJsonSourceFilePath != null)
+                        {
+                            final File parseJsonSourceFile = currentFolder.getFile(parseJsonSourceFilePath).throwErrorOrGetValue();
+                            if (!javaSourceFiles.contains(parseJsonSourceFile))
+                            {
+                                deletedJavaSourceFiles.add(parseJsonSourceFile);
+                            }
+                        }
                     }
                 })
-                .throwError();
+                .catchError(FileNotFoundException.class, () ->
+                {
+                    newJavaSourceFiles.addAll(javaSourceFiles);
+                });
+            })
+            .throwError();
+
+            final String javaVersion = projectJson.getJava().getVersion();
+
+            final JavaCompiler javaCompiler = getJavaCompiler(JavacJavaCompiler::new);
+            final JavaCompilationResult compilationResult = javaCompiler
+                .compile(javaSourceFiles, sourceFolder, outputsFolder, javaVersion, console)
+                .throwErrorOrGetValue();
+
+            final Duration compilationDuration = stopwatch.stop().toSeconds();
+            console.writeLine(" Done (" + compilationDuration.toString("0.0") + ")");
         }
     }
 
@@ -86,14 +137,14 @@ public class Build
      * @param folder The folder to look for Java source files in.
      * @return All of the Java source files found in the provided folder.
      */
-    public static Result<Void> getJavaSourceFiles(Folder folder, Setable<Iterable<File>> javaSourceFiles)
+    public static Result<Iterable<File>> getJavaSourceFiles(Folder folder)
     {
         PreCondition.assertNotNull(folder, "folder");
 
         return folder.getFilesRecursively()
             .thenResult((Iterable<File> files) ->
             {
-                Result<Void> result;
+                Result<Iterable<File>> result;
                 final Iterable<File> javaSources = files.where((File file) -> Comparer.equal(file.getFileExtension(), ".java"));
                 if (!javaSources.any())
                 {
@@ -101,8 +152,7 @@ public class Build
                 }
                 else
                 {
-                    javaSourceFiles.set(javaSources);
-                    result = Result.success();
+                    result = Result.success(javaSources);
                 }
                 return result;
             });

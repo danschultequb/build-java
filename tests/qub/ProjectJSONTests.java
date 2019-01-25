@@ -86,126 +86,21 @@ public class ProjectJSONTests
                 });
             });
 
-            runner.testGroup("setMainClass(String)", () ->
+            runner.testGroup("setJava()", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setMainClass(null);
-                    test.assertEqual(null, projectJSON.getMainClass());
+                    projectJSON.setJava(null);
+                    test.assertNull(projectJSON.getJava());
                 });
 
-                runner.test("with empty", (Test test) ->
+                runner.test("with non-null", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setMainClass("");
-                    test.assertEqual("", projectJSON.getMainClass());
-                });
-
-                runner.test("with non-empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setMainClass("apples");
-                    test.assertEqual("apples", projectJSON.getMainClass());
-                });
-            });
-
-            runner.testGroup("setShortcutName(String)", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setShortcutName(null);
-                    test.assertEqual(null, projectJSON.getShortcutName());
-                });
-
-                runner.test("with empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setShortcutName("");
-                    test.assertEqual("", projectJSON.getShortcutName());
-                });
-
-                runner.test("with non-empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setShortcutName("apples");
-                    test.assertEqual("apples", projectJSON.getShortcutName());
-                });
-            });
-
-            runner.testGroup("setJavaSourcesVersion(String)", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaSourcesVersion((String)null);
-                    test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                });
-
-                runner.test("with empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaSourcesVersion("");
-                    test.assertEqual("", projectJSON.getJavaSourcesVersion());
-                });
-
-                runner.test("with non-empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaSourcesVersion("apples");
-                    test.assertEqual("apples", projectJSON.getJavaSourcesVersion());
-                });
-            });
-
-            runner.testGroup("setJavaTestsVersion(String)", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaTestsVersion((String)null);
-                    test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                });
-
-                runner.test("with empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaTestsVersion("");
-                    test.assertEqual("", projectJSON.getJavaTestsVersion());
-                });
-
-                runner.test("with non-empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaTestsVersion("apples");
-                    test.assertEqual("apples", projectJSON.getJavaTestsVersion());
-                });
-            });
-
-            runner.testGroup("setJavaDependencies(Iterable<Dependency>)", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaDependencies(null);
-                    test.assertEqual(null, projectJSON.getJavaDependencies());
-                });
-
-                runner.test("with empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJavaDependencies(Iterable.empty());
-                    test.assertEqual(Iterable.empty(), projectJSON.getJavaDependencies());
-                });
-
-                runner.test("with non-empty", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    final Iterable<Dependency> dependencies = Iterable.create(
-                        new Dependency().setProject("a").setPublisher("b").setVersionRange("c"),
-                        new Dependency().setProject("d").setPublisher("e").setVersionRange("f"));
-                    projectJSON.setJavaDependencies(dependencies);
-                    test.assertEqual(dependencies, projectJSON.getJavaDependencies());
+                    final ProjectJSONJava java = new ProjectJSONJava();
+                    projectJSON.setJava(java);
+                    test.assertSame(java, projectJSON.getJava());
                 });
             });
 
@@ -213,7 +108,7 @@ public class ProjectJSONTests
             {
                 runner.test("with null file", (Test test) ->
                 {
-                    test.assertThrows(() -> ProjectJSON.parse(null), new PreConditionFailure("projectJSONFile cannot be null."));
+                    test.assertThrows(() -> ProjectJSON.parse((File)null), new PreConditionFailure("projectJSONFile cannot be null."));
                 });
 
                 runner.test("with non-existing file", (Test test) ->
@@ -228,16 +123,16 @@ public class ProjectJSONTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Result<File> file = fileSystem.createFile("/project.json");
-                    test.assertError(new ParseException("The root of a project.json file must be a JSON object.", 0), file.thenResult(ProjectJSON::parse));
+                    test.assertError(new NotFoundException("No root was found in the JSON document."), file.thenResult(ProjectJSON::parse));
                 });
 
-                runner.test("with non-JSON object file contents", (Test test) ->
+                runner.test("with non-JSON file contents", (Test test) ->
                 {
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Result<File> fileResult = fileSystem.createFile("/project.json");
                     fileResult.then((File file) -> CharacterEncoding.UTF_8.encode("hello there").then(file::setContents));
-                    test.assertError(new ParseException("The root of a project.json file must be a JSON object.", 0), fileResult.thenResult(ProjectJSON::parse));
+                    test.assertError(new NotFoundException("No root was found in the JSON document."), fileResult.thenResult(ProjectJSON::parse));
                 });
 
                 runner.test("with empty JSON array", (Test test) ->
@@ -246,7 +141,7 @@ public class ProjectJSONTests
                     fileSystem.createRoot("/");
                     final Result<File> fileResult = fileSystem.createFile("/project.json");
                     fileResult.then((File file) -> CharacterEncoding.UTF_8.encode("[]").then(file::setContents));
-                    test.assertError(new ParseException("The root of a project.json file must be a JSON object.", 0), fileResult.thenResult(ProjectJSON::parse));
+                    test.assertError(new WrongTypeException("Expected the root of the JSON document to be an object."), fileResult.thenResult(ProjectJSON::parse));
                 });
 
                 runner.test("with empty JSON object", (Test test) ->
@@ -262,11 +157,7 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            test.assertEqual(null, projectJSON.getJava());
                         });
                 });
 
@@ -283,11 +174,7 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            test.assertEqual(null, projectJSON.getJava());
                         });
                 });
 
@@ -304,11 +191,7 @@ public class ProjectJSONTests
                             test.assertEqual("bananas", projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            test.assertEqual(null, projectJSON.getJava());
                         });
                 });
 
@@ -325,11 +208,7 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            test.assertEqual(null, projectJSON.getJava());
                         });
                 });
 
@@ -346,11 +225,7 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual("bananas", projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            test.assertEqual(null, projectJSON.getJava());
                         });
                 });
 
@@ -367,11 +242,7 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            test.assertEqual(null, projectJSON.getJava());
                         });
                 });
 
@@ -388,11 +259,7 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual("bananas", projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            test.assertEqual(null, projectJSON.getJava());
                         });
                 });
 
@@ -409,11 +276,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -430,11 +298,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual("a", projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertEqual("a", java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -451,11 +320,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -472,11 +342,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual("1.8", projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -493,11 +364,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual("1.8", projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -514,11 +386,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -535,11 +408,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual("1.8", projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -556,11 +430,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual("1.8", projectJSON.getJavaTestsVersion());
-                            test.assertEqual(null, projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertNull(java.getDependencies());
                         });
                 });
 
@@ -577,11 +452,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(Iterable.create(), projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertEqual(Iterable.empty(), java.getDependencies());
                         });
                 });
 
@@ -598,11 +474,12 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(Iterable.create(new Dependency()), projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertEqual(Iterable.create(new Dependency()), java.getDependencies());
                         });
                 });
 
@@ -619,11 +496,18 @@ public class ProjectJSONTests
                             test.assertEqual(null, projectJSON.getPublisher());
                             test.assertEqual(null, projectJSON.getProject());
                             test.assertEqual(null, projectJSON.getVersion());
-                            test.assertEqual(null, projectJSON.getShortcutName());
-                            test.assertEqual(null, projectJSON.getMainClass());
-                            test.assertEqual(null, projectJSON.getJavaSourcesVersion());
-                            test.assertEqual(null, projectJSON.getJavaTestsVersion());
-                            test.assertEqual(Iterable.create(new Dependency().setPublisher("a").setProject("b").setVersionRange("c")), projectJSON.getJavaDependencies());
+                            final ProjectJSONJava java = projectJSON.getJava();
+                            test.assertNotNull(java);
+                            test.assertNull(java.getVersion());
+                            test.assertNull(java.getMainClass());
+                            test.assertNull(java.getShortcutName());
+                            test.assertEqual(
+                                Iterable.create(
+                                    new Dependency()
+                                        .setPublisher("a")
+                                        .setProject("b")
+                                        .setVersion("c")),
+                                java.getDependencies());
                         });
                 });
             });
