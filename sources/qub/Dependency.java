@@ -88,9 +88,18 @@ public class Dependency
     {
         return JSON.object(object ->
         {
-            object.stringProperty("publisher", Objects.toString(publisher));
-            object.stringProperty("project", Objects.toString(project));
-            object.stringProperty("version", Objects.toString(version));
+            if (publisher != null)
+            {
+                object.stringProperty("publisher", Objects.toString(publisher));
+            }
+            if (project != null)
+            {
+                object.stringProperty("project", Objects.toString(project));
+            }
+            if (version != null)
+            {
+                object.stringProperty("version", Objects.toString(version));
+            }
         }).toString();
     }
 }

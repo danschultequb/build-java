@@ -22,9 +22,10 @@ public class ParseJSONSourceFile
      * Set the path to the source file from the project root folder.
      * @param relativePath The path to the source file from the project root folder.
      */
-    public void setRelativePath(Path relativePath)
+    public ParseJSONSourceFile setRelativePath(Path relativePath)
     {
         this.relativePath = relativePath;
+        return this;
     }
 
     /**
@@ -40,9 +41,10 @@ public class ParseJSONSourceFile
      * Set the last time the source file was modified.
      * @param lastModified The last time the source file was modified.
      */
-    public void setLastModified(DateTime lastModified)
+    public ParseJSONSourceFile setLastModified(DateTime lastModified)
     {
         this.lastModified = lastModified;
+        return this;
     }
 
     /**
@@ -58,9 +60,44 @@ public class ParseJSONSourceFile
      * Set the relative paths to the source files that this source file depends on.
      * @param dependencies The relative paths to the source files that this source file depends on.
      */
-    public void setDependencies(Iterable<Path> dependencies)
+    public ParseJSONSourceFile setDependencies(Iterable<Path> dependencies)
     {
         this.dependencies = dependencies;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object rhs)
+    {
+        return rhs instanceof ParseJSONSourceFile && equals((ParseJSONSourceFile)rhs);
+    }
+
+    public boolean equals(ParseJSONSourceFile rhs)
+    {
+        return rhs != null &&
+            Comparer.equal(relativePath, rhs.relativePath) &&
+            Comparer.equal(lastModified, rhs.lastModified) &&
+            Comparer.equal(dependencies, rhs.dependencies);
+    }
+
+    @Override
+    public String toString()
+    {
+        return JSON.object(sourceFile ->
+        {
+            if (relativePath != null)
+            {
+                sourceFile.stringProperty("relativePath", relativePath.toString());
+            }
+            if (lastModified != null)
+            {
+                sourceFile.numberProperty("lastModified", lastModified.getMillisecondsSinceEpoch());
+            }
+            if (dependencies != null)
+            {
+                sourceFile.stringArrayProperty("dependencies", dependencies.map(Path::toString));
+            }
+        }).toString();
     }
 
     /**

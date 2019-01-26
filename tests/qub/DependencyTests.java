@@ -177,6 +177,24 @@ public class DependencyTests
                     test.assertTrue(lhs.equals(lhs));
                 });
             });
+
+            runner.testGroup("toString()", () ->
+            {
+                runner.test("with no properties", (Test test) ->
+                {
+                    final Dependency dependency = new Dependency();
+                    test.assertEqual("{}", dependency.toString());
+                });
+
+                runner.test("with all properties", (Test test) ->
+                {
+                    final Dependency dependency = new Dependency();
+                    dependency.setPublisher("a");
+                    dependency.setProject("b");
+                    dependency.setVersion("c");
+                    test.assertEqual("{\"publisher\":\"a\",\"project\":\"b\",\"version\":\"c\"}", dependency.toString());
+                });
+            });
         });
     }
 }

@@ -34,9 +34,13 @@ public class ParseJSON
 
     public Result<ParseJSONSourceFile> getSourceFile(Path path)
     {
+        PreCondition.assertNotNull(path, "path");
+
         return pathMap == null
             ? Result.error(new NotFoundException("No source file found in the ParseJSON object with the path " + Strings.escapeAndQuote(path.toString()) + "."))
-            : pathMap.get(path);
+            : pathMap.get(path)
+                .catchErrorResult(NotFoundException.class, () ->
+                    Result.error(new NotFoundException("No source file found in the ParseJSON object with the path " + Strings.escapeAndQuote(path.toString()) + ".")));
     }
 
     public static Result<ParseJSON> parse(File parseJSONFile)

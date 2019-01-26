@@ -72,7 +72,7 @@ public class Build
             outputsFolder.create().then(() ->
             {
                 newJavaSourceFiles.addAll(javaSourceFiles);
-                parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, sourceFolder));
+                parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, currentFolder));
             })
             .catchError(FolderAlreadyExistsException.class, () ->
             {
@@ -80,14 +80,14 @@ public class Build
                 {
                     for (final File javaSourceFile : javaSourceFiles)
                     {
-                        final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(sourceFolder);
+                        final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(currentFolder);
 
                         parseJson.getSourceFile(javaSourceFileRelativePath).then((ParseJSONSourceFile parseJsonSource) ->
                         {
                             if (!javaSourceFile.getLastModified().throwErrorOrGetValue().equals(parseJsonSource.getLastModified()))
                             {
                                 modifiedJavaSourceFiles.add(javaSourceFile);
-                                parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, sourceFolder, javaSourceFiles));
+                                parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, currentFolder, javaSourceFiles));
                             }
                             else
                             {
@@ -98,14 +98,14 @@ public class Build
                         .catchError(NotFoundException.class, () ->
                         {
                             newJavaSourceFiles.add(javaSourceFile);
-                            parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, sourceFolder, javaSourceFiles));
+                            parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, currentFolder, javaSourceFiles));
                         });
                     }
 
                     for (final ParseJSONSourceFile parseJsonSource : parseJson.getSourceFiles())
                     {
                         final Path parseJsonSourceFilePath = parseJsonSource.getRelativePath();
-                        final File parseJsonSourceFile = sourceFolder.getFile(parseJsonSourceFilePath).throwErrorOrGetValue();
+                        final File parseJsonSourceFile = currentFolder.getFile(parseJsonSourceFilePath).throwErrorOrGetValue();
                         if (!javaSourceFiles.contains(parseJsonSourceFile))
                         {
                             deletedJavaSourceFiles.add(parseJsonSourceFile);
@@ -115,7 +115,7 @@ public class Build
                 .catchError(FileNotFoundException.class, () ->
                 {
                     newJavaSourceFiles.addAll(javaSourceFiles);
-                    parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, sourceFolder));
+                    parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, currentFolder));
                 });
             })
             .throwError();
@@ -137,7 +137,7 @@ public class Build
             for (final File deletedSourceFile : deletedJavaSourceFiles)
             {
                 final File classFile = outputsFolder.getFile(deletedSourceFile
-                    .relativeTo(sourceFolder)
+                    .relativeTo(currentFolder)
                     .changeFileExtension(".class"))
                     .throwErrorOrGetValue();
                 classFile.delete().catchError(java.io.FileNotFoundException.class, () -> {});
@@ -148,10 +148,10 @@ public class Build
             javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
             javaSourceFilesToCompile.addAll(nonModifiedJavaSourceFiles.where((File javaSourceFile) ->
             {
-                final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(sourceFolder);
+                final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(currentFolder);
                 final ParseJSONSourceFile parseJsonSourceFile = updatedParseJson.getSourceFile(javaSourceFileRelativePath).throwErrorOrGetValue();
-                final Iterable<Path> dependencRelativeFilePaths = parseJsonSourceFile.getDependencies();
-                final Iterable<File> dependencyFiles = dependencRelativeFilePaths.map((Path dependencyRelativeFilePath) -> sourceFolder.getFile(dependencyRelativeFilePath).throwErrorOrGetValue());
+                final Iterable<Path> dependencyRelativeFilePaths = parseJsonSourceFile.getDependencies();
+                final Iterable<File> dependencyFiles = dependencyRelativeFilePaths.map((Path dependencyRelativeFilePath) -> currentFolder.getFile(dependencyRelativeFilePath).throwErrorOrGetValue());
                 boolean shouldCompile = false;
                 for (final File dependencyFile : dependencyFiles)
                 {
@@ -171,7 +171,7 @@ public class Build
 
                 final JavaCompiler javaCompiler = getJavaCompiler(JavacJavaCompiler::new);
                 final JavaCompilationResult compilationResult = javaCompiler
-                    .compile(javaSourceFilesToCompile, sourceFolder, outputsFolder, javaVersion, console)
+                    .compile(javaSourceFilesToCompile, currentFolder, outputsFolder, javaVersion, console)
                     .throwErrorOrGetValue();
             }
 
