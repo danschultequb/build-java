@@ -6,10 +6,10 @@ package qub;
 public class JavacJavaCompiler implements JavaCompiler
 {
     @Override
-    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder sourceFolder, Folder outputFolder, String javaVersion, Console console)
+    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, String javaVersion, Console console)
     {
         PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
-        PreCondition.assertNotNull(sourceFolder, "sourceFolder");
+        PreCondition.assertNotNull(rootFolder, "sourceFolder");
         PreCondition.assertNotNull(outputFolder, "outputFolder");
         PreCondition.assertNotNull(console, "console");
 

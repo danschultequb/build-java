@@ -84,7 +84,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder))
                     {
                         test.assertThrows(() -> main(console),
-                            new FolderNotFoundException("/sources"));
+                            new NotFoundException("No java source files found in /."));
                     }
                 });
 
@@ -96,7 +96,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder))
                     {
                         test.assertThrows(() -> main(console),
-                            new FolderNotFoundException("/sources"));
+                            new NotFoundException("No java source files found in /."));
                     }
                 });
 
@@ -109,7 +109,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder))
                     {
                         test.assertThrows(() -> main(console),
-                            new NotFoundException("No java source files found in /sources."));
+                            new NotFoundException("No java source files found in /."));
                     }
                 });
 
@@ -127,13 +127,12 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
                             "/outputs/parse.json",
-                            "/outputs/sources/A.class"),
+                            "/outputs/A.class"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
-                    test.assertEqual("A.java source", getFileContents(outputs, "sources/A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "sources/A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -161,13 +160,12 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
                             "/outputs/parse.json",
-                            "/outputs/sources/A.class"),
+                            "/outputs/A.class"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
-                    test.assertEqual("A.java source", getFileContents(outputs, "sources/A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "sources/A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -196,16 +194,15 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
                             "/outputs/parse.json",
-                            "/outputs/sources/A.class",
-                            "/outputs/sources/B.class"),
+                            "/outputs/A.class",
+                            "/outputs/B.class"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
-                    test.assertEqual("A.java source", getFileContents(outputs, "sources/A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "sources/A.class").getMillisecondsSinceEpoch());
-                    test.assertEqual("B.java source", getFileContents(outputs, "sources/B.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "sources/B.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("B.java source", getFileContents(outputs, "B.class"));
+                    test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -223,13 +220,53 @@ public class BuildTests
                         getFileContents(outputs, "parse.json"));
                 });
 
+                runner.test("with multiple source folders", (Test test) ->
+                {
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test);
+                    setFileContents(currentFolder.getFile("project.json"), "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    setFileContents(currentFolder, "tests/B.java", "B.java source");
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/parse.json",
+                            "/outputs/A.class",
+                            "/outputs/B.class"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString),
+                        "Wrong files in outputs folders");
+                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("B.java source", getFileContents(outputs, "B.class"));
+                    test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                                aJava.arrayProperty("dependencies");
+                            });
+                            parse.objectProperty("tests/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 0);
+                                bJava.arrayProperty("dependencies");
+                            });
+                        }).toString(),
+                        getFileContents(outputs, "parse.json"));
+                });
+
                 runner.test("with source file with same age as existing class file but no parse.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
-                    final File classFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File sourceFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
 
                     clock.advance(Duration.minutes(1));
@@ -242,9 +279,8 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class"),
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
@@ -316,7 +352,7 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
-                    final File classFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
@@ -336,9 +372,8 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class"),
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -361,8 +396,8 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/sources/B.class", "B.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
@@ -390,10 +425,9 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class",
-                            "/outputs/sources/B.class"),
+                            "/outputs/A.class",
+                            "/outputs/B.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -427,8 +461,8 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/sources/B.class", "B.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
@@ -456,10 +490,9 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class",
-                            "/outputs/sources/B.class"),
+                            "/outputs/A.class",
+                            "/outputs/B.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -493,8 +526,8 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/sources/B.class", "B.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
@@ -522,10 +555,9 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class",
-                            "/outputs/sources/B.class"),
+                            "/outputs/A.class",
+                            "/outputs/B.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -559,8 +591,8 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/sources/B.class", "B.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
@@ -588,10 +620,9 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class",
-                            "/outputs/sources/B.class"),
+                            "/outputs/A.class",
+                            "/outputs/B.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -625,8 +656,8 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"shortcutName\": \"foo\", \"version\": 1.8 } }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source, depends on B");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/sources/B.class", "B.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
@@ -652,9 +683,8 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class"),
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -683,7 +713,7 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
@@ -706,16 +736,15 @@ public class BuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
+                            "/outputs/A.class",
                             "/outputs/parse.json",
-                            "/outputs/sources/A.class",
-                            "/outputs/sources/B.class"),
+                            "/outputs/B.class"),
                         outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    final File bClassFile = outputs.getFile("sources/B.class").throwErrorOrGetValue();
+                    final File bClassFile = outputs.getFile("B.class").throwErrorOrGetValue();
                     test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source", getFileContents(bClassFile));
 
