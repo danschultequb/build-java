@@ -79,19 +79,6 @@ public class ProjectJSONJava
         this.dependencies = dependencies;
     }
 
-    public static Result<ProjectJSONJava> parse(Iterator<Character> characters)
-    {
-        PreCondition.assertNotNull(characters, "characters");
-
-        final Result<ProjectJSONJava> result = JSON.parse(characters)
-            .getRootObject()
-            .then((JSONObject javaObject) -> ProjectJSONJava.parse(javaObject));
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
     public static ProjectJSONJava parse(JSONObject javaObject)
     {
         PreCondition.assertNotNull(javaObject, "javaObject");

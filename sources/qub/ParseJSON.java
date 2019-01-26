@@ -67,12 +67,7 @@ public class ParseJSON
         PreCondition.assertNotNull(rootObject, "rootObject");
 
         final ParseJSON result = new ParseJSON();
-
-        final List<ParseJSONSourceFile> sources = List.create();
-        for (final JSONProperty sourceFileProperty : rootObject.getProperties())
-        {
-            sources.add(ParseJSONSourceFile.parse(sourceFileProperty));
-        }
+        result.setSourceFiles(rootObject.getProperties().map(ParseJSONSourceFile::parse));
 
         PostCondition.assertNotNull(result, "result");
 
