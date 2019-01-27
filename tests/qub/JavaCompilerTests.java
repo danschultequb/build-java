@@ -122,7 +122,8 @@ public class JavaCompilerTests
                     final Iterable<File> sourceFiles = null;
                     final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
-                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder), new PreConditionFailure("sourceFiles cannot be null."));
+                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
+                        new PreConditionFailure("sourceFiles cannot be null."));
                 });
 
                 runner.test("with empty sourceFiles", (Test test) ->
@@ -133,7 +134,8 @@ public class JavaCompilerTests
                     final Iterable<File> sourceFiles = Iterable.empty();
                     final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
-                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder), new PreConditionFailure("sourceFiles cannot be empty."));
+                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
+                        new PreConditionFailure("sourceFiles cannot be empty."));
                 });
 
                 runner.test("with null rootFolder", (Test test) ->
@@ -145,7 +147,8 @@ public class JavaCompilerTests
                         fileSystem.getFile("/sources/A.java").throwErrorOrGetValue());
                     final Folder rootFolder = null;
                     final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
-                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder), new PreConditionFailure("rootFolder cannot be null."));
+                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
+                        new PreConditionFailure("rootFolder cannot be null."));
                 });
 
                 runner.test("with null outputFolder", (Test test) ->
@@ -157,7 +160,8 @@ public class JavaCompilerTests
                         fileSystem.getFile("/sources/A.java").throwErrorOrGetValue());
                     final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
                     final Folder outputFolder = null;
-                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder), new PreConditionFailure("outputFolder cannot be null."));
+                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
+                        new PreConditionFailure("outputFolder cannot be null."));
                 });
 
                 runner.test("with one source file", (Test test) ->
@@ -216,6 +220,88 @@ public class JavaCompilerTests
                             "-Xlint:unchecked",
                             "-Xlint:deprecation",
                             "-source", "1.7",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
+
+                runner.test("with one dependency with no qubFolder specified", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    compiler.setDependencies(
+                        Iterable.create(
+                            new Dependency()
+                                .setProject("a")
+                                .setPublisher("b")
+                                .setVersion("c")));
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").throwErrorOrGetValue());
+                    final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
+                    test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
+                        new NotFoundException("Cannot resolve project dependencies without a qubFolder."));
+                });
+
+                runner.test("with one dependency", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    compiler.setDependencies(
+                        Iterable.create(
+                            new Dependency()
+                                .setProject("a")
+                                .setPublisher("b")
+                                .setVersion("c")));
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").throwErrorOrGetValue());
+                    final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
+                    compiler.setQubFolder(fileSystem.getFolder("/qub").throwErrorOrGetValue());
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-classpath", "/qub/b/a/c/a.jar",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
+
+                runner.test("with two dependencies", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    compiler.setDependencies(
+                        Iterable.create(
+                            new Dependency()
+                                .setProject("a")
+                                .setPublisher("b")
+                                .setVersion("c"),
+                            new Dependency()
+                                .setProject("x")
+                                .setPublisher("y")
+                                .setVersion("z")));
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").throwErrorOrGetValue());
+                    final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
+                    compiler.setQubFolder(fileSystem.getFolder("/qub").throwErrorOrGetValue());
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-classpath", "/qub/b/a/c/a.jar;/qub/y/x/z/x.jar",
                             "sources/A.java"
                         ),
                         compiler.getArguments(sourceFiles, rootFolder, outputFolder));

@@ -7,6 +7,8 @@ public abstract class JavaCompiler
 {
     private String version;
     private String bootClasspath;
+    private Iterable<Dependency> dependencies;
+    private Folder qubFolder;
 
     public String getVersion()
     {
@@ -28,6 +30,28 @@ public abstract class JavaCompiler
     {
         this.bootClasspath = bootClasspath;
         return this;
+    }
+
+    public JavaCompiler setDependencies(Iterable<Dependency> dependencies)
+    {
+        this.dependencies = dependencies;
+        return this;
+    }
+
+    public Iterable<Dependency> getDependencies()
+    {
+        return dependencies;
+    }
+
+    public JavaCompiler setQubFolder(Folder qubFolder)
+    {
+        this.qubFolder = qubFolder;
+        return this;
+    }
+
+    public Folder getQubFolder()
+    {
+        return qubFolder;
     }
 
     /**
@@ -115,6 +139,27 @@ public abstract class JavaCompiler
         if (!Strings.isNullOrEmpty(bootClasspath))
         {
             result.addAll("-bootclasspath", bootClasspath);
+        }
+
+        final Iterable<Dependency> dependencies = getDependencies();
+        if (!Iterable.isNullOrEmpty(dependencies))
+        {
+            if (qubFolder == null)
+            {
+                throw new NotFoundException("Cannot resolve project dependencies without a qubFolder.");
+            }
+
+            final Iterable<String> dependencyPaths = dependencies.map((Dependency dependency) ->
+            {
+                final String dependencyRelativePath =
+                    dependency.getPublisher() + "/" +
+                    dependency.getProject() + "/" +
+                    dependency.getVersion() + "/" +
+                    dependency.getProject() + ".jar";
+                return qubFolder.getFile(dependencyRelativePath).throwErrorOrGetValue().toString();
+            });
+
+            result.addAll("-classpath", Strings.join(';', dependencyPaths));
         }
 
         result.addAll(sourceFiles.map((File sourceFile) -> sourceFile.relativeTo(rootFolder).toString()));

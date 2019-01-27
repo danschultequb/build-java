@@ -71,6 +71,18 @@ public class Build
                 javaCompiler.checkJavaVersion(projectJsonJava.getVersion(), console)
                     .then(() ->
                     {
+                        final Iterable<Dependency> dependencies = projectJsonJava.getDependencies();
+                        if (!Iterable.isNullOrEmpty(dependencies))
+                        {
+                            final String qubHome = console.getEnvironmentVariable("QUB_HOME");
+                            if (Strings.isNullOrEmpty(qubHome))
+                            {
+                                throw new NotFoundException("Cannot resolve project dependencies without a QUB_HOME environment variable.");
+                            }
+                            javaCompiler.setQubFolder(console.getFileSystem().getFolder(qubHome).throwErrorOrGetValue());
+                            javaCompiler.setDependencies(projectJsonJava.getDependencies());
+                        }
+
                         final Iterable<File> javaSourceFiles = getJavaSourceFiles(rootFolder).throwErrorOrGetValue();
 
                         String outputFolderName = "outputs";
@@ -139,7 +151,6 @@ public class Build
 
                         final ParseJSON updatedParseJson = new ParseJSON();
                         updatedParseJson.setSourceFiles(parseJsonSourceFiles);
-
 
                         try (final CharacterWriteStream parseJsonWriteStream = parseJsonFile.getContentCharacterWriteStream().throwErrorOrGetValue())
                         {

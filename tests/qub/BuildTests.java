@@ -885,6 +885,20 @@ public class BuildTests
                         getFileContents(parseFile),
                         "Wrong parse.json file contents");
                 });
+
+                runner.test("with no QUB_HOME environment variable specified", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"dependencies\": [ { \"publisher\": \"qub\", \"project\": \"qub-java\", \"version\": \"foo\" } ] } }");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+                });
             });
         });
     }
