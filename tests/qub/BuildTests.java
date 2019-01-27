@@ -83,41 +83,47 @@ public class BuildTests
                     setFileContents(currentFolder, "project.json", "{}");
                     try (final Console console = createConsole(output, currentFolder))
                     {
-                        test.assertThrows(() -> main(console),
-                            new NotFoundException("No java source files found in /."));
+                        main(console);
                     }
+                    test.assertEqual(
+                        "Compiling...\n No language specified in project.json. Nothing to compile.\n Done (0.0 Seconds)\n",
+                        output.getText().throwErrorOrGetValue());
                 });
 
                 runner.test("with java sources version set to \"1.8\" but no \"sources\" folder", (Test test) ->
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     try (final Console console = createConsole(output, currentFolder))
                     {
-                        test.assertThrows(() -> main(console),
-                            new NotFoundException("No java source files found in /."));
+                        main(console);
                     }
+                    test.assertEqual(
+                        "Compiling...\n No java source files found in /.\n Done (0.0 Seconds)\n",
+                        output.getText().throwErrorOrGetValue());
                 });
 
                 runner.test("with empty \"sources\" folder", (Test test) ->
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
                     try (final Console console = createConsole(output, currentFolder))
                     {
-                        test.assertThrows(() -> main(console),
-                            new NotFoundException("No java source files found in /."));
+                        main(console);
                     }
+                    test.assertEqual(
+                        "Compiling...\n No java source files found in /.\n Done (0.0 Seconds)\n",
+                        output.getText().throwErrorOrGetValue());
                 });
 
                 runner.test("with non-empty \"sources\" folder and no \"outputs\" folder", (Test test) ->
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     try (final Console console = createConsole(output, currentFolder))
@@ -145,11 +151,43 @@ public class BuildTests
                         getFileContents(outputs, "parse.json"));
                 });
 
+                runner.test("with non-empty \"sources\" folder and custom \"outputs\" folder", (Test test) ->
+                {
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"outputFolder\": \"bin\" } }");
+                    currentFolder.createFolder("sources");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+                    final Folder outputs = currentFolder.getFolder("bin").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/bin/parse.json",
+                            "/bin/A.class"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString),
+                        "Wrong files in outputs folder");
+                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                                aJava.arrayProperty("dependencies");
+                            });
+                        }).toString(),
+                        getFileContents(outputs, "parse.json"));
+                });
+
                 runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder", (Test test) ->
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder.getFile("project.json"), "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder.getFile("sources/A.java"), "A.java source");
                     currentFolder.createFolder("outputs");
@@ -182,7 +220,7 @@ public class BuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder.getFile("project.json"), "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
@@ -224,7 +262,7 @@ public class BuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder.getFile("project.json"), "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "tests/B.java", "B.java source");
                     try (final Console console = createConsole(output, currentFolder))
@@ -265,7 +303,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File sourceFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
 
@@ -304,7 +342,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
                     final File sourceFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
@@ -351,7 +389,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
@@ -395,7 +433,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
@@ -460,7 +498,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
@@ -525,7 +563,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
@@ -590,7 +628,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"version\": \"1.8\" } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
@@ -655,7 +693,7 @@ public class BuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"shortcutName\": \"foo\", \"version\": 1.8 } }");
+                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"shortcutName\": \"foo\" } }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");

@@ -1,6 +1,6 @@
 package qub;
 
-public class FakeJavaCompiler implements JavaCompiler
+public class FakeJavaCompiler extends JavaCompiler
 {
     private int exitCode;
 
@@ -14,7 +14,6 @@ public class FakeJavaCompiler implements JavaCompiler
         this.exitCode = exitCode;
     }
 
-    @Override
     public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, String javaVersion, Console console)
     {
         PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
@@ -24,8 +23,7 @@ public class FakeJavaCompiler implements JavaCompiler
 
         for (final File sourceFile : sourceFiles)
         {
-            final File classFile = Build.getClassFile(sourceFile, rootFolder, outputFolder);
-            sourceFile.copyTo(classFile.getPath());
+            sourceFile.copyTo(Build.getClassFile(sourceFile, rootFolder, outputFolder));
         }
 
         final JavaCompilationResult result = new JavaCompilationResult();

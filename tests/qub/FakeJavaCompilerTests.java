@@ -6,6 +6,8 @@ public class FakeJavaCompilerTests
     {
         runner.testGroup(FakeJavaCompiler.class, () ->
         {
+            JavaCompilerTests.test(runner, FakeJavaCompiler::new);
+
             runner.test("constructor()", (Test test) ->
             {
                 final FakeJavaCompiler compiler = new FakeJavaCompiler();

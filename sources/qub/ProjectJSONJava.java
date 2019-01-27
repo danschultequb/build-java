@@ -5,6 +5,7 @@ public class ProjectJSONJava
     private String mainClass;
     private String shortcutName;
     private String version;
+    private String outputFolder;
     private Iterable<Dependency> dependencies;
 
     /**
@@ -20,9 +21,10 @@ public class ProjectJSONJava
      * Set the main class.
      * @param mainClass The main class.
      */
-    public void setMainClass(String mainClass)
+    public ProjectJSONJava setMainClass(String mainClass)
     {
         this.mainClass = mainClass;
+        return this;
     }
 
     /**
@@ -38,9 +40,10 @@ public class ProjectJSONJava
      * Set the shortcut name.
      * @param shortcutName The shortcut name.
      */
-    public void setShortcutName(String shortcutName)
+    public ProjectJSONJava setShortcutName(String shortcutName)
     {
         this.shortcutName = shortcutName;
+        return this;
     }
 
     /**
@@ -56,9 +59,29 @@ public class ProjectJSONJava
      * Set the Java version to use when building source files.
      * @param version The Java version to use when building source files.
      */
-    public void setVersion(String version)
+    public ProjectJSONJava setVersion(String version)
     {
         this.version = version;
+        return this;
+    }
+
+    /**
+     * Get the name of the outputFolder.
+     * @return The name of the outputFolder.
+     */
+    public String getOutputFolder()
+    {
+        return outputFolder;
+    }
+
+    /**
+     * Set the name of the outputFolder.
+     * @param outputFolder The name of the outputFolder.
+     */
+    public ProjectJSONJava setOutputFolder(String outputFolder)
+    {
+        this.outputFolder = outputFolder;
+        return this;
     }
 
     /**
@@ -74,9 +97,10 @@ public class ProjectJSONJava
      * Set the dependencies for this project.
      * @param dependencies The dependencies for this project.
      */
-    public void setDependencies(Iterable<Dependency> dependencies)
+    public ProjectJSONJava setDependencies(Iterable<Dependency> dependencies)
     {
         this.dependencies = dependencies;
+        return this;
     }
 
     public static ProjectJSONJava parse(JSONObject javaObject)
@@ -89,6 +113,7 @@ public class ProjectJSONJava
         javaObject.getUnquotedStringPropertyValue("version")
             .catchErrorResult(WrongTypeException.class, () -> javaObject.getNumberPropertyValue("version").then(Object::toString))
             .then(result::setVersion);
+        javaObject.getUnquotedStringPropertyValue("outputFolder").then(result::setOutputFolder);
         javaObject.getArrayPropertyValue("dependencies").then((JSONArray dependenciesArray) ->
         {
             result.setDependencies(dependenciesArray.getElements()
