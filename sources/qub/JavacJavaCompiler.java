@@ -6,7 +6,7 @@ package qub;
 public class JavacJavaCompiler extends JavaCompiler
 {
     @Override
-    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, String javaVersion, Console console)
+    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Console console)
     {
         PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
         PreCondition.assertNotNull(rootFolder, "sourceFolder");
@@ -21,17 +21,7 @@ public class JavacJavaCompiler extends JavaCompiler
                 javac.redirectOutput(new NewLineBeforeFirstWriteByteWriteStream(console.getOutputAsByteWriteStream(), wroteNewLineBeforeOutputOrError));
                 javac.redirectError(new NewLineBeforeFirstWriteByteWriteStream(console.getErrorAsByteWriteStream(), wroteNewLineBeforeOutputOrError));
 
-                javac.addArguments("-d", outputFolder.getPath().toString());
-                javac.addArgument("-Xlint:unchecked");
-                javac.addArgument("-Xlint:deprecation");
-
-                final String bootClasspath = getBootClasspath();
-                if (!Strings.isNullOrEmpty(bootClasspath))
-                {
-                    javac.addArguments("-bootclasspath", bootClasspath);
-                }
-
-                javac.addArguments(sourceFiles.map(FileSystemEntry::toString));
+                javac.addArguments(getArguments(sourceFiles, rootFolder, outputFolder));
 
                 final JavaCompilationResult result = new JavaCompilationResult();
                 result.setExitCode(javac.run());

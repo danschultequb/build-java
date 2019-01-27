@@ -182,11 +182,8 @@ public class Build
 
                         if (javaSourceFilesToCompile.any())
                         {
-                            final String javaVersion = projectJsonJava.getVersion();
-
                             javaCompiler
-                                .compile(javaSourceFilesToCompile, rootFolder, outputsFolder, javaVersion, console)
-                                .then((JavaCompilationResult compilationResult) -> {})
+                                .compile(javaSourceFilesToCompile, rootFolder, outputsFolder, console)
                                 .throwError();
                         }
                     })

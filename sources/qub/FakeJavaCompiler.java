@@ -14,7 +14,7 @@ public class FakeJavaCompiler extends JavaCompiler
         this.exitCode = exitCode;
     }
 
-    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, String javaVersion, Console console)
+    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Console console)
     {
         PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
         PreCondition.assertNotNull(rootFolder, "rootFolder");
