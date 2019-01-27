@@ -93,7 +93,7 @@ public class ParseJSONSourceFile
             {
                 sourceFile.numberProperty("lastModified", lastModified.getMillisecondsSinceEpoch());
             }
-            if (dependencies != null)
+            if (!Iterable.isNullOrEmpty(dependencies))
             {
                 sourceFile.stringArrayProperty("dependencies", dependencies.map(Path::toString));
             }
@@ -161,8 +161,14 @@ public class ParseJSONSourceFile
 
         builder.objectProperty(getRelativePath().toString(), (JSONObjectBuilder parseJsonSourceFileBuilder) ->
         {
-            parseJsonSourceFileBuilder.numberProperty("lastModified", getLastModified().getMillisecondsSinceEpoch());
-            parseJsonSourceFileBuilder.stringArrayProperty("dependencies", getDependencies().map(Path::toString));
+            if (lastModified != null)
+            {
+                parseJsonSourceFileBuilder.numberProperty("lastModified", lastModified.getMillisecondsSinceEpoch());
+            }
+            if (!Iterable.isNullOrEmpty(dependencies))
+            {
+                parseJsonSourceFileBuilder.stringArrayProperty("dependencies", dependencies.map(Path::toString));
+            }
         });
     }
 

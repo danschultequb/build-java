@@ -99,6 +99,10 @@ public abstract class JavaCompiler
                         });
                 }
             }
+            else if (javaVersion.equals("11"))
+            {
+                result = Result.success();
+            }
             else
             {
                 result = Result.error(new NotFoundException("No bootclasspath runtime jar file could be found for Java version " + Strings.escapeAndQuote(javaVersion) + "."));

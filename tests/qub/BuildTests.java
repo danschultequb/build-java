@@ -149,7 +149,6 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(outputs, "parse.json"));
@@ -188,7 +187,6 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(outputs, "parse.json"));
@@ -225,7 +223,6 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(outputs, "parse.json"));
@@ -266,12 +263,10 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                             parse.objectProperty("sources/B.java", bJava ->
                             {
                                 bJava.numberProperty("lastModified", 0);
-                                bJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(outputs, "parse.json"));
@@ -310,12 +305,10 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                             parse.objectProperty("tests/B.java", bJava ->
                             {
                                 bJava.numberProperty("lastModified", 0);
-                                bJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(outputs, "parse.json"));
@@ -358,7 +351,6 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(parseFile));
@@ -409,7 +401,6 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(parseJsonFile));
@@ -456,7 +447,6 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(parseFile), "Wrong parse.json file contents");
@@ -520,7 +510,6 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("dependencies");
                             });
                             parse.objectProperty("sources/B.java", aJava ->
                             {
@@ -589,12 +578,10 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                             parse.objectProperty("sources/B.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(parseFile),
@@ -663,7 +650,6 @@ public class BuildTests
                             parse.objectProperty("sources/B.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(parseFile),
@@ -727,7 +713,6 @@ public class BuildTests
                             parse.objectProperty("sources/B.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
@@ -855,12 +840,10 @@ public class BuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("dependencies");
                             });
                             parse.objectProperty("sources/B.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(parseFile),
@@ -945,7 +928,6 @@ public class BuildTests
                             parse.objectProperty("sources/C.java", cJava ->
                             {
                                 cJava.numberProperty("lastModified", 60000);
-                                cJava.stringArrayProperty("dependencies");
                             });
                         }).toString(),
                         getFileContents(parseFile),
@@ -964,6 +946,713 @@ public class BuildTests
                     {
                         main(console);
                     }
+                });
+
+                runner.test("nothing gets compiled when project.json publisher changes", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.stringProperty("publisher", "a");
+                            projectJson.objectProperty("java");
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.stringProperty("publisher", "b");
+                        projectJson.objectProperty("java");
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.stringProperty("publisher", "b");
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("nothing gets compiled when project.json project changes", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.stringProperty("project", "a");
+                            projectJson.objectProperty("java");
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.stringProperty("project", "b");
+                        projectJson.objectProperty("java");
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.stringProperty("project", "b");
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("nothing gets compiled when project.json version changes", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.stringProperty("version", "a");
+                            projectJson.objectProperty("java");
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.stringProperty("version", "b");
+                        projectJson.objectProperty("java");
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.stringProperty("version", "b");
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("everything gets compiled when project.json java version changes from 11 to 1.8", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").throwErrorOrGetValue();
+                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").throwErrorOrGetValue();
+                    javaFolder.createFolder("jre1.8.0_192");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.objectProperty("java", java ->
+                            {
+                                java.stringProperty("version", "11");
+                            });
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.stringProperty("version", "1.8");
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("JAVA_HOME", jdk11Folder.toString()));
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.stringProperty("version", "1.8");
+                                });
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("everything gets compiled when project.json java version changes from 11 to 8", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").throwErrorOrGetValue();
+                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").throwErrorOrGetValue();
+                    javaFolder.createFolder("jre1.8.0_192");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.objectProperty("java", java ->
+                            {
+                                java.stringProperty("version", "11");
+                            });
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.stringProperty("version", "8");
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("JAVA_HOME", jdk11Folder.toString()));
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.stringProperty("version", "8");
+                                });
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("nothing gets compiled when project.json java version changes from 1.8 to 8", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").throwErrorOrGetValue();
+                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").throwErrorOrGetValue();
+                    javaFolder.createFolder("jre1.8.0_192");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.objectProperty("java", java ->
+                            {
+                                java.stringProperty("version", "1.8");
+                            });
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.stringProperty("version", "8");
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("JAVA_HOME", jdk11Folder.toString()));
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.stringProperty("version", "8");
+                                });
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("nothing gets compiled when project.json java version changes from 8 to 1.8", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").throwErrorOrGetValue();
+                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").throwErrorOrGetValue();
+                    javaFolder.createFolder("jre1.8.0_192");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.objectProperty("java", java ->
+                            {
+                                java.stringProperty("version", "8");
+                            });
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.stringProperty("version", "1.8");
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("JAVA_HOME", jdk11Folder.toString()));
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.stringProperty("version", "1.8");
+                                });
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("nothing gets compiled when project.json java dependency is added", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.objectProperty("java");
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.arrayProperty("dependencies", dependencies ->
+                            {
+                                dependencies.objectElement(dependency ->
+                                {
+                                    dependency.stringProperty("publisher", "a");
+                                    dependency.stringProperty("project", "b");
+                                    dependency.stringProperty("version", "c");
+                                });
+                            });
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.arrayProperty("dependencies", dependencies ->
+                                    {
+                                        dependencies.objectElement(dependency ->
+                                        {
+                                            dependency.stringProperty("publisher", "a");
+                                            dependency.stringProperty("project", "b");
+                                            dependency.stringProperty("version", "c");
+                                        });
+                                    });
+                                });
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("everything gets compiled when project.json java dependency is removed", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.objectProperty("java", java ->
+                            {
+                                java.arrayProperty("dependencies", dependencies ->
+                                {
+                                    dependencies.objectElement(dependency ->
+                                    {
+                                        dependency.stringProperty("publisher", "a");
+                                        dependency.stringProperty("project", "b");
+                                        dependency.stringProperty("version", "c");
+                                    });
+                                });
+                            });
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.objectProperty("java");
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("everything gets compiled when project.json java dependency version is changed", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    {
+                        parseJson.objectProperty("project.json", projectJson ->
+                        {
+                            projectJson.objectProperty("java", java ->
+                            {
+                                java.arrayProperty("dependencies", dependencies ->
+                                {
+                                    dependencies.objectElement(dependency ->
+                                    {
+                                        dependency.stringProperty("publisher", "a");
+                                        dependency.stringProperty("project", "b");
+                                        dependency.stringProperty("version", "c");
+                                    });
+                                });
+                            });
+                        });
+                        parseJson.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.arrayProperty("dependencies", dependencies ->
+                            {
+                                dependencies.objectElement(dependency ->
+                                {
+                                    dependency.stringProperty("publisher", "a");
+                                    dependency.stringProperty("project", "b");
+                                    dependency.stringProperty("version", "d");
+                                });
+                            });
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.arrayProperty("dependencies", dependencies ->
+                                    {
+                                        dependencies.objectElement(dependency ->
+                                        {
+                                            dependency.stringProperty("publisher", "a");
+                                            dependency.stringProperty("project", "b");
+                                            dependency.stringProperty("version", "d");
+                                        });
+                                    });
+                                });
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseJsonFile),
+                        "Wrong parse.json file contents");
                 });
             });
         });

@@ -97,9 +97,11 @@ public class Build
                         final List<File> modifiedJavaSourceFiles = List.create();
                         final List<File> nonModifiedJavaSourceFiles = List.create();
                         final List<ParseJSONSourceFile> parseJsonSourceFiles = List.create();
+                        final Value<Boolean> compileEverything = Value.create(false);
                         outputsFolder.create()
                             .then(() ->
                             {
+                                compileEverything.set(true);
                                 newJavaSourceFiles.addAll(javaSourceFiles);
                                 parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, rootFolder));
                             })
@@ -107,23 +109,26 @@ public class Build
                             {
                                 ParseJSON.parse(parseJsonFile).then((ParseJSON parseJson) ->
                                 {
+                                    compileEverything.set(shouldCompileEverything(parseJson.getProjectJson(), projectJson));
+
                                     for (final File javaSourceFile : javaSourceFiles)
                                     {
                                         final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(rootFolder);
 
-                                        parseJson.getSourceFile(javaSourceFileRelativePath).then((ParseJSONSourceFile parseJsonSource) ->
-                                        {
-                                            if (!javaSourceFile.getLastModified().throwErrorOrGetValue().equals(parseJsonSource.getLastModified()))
+                                        parseJson.getSourceFile(javaSourceFileRelativePath)
+                                            .then((ParseJSONSourceFile parseJsonSource) ->
                                             {
-                                                modifiedJavaSourceFiles.add(javaSourceFile);
-                                                parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, rootFolder, javaSourceFiles));
-                                            }
-                                            else
-                                            {
-                                                nonModifiedJavaSourceFiles.add(javaSourceFile);
-                                                parseJsonSourceFiles.add(parseJsonSource);
-                                            }
-                                        })
+                                                if (!javaSourceFile.getLastModified().throwErrorOrGetValue().equals(parseJsonSource.getLastModified()))
+                                                {
+                                                    modifiedJavaSourceFiles.add(javaSourceFile);
+                                                    parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, rootFolder, javaSourceFiles));
+                                                }
+                                                else
+                                                {
+                                                    nonModifiedJavaSourceFiles.add(javaSourceFile);
+                                                    parseJsonSourceFiles.add(parseJsonSource);
+                                                }
+                                            })
                                             .catchError(NotFoundException.class, () ->
                                             {
                                                 newJavaSourceFiles.add(javaSourceFile);
@@ -141,11 +146,13 @@ public class Build
                                         }
                                     }
                                 })
-                                    .catchError(FileNotFoundException.class, () ->
-                                    {
-                                        newJavaSourceFiles.addAll(javaSourceFiles);
-                                        parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, rootFolder));
-                                    });
+                                .catchError(FileNotFoundException.class, () ->
+                                {
+                                    compileEverything.set(true);
+                                    newJavaSourceFiles.addAll(javaSourceFiles);
+                                    parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, rootFolder));
+                                })
+                                .throwError();
                             })
                             .throwError();
 
@@ -161,26 +168,38 @@ public class Build
                         }
 
                         final Set<File> javaSourceFilesToCompile = Set.create();
-                        javaSourceFilesToCompile.addAll(newJavaSourceFiles);
-                        javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
-                        javaSourceFilesToCompile.addAll(nonModifiedJavaSourceFiles.where((File javaSourceFile) ->
+                        if (compileEverything.get())
                         {
-                            final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(rootFolder);
-                            final ParseJSONSourceFile parseJsonSourceFile = updatedParseJson.getSourceFile(javaSourceFileRelativePath).throwErrorOrGetValue();
-                            final Iterable<Path> dependencyRelativeFilePaths = parseJsonSourceFile.getDependencies();
-                            final Iterable<File> dependencyFiles = dependencyRelativeFilePaths.map((Path dependencyRelativeFilePath) -> rootFolder.getFile(dependencyRelativeFilePath).throwErrorOrGetValue());
-                            boolean shouldCompile = false;
-                            for (final File dependencyFile : dependencyFiles)
+                            javaSourceFilesToCompile.addAll(javaSourceFiles);
+                        }
+                        else
+                        {
+                            javaSourceFilesToCompile.addAll(newJavaSourceFiles);
+                            javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
+                            javaSourceFilesToCompile.addAll(nonModifiedJavaSourceFiles.where((File javaSourceFile) ->
                             {
-                                shouldCompile = modifiedJavaSourceFiles.contains(dependencyFile) ||
-                                    deletedJavaSourceFiles.contains(dependencyFile);
-                                if (shouldCompile)
+                                final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(rootFolder);
+                                final ParseJSONSourceFile parseJsonSourceFile = updatedParseJson.getSourceFile(javaSourceFileRelativePath).throwErrorOrGetValue();
+                                final Iterable<Path> dependencyRelativeFilePaths = parseJsonSourceFile.getDependencies();
+                                boolean shouldCompile = false;
+                                if (!Iterable.isNullOrEmpty(dependencyRelativeFilePaths))
                                 {
-                                    break;
+                                    final Iterable<File> dependencyFiles = dependencyRelativeFilePaths
+                                        .map((Path dependencyRelativeFilePath) ->
+                                            rootFolder.getFile(dependencyRelativeFilePath).throwErrorOrGetValue());
+                                    for (final File dependencyFile : dependencyFiles)
+                                    {
+                                        if (modifiedJavaSourceFiles.contains(dependencyFile) ||
+                                            deletedJavaSourceFiles.contains(dependencyFile))
+                                        {
+                                            shouldCompile = true;
+                                            break;
+                                        }
+                                    }
                                 }
-                            }
-                            return shouldCompile;
-                        }));
+                                return shouldCompile;
+                            }));
+                        }
 
                         if (javaSourceFilesToCompile.any())
                         {
@@ -201,6 +220,47 @@ public class Build
         }
     }
 
+    public static boolean shouldCompileEverything(ProjectJSON oldProjectJson, ProjectJSON newProjectJson)
+    {
+        boolean result = false;
+
+        if (oldProjectJson != null && oldProjectJson.getJava() != null &&
+            newProjectJson != null && newProjectJson.getJava() != null)
+        {
+            final ProjectJSONJava oldProjectJsonJava = oldProjectJson.getJava();
+            final ProjectJSONJava newProjectJsonJava = newProjectJson.getJava();
+
+            if (!result)
+            {
+                final String oldProjectJsonJavaVersion = oldProjectJsonJava.getVersion();
+                final String newProjectJsonJavaVersion = newProjectJsonJava.getVersion();
+                if (!Comparer.equal(oldProjectJsonJavaVersion, newProjectJsonJavaVersion))
+                {
+                    result = !isJava8(oldProjectJsonJavaVersion) || !isJava8(newProjectJsonJavaVersion);
+                }
+            }
+
+            if (!result)
+            {
+                final Iterable<Dependency> oldProjectJsonJavaDependencies = oldProjectJsonJava.getDependencies();
+                final Iterable<Dependency> newProjectJsonJavaDependencies = newProjectJsonJava.getDependencies();
+                if (!Iterable.isNullOrEmpty(oldProjectJsonJavaDependencies))
+                {
+                    result = Iterable.isNullOrEmpty(newProjectJsonJavaDependencies) ||
+                        oldProjectJsonJavaDependencies.contains((Dependency oldDependency) ->
+                            !newProjectJsonJavaDependencies.contains(oldDependency));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static boolean isJava8(String javaVersion)
+    {
+        return Comparer.equal(javaVersion, "8") || Comparer.equal(javaVersion, "1.8");
+    }
+
     /**
      * Get all of the Java source files found in the provided folder.
      * @param folder The folder to look for Java source files in.
@@ -214,7 +274,8 @@ public class Build
             .thenResult((Iterable<File> files) ->
             {
                 Result<Iterable<File>> result;
-                final Iterable<File> javaSources = files.where((File file) -> Comparer.equal(file.getFileExtension(), ".java"));
+                final Iterable<File> javaSources = files
+                    .where((File file) -> Comparer.equal(file.getFileExtension(), ".java"));
                 if (!javaSources.any())
                 {
                     result = Result.error(new NotFoundException("No java source files found in " + folder + "."));
