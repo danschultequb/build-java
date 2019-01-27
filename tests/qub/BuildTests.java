@@ -142,6 +142,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -174,6 +178,13 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.stringProperty("outputFolder", "bin");
+                                });
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -207,6 +218,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -244,6 +259,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -284,6 +303,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -328,6 +351,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -375,6 +402,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -418,6 +449,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
@@ -478,6 +513,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
@@ -543,6 +582,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -608,6 +651,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -673,6 +720,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/B.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -735,6 +786,13 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java", java ->
+                                {
+                                    java.stringProperty("shortcutName", "foo");
+                                });
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -790,6 +848,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);
@@ -866,6 +928,10 @@ public class BuildTests
                     test.assertEqual(
                         JSON.object(parse ->
                         {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 0);

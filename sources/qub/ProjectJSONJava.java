@@ -103,6 +103,52 @@ public class ProjectJSONJava
         return this;
     }
 
+    public void write(JSONObjectBuilder builder)
+    {
+        PreCondition.assertNotNull(builder, "builder");
+
+        if (!Strings.isNullOrEmpty(mainClass))
+        {
+            builder.stringProperty("mainClass", mainClass);
+        }
+        if (!Strings.isNullOrEmpty(shortcutName))
+        {
+            builder.stringProperty("shortcutName", shortcutName);
+        }
+        if (!Strings.isNullOrEmpty(version))
+        {
+            builder.stringProperty("version", version);
+        }
+        if (!Strings.isNullOrEmpty(outputFolder))
+        {
+            builder.stringProperty("outputFolder", outputFolder);
+        }
+        if (!Iterable.isNullOrEmpty(dependencies))
+        {
+            builder.arrayProperty("dependencies", dependenciesBuilder ->
+            {
+                for (final Dependency dependency : dependencies)
+                {
+                    dependenciesBuilder.objectElement(dependencyBuilder ->
+                    {
+                        if (!Strings.isNullOrEmpty(dependency.getPublisher()))
+                        {
+                            dependencyBuilder.stringProperty("publisher", dependency.getPublisher());
+                        }
+                        if (!Strings.isNullOrEmpty(dependency.getProject()))
+                        {
+                            dependencyBuilder.stringProperty("project", dependency.getProject());
+                        }
+                        if (!Strings.isNullOrEmpty(dependency.getVersion()))
+                        {
+                            dependencyBuilder.stringProperty("version", dependency.getVersion());
+                        }
+                    });
+                }
+            });
+        }
+    }
+
     public static ProjectJSONJava parse(JSONObject javaObject)
     {
         PreCondition.assertNotNull(javaObject, "javaObject");

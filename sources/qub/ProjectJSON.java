@@ -79,6 +79,28 @@ public class ProjectJSON
         return java;
     }
 
+    public void write(JSONObjectBuilder builder)
+    {
+        PreCondition.assertNotNull(builder, "builder");
+
+        if (!Strings.isNullOrEmpty(publisher))
+        {
+            builder.stringProperty("publisher", publisher);
+        }
+        if (!Strings.isNullOrEmpty(project))
+        {
+            builder.stringProperty("project", project);
+        }
+        if (!Strings.isNullOrEmpty(version))
+        {
+            builder.stringProperty("version", version);
+        }
+        if (java != null)
+        {
+            builder.objectProperty("java", java::write);
+        }
+    }
+
     /**
      * Parse a ProjectJSON object from the provided project.json file.
      * @param projectJSONFile The file to parse.

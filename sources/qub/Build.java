@@ -150,18 +150,9 @@ public class Build
                             .throwError();
 
                         final ParseJSON updatedParseJson = new ParseJSON();
+                        updatedParseJson.setProjectJson(projectJson);
                         updatedParseJson.setSourceFiles(parseJsonSourceFiles);
-
-                        try (final CharacterWriteStream parseJsonWriteStream = parseJsonFile.getContentCharacterWriteStream().throwErrorOrGetValue())
-                        {
-                            JSON.object(parseJsonWriteStream, (JSONObjectBuilder parseJsonBuilder) ->
-                            {
-                                for (final ParseJSONSourceFile parseJSONSourceFile : parseJsonSourceFiles)
-                                {
-                                    parseJSONSourceFile.writeJson(parseJsonBuilder);
-                                }
-                            });
-                        }
+                        updatedParseJson.write(parseJsonFile);
 
                         for (final File deletedSourceFile : deletedJavaSourceFiles)
                         {

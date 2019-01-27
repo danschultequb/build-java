@@ -2,10 +2,22 @@ package qub;
 
 public class ParseJSON
 {
+    private ProjectJSON projectJson;
     private Iterable<ParseJSONSourceFile> sourceFiles;
     private Map<Path,ParseJSONSourceFile> pathMap;
 
-    public void setSourceFiles(Iterable<ParseJSONSourceFile> sourceFiles)
+    public ParseJSON setProjectJson(ProjectJSON projectJson)
+    {
+        this.projectJson = projectJson;
+        return this;
+    }
+
+    public ProjectJSON getProjectJson()
+    {
+        return projectJson;
+    }
+
+    public ParseJSON setSourceFiles(Iterable<ParseJSONSourceFile> sourceFiles)
     {
         this.sourceFiles = sourceFiles;
         if (sourceFiles == null)
@@ -25,6 +37,7 @@ public class ParseJSON
             }
             this.pathMap = pathMap;
         }
+        return this;
     }
 
     public Iterable<ParseJSONSourceFile> getSourceFiles()
@@ -41,6 +54,42 @@ public class ParseJSON
             : pathMap.get(path)
                 .catchErrorResult(NotFoundException.class, () ->
                     Result.error(new NotFoundException("No source file found in the ParseJSON object with the path " + Strings.escapeAndQuote(path.toString()) + ".")));
+    }
+
+    /**
+     * Write this ParseJSON object to the provided file.
+     * @param file The file to write this ParseJSON object to.
+     * @return The result of writing this ParseJSON object.
+     */
+    public Result<Void> write(File file)
+    {
+        PreCondition.assertNotNull(file, "file");
+
+        return file.getContentCharacterWriteStream()
+            .then((CharacterWriteStream writeStream) ->
+            {
+                try
+                {
+                    JSON.object(writeStream, (JSONObjectBuilder parseJsonBuilder) ->
+                    {
+                        final ProjectJSON projectJson = getProjectJson();
+                        if (projectJson != null)
+                        {
+                            parseJsonBuilder.objectProperty("project.json", projectJson::write);
+                        }
+
+                        for (final ParseJSONSourceFile parseJSONSourceFile : getSourceFiles())
+                        {
+                            parseJSONSourceFile.writeJson(parseJsonBuilder);
+                        }
+                    });
+                }
+                finally
+                {
+                    writeStream.dispose();
+                }
+            })
+            .then(() -> null);
     }
 
     public static Result<ParseJSON> parse(File parseJSONFile)
@@ -71,7 +120,12 @@ public class ParseJSON
         PreCondition.assertNotNull(rootObject, "rootObject");
 
         final ParseJSON result = new ParseJSON();
-        result.setSourceFiles(rootObject.getProperties().map(ParseJSONSourceFile::parse));
+        rootObject.getObjectPropertyValue("project.json")
+            .then((JSONObject jsonObject) -> ProjectJSON.parse(jsonObject))
+            .then(result::setProjectJson);
+        result.setSourceFiles(rootObject.getProperties()
+            .where(property -> !property.getName().equals("project.json"))
+            .map(ParseJSONSourceFile::parse));
 
         PostCondition.assertNotNull(result, "result");
 
