@@ -64,23 +64,19 @@ public abstract class JavaCompiler
     {
         PreCondition.assertNotNull(console, "console");
 
-        Result<Void> result;
+        Result<Void> result = Result.success();
 
-        setVersion(javaVersion);
-
-        if (Strings.isNullOrEmpty(javaVersion))
-        {
-            result = Result.success();
-        }
-        else
+        if (!Strings.isNullOrEmpty(javaVersion))
         {
             final String javaHome = console.getEnvironmentVariable("JAVA_HOME");
             if (Strings.isNullOrEmpty(javaHome))
             {
                 result = Result.error(new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."));
             }
-            else if (javaVersion.equals("1.8") || javaVersion.equals("8"))
+            else if (Build.isJava8(javaVersion))
             {
+                setVersion("8");
+
                 final Folder javaFolder = console.getFileSystem().getFolder(javaHome).throwErrorOrGetValue().getParentFolder().throwErrorOrGetValue();
                 final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().throwErrorOrGetValue();
                 final Iterable<Folder> jre18Folders = jreAndJdkFolders.where((Folder jreOrJdkFolder) -> jreOrJdkFolder.getName().startsWith("jre1.8.0_"));
@@ -91,17 +87,16 @@ public abstract class JavaCompiler
                 else
                 {
                     final Folder jre18Folder = jre18Folders.maximum((Folder lhs, Folder rhs) -> Comparison.from(lhs.getName().compareTo(rhs.getName())));
-                    result = jre18Folder.getFile("lib/rt.jar")
+                    jre18Folder.getFile("lib/rt.jar")
                         .then((File bootClasspathFile) ->
                         {
                             setBootClasspath(bootClasspathFile.toString());
-                            return null;
                         });
                 }
             }
-            else if (javaVersion.equals("11"))
+            else if (Build.isJava11(javaVersion))
             {
-                result = Result.success();
+                setVersion("11");
             }
             else
             {
@@ -137,6 +132,7 @@ public abstract class JavaCompiler
         if (!Strings.isNullOrEmpty(version))
         {
             result.addAll("-source", version);
+            result.addAll("-target", version);
         }
 
         final String bootClasspath = getBootClasspath();
@@ -145,6 +141,7 @@ public abstract class JavaCompiler
             result.addAll("-bootclasspath", bootClasspath);
         }
 
+        final List<String> classPaths = List.create(outputFolder.toString());
         final Iterable<Dependency> dependencies = getDependencies();
         if (!Iterable.isNullOrEmpty(dependencies))
         {
@@ -153,7 +150,7 @@ public abstract class JavaCompiler
                 throw new NotFoundException("Cannot resolve project dependencies without a qubFolder.");
             }
 
-            final Iterable<String> dependencyPaths = dependencies.map((Dependency dependency) ->
+            classPaths.addAll(dependencies.map((Dependency dependency) ->
             {
                 final String dependencyRelativePath =
                     dependency.getPublisher() + "/" +
@@ -161,10 +158,9 @@ public abstract class JavaCompiler
                     dependency.getVersion() + "/" +
                     dependency.getProject() + ".jar";
                 return qubFolder.getFile(dependencyRelativePath).throwErrorOrGetValue().toString();
-            });
-
-            result.addAll("-classpath", Strings.join(';', dependencyPaths));
+            }));
         }
+        result.addAll("-classpath", Strings.join(';', classPaths));
 
         result.addAll(sourceFiles.map((File sourceFile) -> sourceFile.relativeTo(rootFolder).toString()));
 

@@ -178,6 +178,7 @@ public class JavaCompilerTests
                             "-d", "/outputs",
                             "-Xlint:unchecked",
                             "-Xlint:deprecation",
+                            "-classpath", "/outputs",
                             "sources/A.java"
                         ),
                         compiler.getArguments(sourceFiles, rootFolder, outputFolder));
@@ -198,6 +199,7 @@ public class JavaCompilerTests
                             "-d", "/outputs",
                             "-Xlint:unchecked",
                             "-Xlint:deprecation",
+                            "-classpath", "/outputs",
                             "sources/A.java",
                             "sources/B.java"
                         ),
@@ -220,6 +222,8 @@ public class JavaCompilerTests
                             "-Xlint:unchecked",
                             "-Xlint:deprecation",
                             "-source", "1.7",
+                            "-target", "1.7",
+                            "-classpath", "/outputs",
                             "sources/A.java"
                         ),
                         compiler.getArguments(sourceFiles, rootFolder, outputFolder));
@@ -268,7 +272,8 @@ public class JavaCompilerTests
                             "-Xlint:unchecked",
                             "-Xlint:deprecation",
                             "-source", "1.7",
-                            "-classpath", "/qub/b/a/c/a.jar",
+                            "-target", "1.7",
+                            "-classpath", "/outputs;/qub/b/a/c/a.jar",
                             "sources/A.java"
                         ),
                         compiler.getArguments(sourceFiles, rootFolder, outputFolder));
@@ -301,7 +306,8 @@ public class JavaCompilerTests
                             "-Xlint:unchecked",
                             "-Xlint:deprecation",
                             "-source", "1.7",
-                            "-classpath", "/qub/b/a/c/a.jar;/qub/y/x/z/x.jar",
+                            "-target", "1.7",
+                            "-classpath", "/outputs;/qub/b/a/c/a.jar;/qub/y/x/z/x.jar",
                             "sources/A.java"
                         ),
                         compiler.getArguments(sourceFiles, rootFolder, outputFolder));

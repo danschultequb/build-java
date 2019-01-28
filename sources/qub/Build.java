@@ -258,7 +258,12 @@ public class Build
 
     public static boolean isJava8(String javaVersion)
     {
-        return Comparer.equal(javaVersion, "8") || Comparer.equal(javaVersion, "1.8");
+        return Strings.isOneOf(javaVersion, Iterable.create("8", "1.8", "8.0"));
+    }
+
+    public static boolean isJava11(String javaVersion)
+    {
+        return Strings.isOneOf(javaVersion, Iterable.create("11", "11.0"));
     }
 
     /**
