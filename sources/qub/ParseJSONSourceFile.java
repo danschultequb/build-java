@@ -135,15 +135,16 @@ public class ParseJSONSourceFile
         final ParseJSONSourceFile result = new ParseJSONSourceFile();
         result.setRelativePath(sourceFile.relativeTo(rootFolder));
         result.setLastModified(sourceFile.getLastModified().throwErrorOrGetValue());
-        try (final CharacterReadStream contentCharacterReadStream = sourceFile.getContentByteReadStream().throwErrorOrGetValue().asCharacterReadStream())
-        {
-            final String contents = contentCharacterReadStream.readEntireString().throwErrorOrGetValue();
-            result.setDependencies(sourceFiles
-                .where((File otherSourceFile) ->
-                    otherSourceFile != sourceFile &&
-                        contents.contains(otherSourceFile.getNameWithoutFileExtension()))
-                .map((File sourceFileDependency) -> sourceFileDependency.relativeTo(rootFolder)));
-        }
+        sourceFile.getContentsAsString()
+            .then(Strings::getWords)
+            .then((Set<String> words) ->
+            {
+                result.setDependencies(sourceFiles
+                    .where((File otherSourceFile) ->
+                        otherSourceFile != sourceFile &&
+                            words.contains(otherSourceFile.getNameWithoutFileExtension()))
+                    .map((File sourceFileDependency) -> sourceFileDependency.relativeTo(rootFolder)));
+            });
 
         PostCondition.assertNotNull(result, "result");
 

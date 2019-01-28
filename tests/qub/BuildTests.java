@@ -1654,6 +1654,133 @@ public class BuildTests
                         getFileContents(parseJsonFile),
                         "Wrong parse.json file contents");
                 });
+
+                runner.test("with multiple source files newer than their existing class files and with parse.json file", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                        parse.objectProperty("sources/B.java", bJava ->
+                        {
+                            bJava.numberProperty("lastModified", 0);
+                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/B.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
+                    test.assertEqual("B.java source, depends on A", getFileContents(bClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                            parse.objectProperty("sources/B.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+                            });
+                        }).toString(),
+                        getFileContents(parseFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("with partial-name dependency match", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File abJavaFile = setFileContents(currentFolder, "sources/AB.java", "AB.java source");
+                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source, depends on AB");
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console);
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/parse.json",
+                            "/outputs/A.class",
+                            "/outputs/AB.class",
+                            "/outputs/B.class"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+
+                    test.assertEqual(0, getFileLastModified(outputs, "AB.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("AB.java source", getFileContents(outputs, "AB.class"));
+
+                    test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("B.java source, depends on AB", getFileContents(outputs, "B.class"));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "parse.json"), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                            parse.objectProperty("sources/AB.java", abJava ->
+                            {
+                                abJava.numberProperty("lastModified", 0);
+                            });
+                            parse.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 0);
+                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/AB.java"));
+                            });
+                        }).toString(),
+                        getFileContents(outputs, "parse.json"),
+                        "Wrong parse.json file contents");
+                });
             });
         });
     }
