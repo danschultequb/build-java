@@ -6,6 +6,7 @@ public class ProjectJSONJava
     private String shortcutName;
     private String version;
     private String outputFolder;
+    private Iterable<PathPattern> sourceFilePatterns;
     private Iterable<Dependency> dependencies;
 
     /**
@@ -84,6 +85,17 @@ public class ProjectJSONJava
         return this;
     }
 
+    public Iterable<PathPattern> getSourceFilePatterns()
+    {
+        return sourceFilePatterns;
+    }
+
+    public ProjectJSONJava setSourceFilePatterns(Iterable<PathPattern> sourceFilePatterns)
+    {
+        this.sourceFilePatterns = sourceFilePatterns;
+        return this;
+    }
+
     /**
      * Get the dependencies for this project.
      * @return The dependencies for this project.
@@ -123,6 +135,10 @@ public class ProjectJSONJava
         {
             builder.stringProperty("outputFolder", outputFolder);
         }
+        if (!Iterable.isNullOrEmpty(sourceFilePatterns))
+        {
+            builder.stringArrayProperty("sourceFiles", sourceFilePatterns.map(PathPattern::toString));
+        }
         if (!Iterable.isNullOrEmpty(dependencies))
         {
             builder.arrayProperty("dependencies", dependenciesBuilder ->
@@ -160,6 +176,26 @@ public class ProjectJSONJava
             .catchErrorResult(WrongTypeException.class, () -> javaObject.getNumberPropertyValue("version").then(Object::toString))
             .then(result::setVersion);
         javaObject.getUnquotedStringPropertyValue("outputFolder").then(result::setOutputFolder);
+        javaObject.getUnquotedStringPropertyValue("sourceFiles")
+            .then((String sourceFilesPattern) ->
+            {
+                if (!Strings.isNullOrEmpty(sourceFilesPattern))
+                {
+                    result.setSourceFilePatterns(Iterable.create(PathPattern.parse(sourceFilesPattern)));
+                }
+            })
+            .catchError(WrongTypeException.class, () ->
+            {
+                javaObject.getArrayPropertyValue("sourceFiles")
+                    .then((JSONArray sourceFilesArray) ->
+                    {
+                        result.setSourceFilePatterns(sourceFilesArray.getElements()
+                            .instanceOf(JSONQuotedString.class)
+                            .map(JSONQuotedString::toUnquotedString)
+                            .where(value -> !Strings.isNullOrEmpty(value))
+                            .map(PathPattern::parse));
+                    });
+            });
         javaObject.getArrayPropertyValue("dependencies").then((JSONArray dependenciesArray) ->
         {
             result.setDependencies(dependenciesArray.getElements()

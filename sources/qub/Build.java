@@ -83,7 +83,12 @@ public class Build
                             javaCompiler.setDependencies(projectJsonJava.getDependencies());
                         }
 
-                        final Iterable<File> javaSourceFiles = getJavaSourceFiles(rootFolder).throwErrorOrGetValue();
+                        Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFilePatterns();
+                        if (Iterable.isNullOrEmpty(sourceFilePatterns))
+                        {
+                            sourceFilePatterns = Iterable.create(PathPattern.parse("**/*.java"));
+                        }
+                        final Iterable<File> javaSourceFiles = getJavaSourceFiles(rootFolder, sourceFilePatterns).throwErrorOrGetValue();
 
                         String outputFolderName = "outputs";
                         if (!Strings.isNullOrEmpty(projectJsonJava.getOutputFolder()))
@@ -271,16 +276,17 @@ public class Build
      * @param folder The folder to look for Java source files in.
      * @return All of the Java source files found in the provided folder.
      */
-    public static Result<Iterable<File>> getJavaSourceFiles(Folder folder)
+    public static Result<Iterable<File>> getJavaSourceFiles(Folder folder, Iterable<PathPattern> sourceFilePatterns)
     {
         PreCondition.assertNotNull(folder, "folder");
+        PreCondition.assertNotNullAndNotEmpty(sourceFilePatterns, "sourceFilePatterns");
 
         return folder.getFilesRecursively()
             .thenResult((Iterable<File> files) ->
             {
                 Result<Iterable<File>> result;
                 final Iterable<File> javaSources = files
-                    .where((File file) -> Comparer.equal(file.getFileExtension(), ".java"));
+                    .where((File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folder))));
                 if (!javaSources.any())
                 {
                     result = Result.error(new NotFoundException("No java source files found in " + folder + "."));
