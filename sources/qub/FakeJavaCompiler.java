@@ -26,9 +26,9 @@ public class FakeJavaCompiler extends JavaCompiler
             sourceFile.copyTo(Build.getClassFile(sourceFile, rootFolder, outputFolder));
         }
 
-        final JavaCompilationResult result = new JavaCompilationResult();
-        result.setExitCode(getExitCode());
-
-        return Result.success(result);
+        return Result.success(
+            new JavaCompilationResult(
+                getExitCode(),
+                Iterable.empty()));
     }
 }

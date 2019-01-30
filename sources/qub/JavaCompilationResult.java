@@ -5,23 +5,18 @@ package qub;
  */
 public class JavaCompilationResult
 {
-    private int exitCode;
-
     /**
-     * Get the exit code that was returned from the compilation process.
-     * @return The exit code that was returned from the compilation process.
+     * The exit code that was returned form the compilation process.
      */
-    public int getExitCode()
-    {
-        return exitCode;
-    }
-
+    public final int exitCode;
     /**
-     * Set the exit code that was returned from the compilation process.
-     * @param exitCode The exit code that was returned from the compilation process.
+     * The erros and warnings that were emitted during compilation.
      */
-    public void setExitCode(int exitCode)
+    public final Iterable<JavaCompilerIssue> issues;
+
+    public JavaCompilationResult(int exitCode, Iterable<JavaCompilerIssue> issues)
     {
         this.exitCode = exitCode;
+        this.issues = issues;
     }
 }
