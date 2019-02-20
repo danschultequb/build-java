@@ -339,9 +339,13 @@ public class Build
                                     jar.addArgument(manifestFile.relativeTo(outputsFolder).toString());
                                 }
 
-                                jar.addArgument(".");
+                                jar.addArguments(outputsFolder.getFilesRecursively().await()
+                                    .where((File outputFile) -> Comparer.equal(outputFile.getFileExtension(), ".class"))
+                                    .map((File outputClassFile) -> outputClassFile.relativeTo(outputsFolder).toString()));
 
-                                console.write("Creating sources jar file...");
+                                jar.addArguments(javaSourceFiles
+                                    .map((File javaSourceFile) -> javaSourceFile.relativeTo(outputsFolder).toString()));
+
                                 if (isVerbose(console).await())
                                 {
                                     console.writeLine(jar.getCommand());
