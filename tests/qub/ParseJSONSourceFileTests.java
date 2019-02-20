@@ -66,7 +66,7 @@ public class ParseJSONSourceFileTests
                             new ParseJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(6))
-                                .setDependencies(Iterable.empty())));
+                                .setDependencies(Iterable.create())));
                 });
 
                 runner.test("with equal", (Test test) ->
@@ -134,7 +134,7 @@ public class ParseJSONSourceFileTests
                             new ParseJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(6))
-                                .setDependencies(Iterable.empty())));
+                                .setDependencies(Iterable.create())));
                 });
 
                 runner.test("with equal", (Test test) ->

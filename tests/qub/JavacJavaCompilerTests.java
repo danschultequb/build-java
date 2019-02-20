@@ -19,21 +19,21 @@ public class JavacJavaCompilerTests
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
                         .throwErrorOrGetValue();
                     final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                    final Console console = new Console();
-                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, console), new PreConditionFailure("sourceFiles cannot be null."));
+                    final Process process = new Process();
+                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process), new PreConditionFailure("sourceFiles cannot be null."));
                 });
 
                 runner.test("with empty sourceFiles", (Test test) ->
                 {
                     final JavacJavaCompiler compiler = new JavacJavaCompiler();
-                    final Iterable<File> sourceFiles = Iterable.empty();
+                    final Iterable<File> sourceFiles = Iterable.create();
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
                         .throwErrorOrGetValue();
                     final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                    final Console console = new Console();
-                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, console), new PreConditionFailure("sourceFiles cannot be empty."));
+                    final Process process = new Process();
+                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process), new PreConditionFailure("sourceFiles cannot be empty."));
                 });
 
                 runner.test("with null rootFolder", (Test test) ->
@@ -45,11 +45,11 @@ public class JavacJavaCompilerTests
                         .throwErrorOrGetValue();
                     final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").throwErrorOrGetValue());
                     final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                    final Console console = new Console();
-                    test.assertThrows(() -> compiler.compile(sourceFiles, null, outputFolder, console), new PreConditionFailure("rootFolder cannot be null."));
+                    final Process process = new Process();
+                    test.assertThrows(() -> compiler.compile(sourceFiles, null, outputFolder, process), new PreConditionFailure("rootFolder cannot be null."));
                 });
 
-                runner.test("with null console", (Test test) ->
+                runner.test("with null process", (Test test) ->
                 {
                     final JavacJavaCompiler compiler = new JavacJavaCompiler();
                     final Folder rootFolder = test.getProcess()
@@ -58,8 +58,8 @@ public class JavacJavaCompilerTests
                         .throwErrorOrGetValue();
                     final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").throwErrorOrGetValue());
                     final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                    final Console console = null;
-                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, console), new PreConditionFailure("console cannot be null."));
+                    final Process process = null;
+                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process), new PreConditionFailure("process cannot be null."));
                 });
 
                 runner.test("with no PATH environment variable", (Test test) ->
@@ -71,9 +71,9 @@ public class JavacJavaCompilerTests
                         .throwErrorOrGetValue();
                     final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").throwErrorOrGetValue());
                     final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                    final Console console = new Console();
-                    console.setEnvironmentVariables(Map.create());
-                    test.assertError(new FileNotFoundException("javac"), compiler.compile(sourceFiles, rootFolder, outputFolder, console));
+                    final Process process = new Process();
+                    process.setEnvironmentVariables(Map.create());
+                    test.assertError(new FileNotFoundException("javac"), compiler.compile(sourceFiles, rootFolder, outputFolder, process));
                 });
 
                 runner.test("with empty PATH environment variable", (Test test) ->
@@ -85,9 +85,9 @@ public class JavacJavaCompilerTests
                         .throwErrorOrGetValue();
                     final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").throwErrorOrGetValue());
                     final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                    final Console console = new Console();
-                    console.setEnvironmentVariables(Map.<String,String>create().set("PATH", ""));
-                    test.assertError(new FileNotFoundException("javac"), compiler.compile(sourceFiles, rootFolder, outputFolder, console));
+                    final Process process = new Process();
+                    process.setEnvironmentVariables(Map.<String,String>create().set("PATH", ""));
+                    test.assertError(new FileNotFoundException("javac"), compiler.compile(sourceFiles, rootFolder, outputFolder, process));
                 });
 
                 runner.test("with Java file that doesn't exist", (Test test) ->
@@ -102,25 +102,19 @@ public class JavacJavaCompilerTests
                         final File aJava = rootFolder.getFile("sources/A.java").throwErrorOrGetValue();
                         final Iterable<File> sourceFiles = Iterable.create(aJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                        final Console console = new Console();
-                        final InMemoryLineStream output = new InMemoryLineStream();
-                        console.setOutput(output);
-                        final InMemoryLineStream error = new InMemoryLineStream();
-                        console.setError(error);
-                        final Result<JavaCompilationResult> result = compiler.compile(sourceFiles, rootFolder, outputFolder, console);
-                        test.assertSuccess(result,
-                            (JavaCompilationResult compilationResult) ->
+                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
+                            (JavaCompilationResult result) ->
                             {
-                                test.assertNotNull(compilationResult);
-                                test.assertEqual(2, compilationResult.exitCode);
-                                test.assertSuccess("", output.getText());
-                                test.assertSuccess(
+                                test.assertNotNull(result);
+                                test.assertEqual(2, result.exitCode);
+                                test.assertEqual("", result.output);
+                                test.assertEqual(
                                     Iterable.create(
-                                        "",
                                         "error: file not found: sources\\A.java",
                                         "Usage: javac <options> <source files>",
                                         "use --help for a list of possible options"),
-                                    error.getText().then((String text) -> Strings.getLines(text)));
+                                    Strings.getLines(result.error));
+                                test.assertEqual(Iterable.create(), result.issues);
                                 test.assertSuccess(false, Build.getClassFile(aJava, rootFolder, outputFolder).exists());
                             });
                     }
@@ -143,19 +137,14 @@ public class JavacJavaCompilerTests
                         bJava.create();
                         final Iterable<File> sourceFiles = Iterable.create(bJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                        final Console console = new Console();
-                        final InMemoryLineStream output = new InMemoryLineStream();
-                        console.setOutput(output);
-                        final InMemoryLineStream error = new InMemoryLineStream();
-                        console.setError(error);
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, console),
+                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
                             (JavaCompilationResult result) ->
                             {
                                 test.assertNotNull(result);
                                 test.assertEqual(0, result.exitCode);
-                                test.assertSuccess("", output.getText());
-                                test.assertSuccess("", error.getText());
-                                test.assertEqual(Iterable.empty(), result.issues);
+                                test.assertEqual("", result.output);
+                                test.assertEqual("", result.error);
+                                test.assertEqual(Iterable.create(), result.issues);
                                 test.assertSuccess(false, Build.getClassFile(bJava, rootFolder, outputFolder).exists());
                             });
                     }
@@ -189,19 +178,14 @@ public class JavacJavaCompilerTests
                                     "}")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                        final Console console = new Console();
-                        final InMemoryLineStream output = new InMemoryLineStream();
-                        console.setOutput(output);
-                        final InMemoryLineStream error = new InMemoryLineStream();
-                        console.setError(error);
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, console),
+                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
                             (JavaCompilationResult result) ->
                             {
                                 test.assertNotNull(result);
                                 test.assertEqual(0, result.exitCode);
-                                test.assertSuccess("", output.getText());
-                                test.assertSuccess("", error.getText());
-                                test.assertEqual(Iterable.empty(), result.issues);
+                                test.assertEqual("", result.output);
+                                test.assertEqual("", result.error);
+                                test.assertEqual(Iterable.create(), result.issues);
                                 test.assertSuccess(true, Build.getClassFile(cJava, rootFolder, outputFolder).exists());
                             });
                     }
@@ -235,25 +219,19 @@ public class JavacJavaCompilerTests
                                     "}")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                        final Console console = new Console();
-                        final InMemoryLineStream output = new InMemoryLineStream();
-                        console.setOutput(output);
-                        final InMemoryLineStream error = new InMemoryLineStream();
-                        console.setError(error);
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, console),
+                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
                             (JavaCompilationResult result) ->
                             {
                                 test.assertNotNull(result);
                                 test.assertEqual(1, result.exitCode);
-                                test.assertSuccess("", output.getText());
-                                test.assertSuccess(
+                                test.assertEqual("", result.output);
+                                test.assertEqual(
                                     Iterable.create(
-                                        "",
                                         "sources\\C.java:1: error: class MyTestClass is public, should be declared in a file named MyTestClass.java",
                                         "public class MyTestClass",
                                         "       ^",
                                         "1 error"),
-                                    error.getText().then((String text) -> Strings.getLines(text)));
+                                    Strings.getLines(result.error));
                                 test.assertEqual(
                                     Iterable.create(
                                         JavaCompiler.error(
@@ -283,30 +261,24 @@ public class JavacJavaCompilerTests
                         cJava.setContentsAsString("Im not a valid Java file");
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                        final Console console = new Console();
-                        final InMemoryLineStream output = new InMemoryLineStream();
-                        console.setOutput(output);
-                        final InMemoryLineStream error = new InMemoryLineStream();
-                        console.setError(error);
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, console),
+                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
                             (JavaCompilationResult result) ->
                             {
                                 test.assertNotNull(result);
                                 test.assertEqual(1, result.exitCode);
-                                test.assertSuccess("", output.getText());
-                                test.assertSuccess(
+                                test.assertEqual("", result.output);
+                                test.assertEqual(
                                     Iterable.create(
-                                        "",
                                         "sources\\C.java:1: error: class, interface, or enum expected",
                                         "Im not a valid Java file",
                                         "^",
                                         "1 error"),
-                                    error.getText().then((String text) -> Strings.getLines(text)));
+                                    Strings.getLines(result.error));
                                 test.assertEqual(Iterable.create(
                                     JavaCompiler.error(
                                         "sources\\C.java",
                                         1, 1,
-                                        "error: class, interface, or enum expected")),
+                                        "class, interface, or enum expected")),
                                     result.issues);
                                 test.assertSuccess(false, Build.getClassFile(cJava, rootFolder, outputFolder).exists());
                             });
@@ -341,20 +313,14 @@ public class JavacJavaCompilerTests
                                     "")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").throwErrorOrGetValue();
-                        final Console console = new Console();
-                        final InMemoryLineStream output = new InMemoryLineStream();
-                        console.setOutput(output);
-                        final InMemoryLineStream error = new InMemoryLineStream();
-                        console.setError(error);
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, console),
+                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
                             (JavaCompilationResult result) ->
                             {
                                 test.assertNotNull(result);
                                 test.assertEqual(1, result.exitCode);
-                                test.assertSuccess("", output.getText());
-                                test.assertSuccess(
+                                test.assertEqual("", result.output);
+                                test.assertEqual(
                                     Iterable.create(
-                                        "",
                                         "sources\\C.java:6: error: \';\' expected",
                                         "    return value",
                                         "                ^",
@@ -362,12 +328,12 @@ public class JavacJavaCompilerTests
                                         "  }",
                                         "   ^",
                                         "2 errors"),
-                                    error.getText().then((String text) -> Strings.getLines(text)));
+                                    Strings.getLines(result.error));
                                 test.assertEqual(
                                     Iterable.create(
                                         JavaCompiler.error(
                                             "sources\\C.java",
-                                            6, 15,
+                                            6, 17,
                                             "';' expected"),
                                         JavaCompiler.error(
                                             "sources\\C.java",

@@ -57,18 +57,18 @@ public abstract class JavaCompiler
     /**
      * Check that this system has the proper JRE installed to compile to the provided Java version.
      * @param javaVersion The Java version to check for.
-     * @param console The console to use.
+     * @param process The process to use.
      * @return Whether or not the proper JRE is installed to compile to the provided Java version.
      */
-    public Result<Void> checkJavaVersion(String javaVersion, Console console)
+    public Result<Void> checkJavaVersion(String javaVersion, Process process)
     {
-        PreCondition.assertNotNull(console, "console");
+        PreCondition.assertNotNull(process, "process");
 
         Result<Void> result = Result.success();
 
         if (!Strings.isNullOrEmpty(javaVersion))
         {
-            final String javaHome = console.getEnvironmentVariable("JAVA_HOME");
+            final String javaHome = process.getEnvironmentVariable("JAVA_HOME");
             if (Strings.isNullOrEmpty(javaHome))
             {
                 result = Result.error(new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."));
@@ -77,7 +77,7 @@ public abstract class JavaCompiler
             {
                 setVersion("8");
 
-                final Folder javaFolder = console.getFileSystem().getFolder(javaHome).throwErrorOrGetValue().getParentFolder().throwErrorOrGetValue();
+                final Folder javaFolder = process.getFileSystem().getFolder(javaHome).throwErrorOrGetValue().getParentFolder().throwErrorOrGetValue();
                 final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().throwErrorOrGetValue();
                 final Iterable<Folder> jre18Folders = jreAndJdkFolders.where((Folder jreOrJdkFolder) -> jreOrJdkFolder.getName().startsWith("jre1.8.0_"));
                 if (!jre18Folders.any())
@@ -175,10 +175,10 @@ public abstract class JavaCompiler
      * @param sourceFiles The source files to compile.
      * @param rootFolder The folder that contains all of the source files to compile.
      * @param outputFolder The output folder where the compiled results will be placed.
-     * @param console The Console or Process to use.
+     * @param process The process to use.
      * @return The result of the compilation.
      */
-    public abstract Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Console console);
+    public abstract Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Process process);
 
     public static JavaCompilerIssue error(String sourceFilePath, int lineNumber, int columnNumber, String errorMessage)
     {

@@ -11,103 +11,103 @@ public class JavaCompilerTests
                 runner.test("with null javaVersion", (Test test) ->
                 {
                     final String javaVersion = null;
-                    final Console console = new Console();
+                    final Process process = new Process();
                     final JavaCompiler compiler = creator.run();
-                    test.assertSuccess(compiler.checkJavaVersion(javaVersion, console));
+                    test.assertSuccess(compiler.checkJavaVersion(javaVersion, process));
                 });
 
                 runner.test("with empty javaVersion", (Test test) ->
                 {
                     final String javaVersion = null;
-                    final Console console = new Console();
+                    final Process process = new Process();
                     final JavaCompiler compiler = creator.run();
-                    test.assertSuccess(compiler.checkJavaVersion(javaVersion, console));
+                    test.assertSuccess(compiler.checkJavaVersion(javaVersion, process));
                 });
 
-                runner.test("with null console", (Test test) ->
+                runner.test("with null process", (Test test) ->
                 {
                     final String javaVersion = "spam";
-                    final Console console = null;
+                    final Process process = null;
                     final JavaCompiler compiler = creator.run();
-                    test.assertThrows(() -> compiler.checkJavaVersion(javaVersion, console), new PreConditionFailure("console cannot be null."));
+                    test.assertThrows(() -> compiler.checkJavaVersion(javaVersion, process), new PreConditionFailure("process cannot be null."));
                 });
 
                 runner.test("with no JAVA_HOME environment variable", (Test test) ->
                 {
                     final String javaVersion = "1.8";
-                    final Console console = new Console();
+                    final Process process = new Process();
                     final JavaCompiler compiler = creator.run();
-                    console.setEnvironmentVariables(Map.create());
+                    process.setEnvironmentVariables(Map.create());
                     test.assertError(
                         new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."),
-                        compiler.checkJavaVersion(javaVersion, console));
+                        compiler.checkJavaVersion(javaVersion, process));
                 });
 
                 runner.test("with null JAVA_HOME environment variable", (Test test) ->
                 {
                     final String javaVersion = "1.8";
-                    final Console console = new Console();
-                    console.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", null));
+                    final Process process = new Process();
+                    process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", null));
                     final JavaCompiler compiler = creator.run();
                     test.assertError(
                         new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."),
-                        compiler.checkJavaVersion(javaVersion, console));
+                        compiler.checkJavaVersion(javaVersion, process));
                 });
 
                 runner.test("with empty JAVA_HOME environment variable", (Test test) ->
                 {
                     final String javaVersion = "1.8";
-                    final Console console = new Console();
-                    console.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", ""));
+                    final Process process = new Process();
+                    process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", ""));
                     final JavaCompiler compiler = creator.run();
                     test.assertError(
                         new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."),
-                        compiler.checkJavaVersion(javaVersion, console));
+                        compiler.checkJavaVersion(javaVersion, process));
                 });
 
                 runner.test("with unrecognized java version", (Test test) ->
                 {
                     final String javaVersion = "spam";
-                    final Console console = new Console();
+                    final Process process = new Process();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     fileSystem.createFolder("/my/Java/jdk-11.0.1");
-                    console.setFileSystem(fileSystem);
-                    console.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
+                    process.setFileSystem(fileSystem);
+                    process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
                     test.assertError(
                         new NotFoundException("No bootclasspath runtime jar file could be found for Java version \"spam\"."),
-                        compiler.checkJavaVersion(javaVersion, console));
+                        compiler.checkJavaVersion(javaVersion, process));
                 });
 
                 runner.test("with not installed java version", (Test test) ->
                 {
                     final String javaVersion = "1.8";
-                    final Console console = new Console();
+                    final Process process = new Process();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     fileSystem.createFolder("/my/Java/jdk-11.0.1");
-                    console.setFileSystem(fileSystem);
-                    console.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
+                    process.setFileSystem(fileSystem);
+                    process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
                     test.assertError(
                         new NotFoundException("No installed JREs found for Java version \"1.8\"."),
-                        compiler.checkJavaVersion(javaVersion, console));
+                        compiler.checkJavaVersion(javaVersion, process));
                 });
 
                 runner.test("with multiple matching versions java version", (Test test) ->
                 {
                     final String javaVersion = "1.8";
-                    final Console console = new Console();
+                    final Process process = new Process();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     fileSystem.createFolder("/my/Java/jdk-11.0.1");
                     fileSystem.createFolder("/my/Java/jre1.8.0_192");
                     fileSystem.createFolder("/my/Java/jre1.8.0_201");
-                    console.setFileSystem(fileSystem);
-                    console.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
+                    process.setFileSystem(fileSystem);
+                    process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
-                    test.assertSuccess(null, compiler.checkJavaVersion(javaVersion, console));
+                    test.assertSuccess(null, compiler.checkJavaVersion(javaVersion, process));
                     test.assertEqual("/my/Java/jre1.8.0_201/lib/rt.jar", compiler.getBootClasspath());
                 });
             });
@@ -131,7 +131,7 @@ public class JavaCompilerTests
                     final JavaCompiler compiler = creator.run();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
-                    final Iterable<File> sourceFiles = Iterable.empty();
+                    final Iterable<File> sourceFiles = Iterable.create();
                     final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
                     test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),

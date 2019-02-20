@@ -16,4 +16,33 @@ public class JavaCompilerIssue
         this.type = type;
         this.message = message;
     }
+
+    @Override
+    public boolean equals(Object rhs)
+    {
+        return rhs instanceof JavaCompilerIssue && equals((JavaCompilerIssue)rhs);
+    }
+
+    public boolean equals(JavaCompilerIssue rhs)
+    {
+        return rhs != null &&
+            Comparer.equal(sourceFilePath, rhs.sourceFilePath) &&
+            Comparer.equal(lineNumber, rhs.lineNumber) &&
+            Comparer.equal(columnNumber, rhs.columnNumber) &&
+            Comparer.equal(type, rhs.type) &&
+            Comparer.equal(message, rhs.message);
+    }
+
+    @Override
+    public String toString()
+    {
+        return JSON.object(json ->
+        {
+            json.stringProperty("sourceFilePath", sourceFilePath);
+            json.numberProperty("lineNumber", lineNumber);
+            json.numberProperty("columnNumber", columnNumber);
+            json.stringProperty("type", type.toString());
+            json.stringProperty("message", message);
+        }).toString();
+    }
 }

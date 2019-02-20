@@ -65,31 +65,25 @@ public class ParseJSON
     {
         PreCondition.assertNotNull(file, "file");
 
-        return file.getContentCharacterWriteStream()
-            .then((CharacterWriteStream writeStream) ->
+        return Result.create(() ->
+        {
+            try (final CharacterWriteStream writeStream = file.getContentCharacterWriteStream().await())
             {
-                try
+                JSON.object(writeStream, (JSONObjectBuilder parseJsonBuilder) ->
                 {
-                    JSON.object(writeStream, (JSONObjectBuilder parseJsonBuilder) ->
+                    final ProjectJSON projectJson = getProjectJson();
+                    if (projectJson != null)
                     {
-                        final ProjectJSON projectJson = getProjectJson();
-                        if (projectJson != null)
-                        {
-                            parseJsonBuilder.objectProperty("project.json", projectJson::write);
-                        }
+                        parseJsonBuilder.objectProperty("project.json", projectJson::write);
+                    }
 
-                        for (final ParseJSONSourceFile parseJSONSourceFile : getSourceFiles())
-                        {
-                            parseJSONSourceFile.writeJson(parseJsonBuilder);
-                        }
-                    });
-                }
-                finally
-                {
-                    writeStream.dispose();
-                }
-            })
-            .then(() -> null);
+                    for (final ParseJSONSourceFile parseJSONSourceFile : getSourceFiles())
+                    {
+                        parseJSONSourceFile.writeJson(parseJsonBuilder);
+                    }
+                });
+            }
+        });
     }
 
     public static Result<ParseJSON> parse(File parseJSONFile)

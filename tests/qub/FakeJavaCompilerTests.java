@@ -11,24 +11,8 @@ public class FakeJavaCompilerTests
             runner.test("constructor()", (Test test) ->
             {
                 final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                test.assertEqual(0, compiler.getExitCode());
-            });
-
-            runner.testGroup("setExitCode()", () ->
-            {
-                runner.test("with 0", (Test test) ->
-                {
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.setExitCode(0);
-                    test.assertEqual(0, compiler.getExitCode());
-                });
-
-                runner.test("with 1", (Test test) ->
-                {
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.setExitCode(1);
-                    test.assertEqual(1, compiler.getExitCode());
-                });
+                test.assertEqual(0, compiler.exitCode);
+                test.assertEqual(null, compiler.issues);
             });
 
             runner.testGroup("compile()", () ->
@@ -49,7 +33,7 @@ public class FakeJavaCompilerTests
                 {
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
-                    final Iterable<File> sourceFiles = Iterable.empty();
+                    final Iterable<File> sourceFiles = Iterable.create();
                     final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
 
@@ -80,7 +64,7 @@ public class FakeJavaCompilerTests
                     final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
 
                     final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, null), new PreConditionFailure("console cannot be null."));
+                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, null), new PreConditionFailure("process cannot be null."));
                 });
             });
         });

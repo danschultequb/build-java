@@ -457,7 +457,7 @@ public class ProjectJSONTests
                             test.assertNull(java.getVersion());
                             test.assertNull(java.getMainClass());
                             test.assertNull(java.getShortcutName());
-                            test.assertEqual(Iterable.empty(), java.getDependencies());
+                            test.assertEqual(Iterable.create(), java.getDependencies());
                         });
                 });
 

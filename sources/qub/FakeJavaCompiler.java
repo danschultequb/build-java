@@ -2,24 +2,15 @@ package qub;
 
 public class FakeJavaCompiler extends JavaCompiler
 {
-    private int exitCode;
+    public int exitCode;
+    public Iterable<JavaCompilerIssue> issues;
 
-    public int getExitCode()
-    {
-        return exitCode;
-    }
-
-    public void setExitCode(int exitCode)
-    {
-        this.exitCode = exitCode;
-    }
-
-    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Console console)
+    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Process process)
     {
         PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
         PreCondition.assertNotNull(rootFolder, "rootFolder");
         PreCondition.assertNotNull(outputFolder, "outputFolder");
-        PreCondition.assertNotNull(console, "console");
+        PreCondition.assertNotNull(process, "process");
 
         for (final File sourceFile : sourceFiles)
         {
@@ -28,7 +19,9 @@ public class FakeJavaCompiler extends JavaCompiler
 
         return Result.success(
             new JavaCompilationResult(
-                getExitCode(),
-                Iterable.empty()));
+                exitCode,
+                "",
+                "",
+                issues));
     }
 }

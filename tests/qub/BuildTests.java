@@ -28,7 +28,13 @@ public class BuildTests
                     {
                         main(console);
                     }
-                    test.assertSuccess("Usage: qub-build\n  Used to compile and package source code projects.\n", output.getText());
+                    test.assertEqual(
+                        "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]\n" +
+                        "  Used to compile and package source code projects.\n" +
+                        "  -folder: The folder to build. This can be specified either with the -folder\n" +
+                        "           argument name or without it.\n" +
+                        "  -verbose: Show verbose logs.\n",
+                        output.getText().await());
                 });
 
                 runner.test("with -? command line argument", (Test test) ->
@@ -38,7 +44,62 @@ public class BuildTests
                     {
                         main(console);
                     }
-                    test.assertSuccess("Usage: qub-build\n  Used to compile and package source code projects.\n", output.getText());
+                    test.assertEqual(
+                        "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]\n" +
+                            "  Used to compile and package source code projects.\n" +
+                            "  -folder: The folder to build. This can be specified either with the -folder\n" +
+                            "           argument name or without it.\n" +
+                            "  -verbose: Show verbose logs.\n",
+                        output.getText().await());
+                });
+
+                runner.test("with no project.json in the unnamed specified folder command line argument", (Test test) ->
+                {
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test);
+                    try (final Console console = createConsole(output, currentFolder, "/fake/folder/"))
+                    {
+                        main(console);
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            " The file at \"/fake/folder/project.json\" doesn't exist.",
+                            " Done (0.0 Seconds)"),
+                        Strings.getLines(output.getText().await()));
+                });
+
+                runner.test("with no project.json in the named specified folder command line argument", (Test test) ->
+                {
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test);
+                    try (final Console console = createConsole(output, currentFolder, "-folder=/fake/folder/"))
+                    {
+                        main(console);
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            " The file at \"/fake/folder/project.json\" doesn't exist.",
+                            " Done (0.0 Seconds)"),
+                        Strings.getLines(output.getText().await()));
+                });
+
+                runner.test("with no project.json in the specified folder with -verbose before folder", (Test test) ->
+                {
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test);
+                    try (final Console console = createConsole(output, currentFolder, "-verbose", "/fake/folder/"))
+                    {
+                        main(console);
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE:  Parsing project.json...",
+                            " The file at \"/fake/folder/project.json\" doesn't exist.",
+                            " Done (0.0 Seconds)"),
+                        Strings.getLines(output.getText().await()));
                 });
 
                 runner.test("with no project.json in the current folder", (Test test) ->
@@ -47,9 +108,14 @@ public class BuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final Console console = createConsole(output, currentFolder))
                     {
-                        test.assertThrows(() -> main(console),
-                            new FileNotFoundException("/project.json"));
+                        main(console);
                     }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            " The file at \"/project.json\" doesn't exist.",
+                            " Done (0.0 Seconds)"),
+                        Strings.getLines(output.getText().await()));
                 });
 
                 runner.test("with empty project.json", (Test test) ->
@@ -59,9 +125,14 @@ public class BuildTests
                     setFileContents(currentFolder, "project.json", "");
                     try (final Console console = createConsole(output, currentFolder))
                     {
-                        test.assertThrows(() -> main(console),
-                            new NotFoundException("No root was found in the JSON document."));
+                        main(console);
                     }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            " No root was found in the JSON document.",
+                            " Done (0.0 Seconds)"),
+                        Strings.getLines(output.getText().await()));
                 });
 
                 runner.test("with empty array project.json", (Test test) ->
@@ -71,9 +142,14 @@ public class BuildTests
                     setFileContents(currentFolder, "project.json", "[]");
                     try (final Console console = createConsole(output, currentFolder))
                     {
-                        test.assertThrows(() -> main(console),
-                            new WrongTypeException("Expected the root of the JSON document to be an object."));
+                        main(console);
                     }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            " Expected the root of the JSON document to be an object.",
+                            " Done (0.0 Seconds)"),
+                        Strings.getLines(output.getText().await()));
                 });
 
                 runner.test("with empty object project.json", (Test test) ->
@@ -99,9 +175,11 @@ public class BuildTests
                     {
                         main(console);
                     }
-                    test.assertEqual(
-                        "Compiling...\n No java source files found in /.\n Done (0.0 Seconds)\n",
-                        output.getText().throwErrorOrGetValue());
+                    final Array<String> outputLines = Strings.getLines(output.getText().await()).toArray();
+                    test.assertEqual("Compiling...", outputLines.get(0));
+                    test.assertEqual(" No java source files found in /.", outputLines.get(1));
+                    test.assertContains(outputLines.get(2), " Done (0.");
+                    test.assertContains(outputLines.get(2), " Seconds)");
                 });
 
                 runner.test("with empty \"sources\" folder", (Test test) ->
@@ -429,6 +507,67 @@ public class BuildTests
                         main(console);
                     }
 
+                    final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().throwErrorOrGetValue().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile), "Wrong parse.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                });
+
+                runner.test("with one source file with one error", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/A.java",
+                            1, 5,
+                            Issue.Type.Error,
+                            "This doesn't look right to me."));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console, compiler);
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            " /sources/A.java (Line 1): This doesn't look right to me.",
+                            " Done (0.0 Seconds)"),
+                        Strings.getLines(output.getText().await()));
                     final Folder outputs = currentFolder.getFolder("outputs").throwErrorOrGetValue();
                     test.assertEqual(
                         Iterable.create(
@@ -1904,8 +2043,18 @@ public class BuildTests
 
     private static void main(Console console)
     {
+        PreCondition.assertNotNull(console, "console");
+
+        main(console, new FakeJavaCompiler());
+    }
+
+    private static void main(Console console, JavaCompiler compiler)
+    {
+        PreCondition.assertNotNull(console, "console");
+        PreCondition.assertNotNull(compiler, "compiler");
+
         final Build build = new Build();
-        build.setJavaCompiler(new FakeJavaCompiler());
+        build.setJavaCompiler(compiler);
         build.main(console);
     }
 }

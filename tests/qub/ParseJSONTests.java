@@ -24,8 +24,8 @@ public class ParseJSONTests
                 runner.test("with empty", (Test test) ->
                 {
                     final ParseJSON parseJson = new ParseJSON();
-                    parseJson.setSourceFiles(Iterable.empty());
-                    test.assertEqual(Iterable.empty(), parseJson.getSourceFiles());
+                    parseJson.setSourceFiles(Iterable.create());
+                    test.assertEqual(Iterable.create(), parseJson.getSourceFiles());
                 });
 
                 runner.test("with source file with null relative path", (Test test) ->
@@ -62,7 +62,7 @@ public class ParseJSONTests
                 runner.test("with empty sourceFiles", (Test test) ->
                 {
                     final ParseJSON parseJson = new ParseJSON();
-                    parseJson.setSourceFiles(Iterable.empty());
+                    parseJson.setSourceFiles(Iterable.create());
                     test.assertError(
                         new NotFoundException("No source file found in the ParseJSON object with the path \"sources/A.java\"."),
                         parseJson.getSourceFile(Path.parse("sources/A.java")));
