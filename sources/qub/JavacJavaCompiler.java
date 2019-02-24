@@ -70,7 +70,6 @@ public class JavacJavaCompiler extends JavaCompiler
                                 })
                                 .catchError(NumberFormatException.class, () ->
                                 {
-
                                 });
                         }
                     }

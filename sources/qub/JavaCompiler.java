@@ -157,7 +157,7 @@ public abstract class JavaCompiler
                     dependency.getProject() + "/" +
                     dependency.getVersion() + "/" +
                     dependency.getProject() + ".jar";
-                return qubFolder.getFile(dependencyRelativePath).throwErrorOrGetValue().toString();
+                return qubFolder.getFile(dependencyRelativePath).await().toString();
             }));
         }
         result.addAll("-classpath", Strings.join(';', classPaths));

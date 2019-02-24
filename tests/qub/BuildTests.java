@@ -46,10 +46,10 @@ public class BuildTests
                     }
                     test.assertEqual(
                         "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]\n" +
-                            "  Used to compile and package source code projects.\n" +
-                            "  -folder: The folder to build. This can be specified either with the -folder\n" +
-                            "           argument name or without it.\n" +
-                            "  -verbose: Show verbose logs.\n",
+                        "  Used to compile and package source code projects.\n" +
+                        "  -folder: The folder to build. This can be specified either with the -folder\n" +
+                        "           argument name or without it.\n" +
+                        "  -verbose: Show verbose logs.\n",
                         output.getText().await());
                 });
 
@@ -64,9 +64,8 @@ public class BuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            " The file at \"/fake/folder/project.json\" doesn't exist.",
-                            " Done (0.0 Seconds)"),
-                        Strings.getLines(output.getText().await()));
+                            "ERROR: The file at \"/fake/folder/project.json\" doesn't exist."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with no project.json in the named specified folder command line argument", (Test test) ->
@@ -80,9 +79,8 @@ public class BuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            " The file at \"/fake/folder/project.json\" doesn't exist.",
-                            " Done (0.0 Seconds)"),
-                        Strings.getLines(output.getText().await()));
+                            "ERROR: The file at \"/fake/folder/project.json\" doesn't exist."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with no project.json in the specified folder with -verbose before folder", (Test test) ->
@@ -96,10 +94,9 @@ public class BuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            "VERBOSE:  Parsing project.json...",
-                            " The file at \"/fake/folder/project.json\" doesn't exist.",
-                            " Done (0.0 Seconds)"),
-                        Strings.getLines(output.getText().await()));
+                            "VERBOSE: Parsing project.json...",
+                            "ERROR: The file at \"/fake/folder/project.json\" doesn't exist."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with no project.json in the current folder", (Test test) ->
@@ -113,9 +110,8 @@ public class BuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            " The file at \"/project.json\" doesn't exist.",
-                            " Done (0.0 Seconds)"),
-                        Strings.getLines(output.getText().await()));
+                            "ERROR: The file at \"/project.json\" doesn't exist."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with empty project.json", (Test test) ->
@@ -130,9 +126,8 @@ public class BuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            " No root was found in the JSON document.",
-                            " Done (0.0 Seconds)"),
-                        Strings.getLines(output.getText().await()));
+                            "ERROR: No root was found in the JSON document."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with empty array project.json", (Test test) ->
@@ -147,9 +142,8 @@ public class BuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            " Expected the root of the JSON document to be an object.",
-                            " Done (0.0 Seconds)"),
-                        Strings.getLines(output.getText().await()));
+                            "ERROR: Expected the root of the JSON document to be an object."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with empty object project.json", (Test test) ->
@@ -162,8 +156,10 @@ public class BuildTests
                         main(console);
                     }
                     test.assertEqual(
-                        "Compiling...\n No language specified in project.json. Nothing to compile.\n Done (0.0 Seconds)\n",
-                        output.getText().await());
+                        Iterable.create(
+                            "Compiling...",
+                            "ERROR: No language specified in project.json. Nothing to compile."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with java sources version set to \"1.8\" but no \"sources\" folder", (Test test) ->
@@ -175,11 +171,11 @@ public class BuildTests
                     {
                         main(console);
                     }
-                    final Array<String> outputLines = Strings.getLines(output.getText().await()).toArray();
-                    test.assertEqual("Compiling...", outputLines.get(0));
-                    test.assertEqual(" No java source files found in /.", outputLines.get(1));
-                    test.assertContains(outputLines.get(2), " Done (0.");
-                    test.assertContains(outputLines.get(2), " Seconds)");
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "No java source files found in /."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with empty \"sources\" folder", (Test test) ->
@@ -193,8 +189,10 @@ public class BuildTests
                         main(console);
                     }
                     test.assertEqual(
-                        "Compiling...\n No java source files found in /.\n Done (0.0 Seconds)\n",
-                        output.getText().await());
+                        Iterable.create(
+                            "Compiling...",
+                            "No java source files found in /."),
+                        Strings.getLines(output.getText().await()).skipLast());
                 });
 
                 runner.test("with non-empty \"sources\" folder and no \"outputs\" folder", (Test test) ->
@@ -208,10 +206,18 @@ public class BuildTests
                     {
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -243,10 +249,18 @@ public class BuildTests
                     {
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("bin").await();
                     test.assertEqual(
                         Iterable.create(
                             "/bin/A.class",
+                            "/bin/A.jar",
                             "/bin/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -282,10 +296,18 @@ public class BuildTests
                     {
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -319,12 +341,20 @@ public class BuildTests
                     {
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -361,12 +391,20 @@ public class BuildTests
                     {
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -408,10 +446,17 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -440,7 +485,7 @@ public class BuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/sources/A.class", "A.java source");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File sourceFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
@@ -459,12 +504,16 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
-                            "/outputs/sources",
-                            "/outputs/parse.json",
-                            "/outputs/sources/A.class"),
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(beforeClockAdvance, getFileLastModified(classFile), "Wrong A.class file lastModified");
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -507,10 +556,17 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
@@ -565,9 +621,9 @@ public class BuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            " /sources/A.java (Line 1): This doesn't look right to me.",
-                            " Done (0.0 Seconds)"),
-                        Strings.getLines(output.getText().await()));
+                            "/sources/A.java (Line 1): This doesn't look right to me."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
@@ -624,12 +680,19 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -692,12 +755,19 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -759,12 +829,19 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -827,12 +904,19 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -893,10 +977,17 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -953,12 +1044,19 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -1028,13 +1126,20 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
                             "/outputs/C.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -1083,8 +1188,17 @@ public class BuildTests
 
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
+                        console.setEnvironmentVariables(Map.<String,String>create());
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "ERROR: Cannot resolve project dependencies without a QUB_HOME environment variable."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertFalse(currentFolder.getFolder("outputs").await().exists().await());
                 });
 
                 runner.test("nothing gets compiled when project.json publisher changes", (Test test) ->
@@ -1118,6 +1232,11 @@ public class BuildTests
                     {
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling..."),
+                        Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
@@ -1179,6 +1298,11 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
@@ -1238,6 +1362,11 @@ public class BuildTests
                     {
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling..."),
+                        Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
@@ -1308,10 +1437,17 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -1379,10 +1515,17 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -1449,6 +1592,11 @@ public class BuildTests
                             .set("JAVA_HOME", jdk11Folder.toString()));
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling..."),
+                        Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
@@ -1521,6 +1669,11 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
@@ -1587,12 +1740,19 @@ public class BuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
                     {
+                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
                         console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", "/qub/"));
+                            .set("QUB_HOME", qubFolder.toString()));
+                        qubFolder.createFile("a/b/c/b.jar").await();
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling..."),
+                        Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
@@ -1675,10 +1835,17 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -1749,17 +1916,26 @@ public class BuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
                     {
+                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
                         console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", "/qub/"));
+                            .set("QUB_HOME", qubFolder.toString()));
+                        qubFolder.createFile("a/b/d/b.jar").await();
                         main(console);
                     }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -1826,12 +2002,19 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1877,13 +2060,20 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/AB.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/parse.json",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
@@ -1935,11 +2125,18 @@ public class BuildTests
                         main(console);
                     }
 
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/B.class"),
+                            "/outputs/B.class",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
@@ -1970,8 +2167,15 @@ public class BuildTests
 
                     test.assertEqual(
                         Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertEqual(
+                        Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/B.class"),
+                            "/outputs/B.class",
+                            "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
@@ -2002,8 +2206,15 @@ public class BuildTests
 
                     test.assertEqual(
                         Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertEqual(
+                        Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/B.class"),
+                            "/outputs/B.class",
+                            "/outputs/fake-project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
@@ -2013,6 +2224,89 @@ public class BuildTests
                     test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
 
                     test.assertFalse(outputs.fileExists("parse.json").await());
+                });
+
+                runner.test("with project.json dependency with publisher that doesn't exist", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.stringProperty("project", "fake-project");
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.arrayProperty("dependencies", dependencies ->
+                            {
+                                dependencies.objectElement(dependency ->
+                                {
+                                    dependency.stringProperty("publisher", "fake-qub");
+                                    dependency.stringProperty("project", "qub-java");
+                                    dependency.stringProperty("version", "1");
+                                });
+                            });
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false", "-createjar=true"))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub_home/"));
+                        main(console);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "ERROR: No publisher folder named \"fake-qub\" found in the Qub folder (/qub_home)."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertFalse(currentFolder.folderExists("outputs").await());
+                });
+
+                runner.test("with project.json dependency with project that doesn't exist", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+                    {
+                        projectJson.stringProperty("project", "fake-project");
+                        projectJson.objectProperty("java", java ->
+                        {
+                            java.arrayProperty("dependencies", dependencies ->
+                            {
+                                dependencies.objectElement(dependency ->
+                                {
+                                    dependency.stringProperty("publisher", "qub");
+                                    dependency.stringProperty("project", "fake-qub-java");
+                                    dependency.stringProperty("version", "1");
+                                });
+                            });
+                        });
+                    }).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+
+                    final Folder qubFolder = currentFolder.getFileSystem().createFolder("/qub_home/").await();
+                    qubFolder.createFolder("qub").await();
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false", "-createjar=true"))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", qubFolder.toString()));
+                        main(console);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub)."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertFalse(currentFolder.folderExists("outputs").await());
                 });
             });
         });
@@ -2149,6 +2443,7 @@ public class BuildTests
 
         final Build build = new Build();
         build.setJavaCompiler(compiler);
+        build.setJarCreator(new FakeJarCreator());
         build.main(console);
     }
 }
