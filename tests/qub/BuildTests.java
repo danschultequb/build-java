@@ -6,11 +6,26 @@ public class BuildTests
     {
         runner.testGroup(Build.class, () ->
         {
-            runner.testGroup("main(String[])", () ->
+            runner.testGroup("getShowTotalDuration()", () ->
             {
-                runner.test("with null", (Test test) ->
+                runner.test("when not set", (Test test) ->
                 {
-                    test.assertThrows(() -> Build.main((String[])null), new PreConditionFailure("args cannot be null."));
+                    final Build build = new Build();
+                    test.assertTrue(build.getShowTotalDuration());
+                });
+
+                runner.test("when set to false", (Test test) ->
+                {
+                    final Build build = new Build();
+                    build.setShowTotalDuration(false);
+                    test.assertFalse(build.getShowTotalDuration());
+                });
+
+                runner.test("when set to true", (Test test) ->
+                {
+                    final Build build = new Build();
+                    build.setShowTotalDuration(true);
+                    test.assertTrue(build.getShowTotalDuration());
                 });
             });
 
@@ -2344,6 +2359,14 @@ public class BuildTests
                         currentFolder.getFolder("outputs").await()
                             .getFilesAndFoldersRecursively().await()
                             .map(FileSystemEntry::toString));
+                });
+            });
+
+            runner.testGroup("main(String[])", () ->
+            {
+                runner.test("with null", (Test test) ->
+                {
+                    test.assertThrows(() -> Build.main((String[])null), new PreConditionFailure("args cannot be null."));
                 });
             });
         });

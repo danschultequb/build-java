@@ -11,7 +11,7 @@ public class Build
      * to true if it hasn't been set.
      * @return Whether or not to show the total duration of this Build command.
      */
-    private boolean getShowTotalDuration()
+    public boolean getShowTotalDuration()
     {
         if (showTotalDuration == null)
         {
