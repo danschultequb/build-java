@@ -2316,6 +2316,35 @@ public class BuildTests
 
                     test.assertFalse(currentFolder.folderExists("outputs").await());
                 });
+
+                runner.test("with show total duration set to false", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", JSON.object(projectJson -> projectJson.objectProperty("java")).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+
+                    try (final Console console = createConsole(output, currentFolder))
+                    {
+                        main(console, false);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Creating jar file..."),
+                        Strings.getLines(output.getText().await()));
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/A.jar"),
+                        currentFolder.getFolder("outputs").await()
+                            .getFilesAndFoldersRecursively().await()
+                            .map(FileSystemEntry::toString));
+                });
             });
         });
     }
@@ -2441,7 +2470,14 @@ public class BuildTests
     {
         PreCondition.assertNotNull(console, "console");
 
-        main(console, new FakeJavaCompiler());
+        main(console, true);
+    }
+
+    private static void main(Console console, boolean showTotalDuration)
+    {
+        PreCondition.assertNotNull(console, "console");
+
+        main(console, new FakeJavaCompiler(), showTotalDuration);
     }
 
     private static void main(Console console, JavaCompiler compiler)
@@ -2449,9 +2485,18 @@ public class BuildTests
         PreCondition.assertNotNull(console, "console");
         PreCondition.assertNotNull(compiler, "compiler");
 
+        main(console, compiler, true);
+    }
+
+    private static void main(Console console, JavaCompiler compiler, boolean showTotalDuration)
+    {
+        PreCondition.assertNotNull(console, "console");
+        PreCondition.assertNotNull(compiler, "compiler");
+
         final Build build = new Build();
         build.setJavaCompiler(compiler);
         build.setJarCreator(new FakeJarCreator());
+        build.setShowTotalDuration(showTotalDuration);
         build.main(console);
     }
 }
