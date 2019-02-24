@@ -617,7 +617,7 @@ public class Build
 
     public static Result<Void> verboseLog(Console console, String message)
     {
-        return verboseLog(console, message, true);
+        return verboseLog(console, message, false);
     }
 
     public static Result<Void> verboseLog(Console console, String message, boolean showTimestamp)
