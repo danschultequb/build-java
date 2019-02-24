@@ -84,8 +84,11 @@ public class Build
             console.writeLine("Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]");
             console.writeLine("  Used to compile and package source code projects.");
             console.writeLine("  -folder: The folder to build. This can be specified either with the -folder");
-            console.writeLine("           argument name or without it.");
-            console.writeLine("  -verbose: Show verbose logs.");
+            console.writeLine("           argument name or without it. The current folder will be used if this");
+            console.writeLine("           isn't defined.");
+            console.writeLine("  -createjar: Whether or not to create a jar file from the compiled source code");
+            console.writeLine("              files.");
+            console.writeLine("  -verbose: Whether or not to show verbose logs.");
         }
         else
         {
@@ -96,49 +99,9 @@ public class Build
             {
                 console.writeLine("Compiling...").await();
 
-                Path folderPathToBuild = null;
-                boolean useParseJson = false;
-                boolean createJar = true;
-                if (commandLine.any())
-                {
-                    CommandLineArgument folderArgument = commandLine.get("folder");
-                    if (folderArgument == null)
-                    {
-                        folderArgument = commandLine.getArguments()
-                            .first((CommandLineArgument argument) -> argument.getName() == null);
-                    }
-                    if (folderArgument != null)
-                    {
-                        folderPathToBuild = Path.parse(folderArgument.getValue());
-                    }
-
-                    CommandLineArgument useParseJsonArgument = commandLine.get("parsejson");
-                    if (useParseJsonArgument != null)
-                    {
-                        useParseJson = Strings.isNullOrEmpty(useParseJsonArgument.getValue()) ||
-                            java.lang.Boolean.parseBoolean(useParseJsonArgument.getValue());
-                    }
-
-                    CommandLineArgument createJarArgument = commandLine.get("createjar");
-                    if (createJarArgument != null)
-                    {
-                        createJar = Strings.isNullOrEmpty(createJarArgument.getValue()) ||
-                            java.lang.Boolean.parseBoolean(createJarArgument.getValue());
-                    }
-                }
-
-                if (folderPathToBuild == null)
-                {
-                    folderPathToBuild = console.getCurrentFolderPath();
-                }
-
-                if (!folderPathToBuild.isRooted())
-                {
-                    folderPathToBuild = console.getCurrentFolderPath().resolve(folderPathToBuild).await();
-                }
-
-                final FileSystem fileSystem = console.getFileSystem();
-                final Folder folderToBuild = fileSystem.getFolder(folderPathToBuild).await();
+                final boolean useParseJson = shouldUseParseJson(console);
+                final boolean createJar = shouldCreateJar(console);
+                final Folder folderToBuild = getFolderToBuild(console).await();
                 final File projectJsonFile = folderToBuild.getFile("project.json").await();
 
                 verboseLog(console, "Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...", false).await();
@@ -170,7 +133,7 @@ public class Build
                             }
                             else
                             {
-                                final Folder qubFolder = fileSystem.getFolder(qubHome).await();
+                                final Folder qubFolder = console.getFileSystem().getFolder(qubHome).await();
                                 javaCompiler.setQubFolder(qubFolder);
 
                                 for (final Dependency dependency : dependencies)
@@ -439,6 +402,77 @@ public class Build
         }
     }
 
+    public static Result<Folder> getFolderToBuild(Console console)
+    {
+        PreCondition.assertNotNull(console, "console");
+
+        final CommandLine commandLine = console.getCommandLine();
+        Path folderPathToBuild = null;
+
+        CommandLineArgument folderArgument = commandLine.get("folder");
+        if (folderArgument == null)
+        {
+            folderArgument = commandLine.getArguments()
+                .first((CommandLineArgument argument) -> argument.getName() == null);
+        }
+        if (folderArgument != null)
+        {
+            folderPathToBuild = Path.parse(folderArgument.getValue());
+        }
+
+        if (folderPathToBuild == null)
+        {
+            folderPathToBuild = console.getCurrentFolderPath();
+        }
+
+        if (!folderPathToBuild.isRooted())
+        {
+            folderPathToBuild = console.getCurrentFolderPath().resolve(folderPathToBuild).await();
+        }
+
+        final FileSystem fileSystem = console.getFileSystem();
+        final Result<Folder> result = fileSystem.getFolder(folderPathToBuild);
+
+        PostCondition.assertNotNull(result, "result");
+
+        return result;
+    }
+
+    public static boolean shouldCreateJar(Console console)
+    {
+        PreCondition.assertNotNull(console, "console");
+
+        final CommandLine commandLine = console.getCommandLine();
+
+        boolean result = true;
+        CommandLineArgument createJarArgument = commandLine.get("createjar");
+        if (createJarArgument != null)
+        {
+            result = Strings.isNullOrEmpty(createJarArgument.getValue()) ||
+                java.lang.Boolean.parseBoolean(createJarArgument.getValue());
+        }
+
+        return result;
+    }
+
+    public static boolean shouldUseParseJson(Console console)
+    {
+        PreCondition.assertNotNull(console, "console");
+
+        final CommandLine commandLine = console.getCommandLine();
+
+        boolean result = false;
+
+        CommandLineArgument useParseJsonArgument = commandLine.get("parsejson");
+        if (useParseJsonArgument != null)
+        {
+            result = Strings.isNullOrEmpty(useParseJsonArgument.getValue()) ||
+                java.lang.Boolean.parseBoolean(useParseJsonArgument.getValue());
+        }
+
+        return result;
+    }
+
     public static boolean shouldCompileEverything(ProjectJSON oldProjectJson, ProjectJSON newProjectJson)
     {
         boolean result = false;
@@ -560,10 +594,10 @@ public class Build
 
     public static Result<Void> error(Console console, String message)
     {
-        return errorLog(console, message, false);
+        return error(console, message, false);
     }
 
-    public static Result<Void> errorLog(Console console, String message, boolean showTimestamp)
+    public static Result<Void> error(Console console, String message, boolean showTimestamp)
     {
         final Result<Void> result = console.writeLine("ERROR" + (showTimestamp ? "(" + System.currentTimeMillis() + ")" : "") + ": " + message).then(() -> {});
         console.incrementExitCode();

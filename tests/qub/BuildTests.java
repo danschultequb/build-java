@@ -29,12 +29,16 @@ public class BuildTests
                         main(console);
                     }
                     test.assertEqual(
-                        "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]\n" +
-                        "  Used to compile and package source code projects.\n" +
-                        "  -folder: The folder to build. This can be specified either with the -folder\n" +
-                        "           argument name or without it.\n" +
-                        "  -verbose: Show verbose logs.\n",
-                        output.getText().await());
+                        Iterable.create(
+                            "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]",
+                            "  Used to compile and package source code projects.",
+                            "  -folder: The folder to build. This can be specified either with the -folder",
+                            "           argument name or without it. The current folder will be used if this",
+                            "           isn't defined.",
+                            "  -createjar: Whether or not to create a jar file from the compiled source code",
+                            "              files.",
+                            "  -verbose: Whether or not to show verbose logs."),
+                        Strings.getLines(output.getText().await()));
                 });
 
                 runner.test("with -? command line argument", (Test test) ->
@@ -45,12 +49,16 @@ public class BuildTests
                         main(console);
                     }
                     test.assertEqual(
-                        "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]\n" +
-                        "  Used to compile and package source code projects.\n" +
-                        "  -folder: The folder to build. This can be specified either with the -folder\n" +
-                        "           argument name or without it.\n" +
-                        "  -verbose: Show verbose logs.\n",
-                        output.getText().await());
+                        Iterable.create(
+                            "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]",
+                            "  Used to compile and package source code projects.",
+                            "  -folder: The folder to build. This can be specified either with the -folder",
+                            "           argument name or without it. The current folder will be used if this",
+                            "           isn't defined.",
+                            "  -createjar: Whether or not to create a jar file from the compiled source code",
+                            "              files.",
+                            "  -verbose: Whether or not to show verbose logs."),
+                        Strings.getLines(output.getText().await()));
                 });
 
                 runner.test("with no project.json in the unnamed specified folder command line argument", (Test test) ->
