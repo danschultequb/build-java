@@ -42,6 +42,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, "/?"))
                     {
                         main(console);
+                        test.assertEqual(-1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -62,6 +63,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, "-?"))
                     {
                         main(console);
+                        test.assertEqual(-1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -83,6 +85,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "/fake/folder/", "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -98,6 +101,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-folder=/fake/folder/", "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -113,6 +117,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-verbose", "/fake/folder/", "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -129,6 +134,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -145,6 +151,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -161,6 +168,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -177,6 +185,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -193,11 +202,12 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            "No java source files found in /."),
+                            "ERROR: No java source files found in /."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
 
@@ -210,11 +220,12 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            "No java source files found in /."),
+                            "ERROR: No java source files found in /."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
 
@@ -228,6 +239,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -271,6 +283,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -318,6 +331,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -363,6 +377,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -413,6 +428,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -467,6 +483,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -525,6 +542,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -577,6 +595,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -639,6 +658,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console, compiler);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -701,6 +721,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -776,6 +797,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -850,6 +872,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -925,6 +948,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -998,6 +1022,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1065,6 +1090,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1147,6 +1173,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1213,6 +1240,7 @@ public class BuildTests
                     {
                         console.setEnvironmentVariables(Map.<String,String>create());
                         main(console);
+                        test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1254,6 +1282,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1319,6 +1348,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1384,6 +1414,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1458,6 +1489,7 @@ public class BuildTests
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1536,6 +1568,7 @@ public class BuildTests
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1614,6 +1647,7 @@ public class BuildTests
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1690,6 +1724,7 @@ public class BuildTests
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1770,6 +1805,7 @@ public class BuildTests
                             .set("QUB_HOME", qubFolder.toString()));
                         qubFolder.createFile("a/b/c/b.jar").await();
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1856,6 +1892,7 @@ public class BuildTests
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("QUB_HOME", "/qub/"));
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1946,6 +1983,7 @@ public class BuildTests
                             .set("QUB_HOME", qubFolder.toString()));
                         qubFolder.createFile("a/b/d/b.jar").await();
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2023,6 +2061,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2081,6 +2120,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2146,6 +2186,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2186,6 +2227,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2225,6 +2267,7 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson=false", "-createjar=true"))
                     {
                         main(console);
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(

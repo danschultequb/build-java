@@ -115,6 +115,7 @@ public class Build
             console.writeLine("  -createjar: Whether or not to create a jar file from the compiled source code");
             console.writeLine("              files.");
             console.writeLine("  -verbose: Whether or not to show verbose logs.");
+            console.setExitCode(-1);
         }
         else
         {
@@ -220,214 +221,217 @@ public class Build
                             sourceFilePatterns = Iterable.create(PathPattern.parse("**/*.java"));
                         }
                         final Iterable<File> javaSourceFiles = getJavaSourceFiles(folderToBuild, sourceFilePatterns)
-                            .catchError(NotFoundException.class, (NotFoundException error) ->
+                            .catchError((Throwable error) ->
                             {
-                                console.writeLine(error.getMessage());
+                                error(console, error.getMessage());
                                 return Iterable.create();
                             })
                             .await();
 
-                        String outputFolderName = "outputs";
-                        if (!Strings.isNullOrEmpty(projectJsonJava.getOutputFolder()))
+                        if (console.getExitCode() == 0)
                         {
-                            outputFolderName = projectJsonJava.getOutputFolder();
-                        }
-                        final Folder outputsFolder = folderToBuild.getFolder(outputFolderName).await();
-                        final File parseJsonFile = outputsFolder.getFile("parse.json").await();
-                        final List<File> newJavaSourceFiles = List.create();
-                        final List<File> deletedJavaSourceFiles = List.create();
-                        final List<File> modifiedJavaSourceFiles = List.create();
-                        final List<File> nonModifiedJavaSourceFiles = List.create();
-                        final List<ParseJSONSourceFile> parseJsonSourceFiles = List.create();
-                        final Value<Boolean> compileEverything = Value.create(false);
-                        final ParseJSON updatedParseJson = new ParseJSON();
-                        if (!useParseJson)
-                        {
-                            compileEverything.set(true);
-                            outputsFolder.delete()
-                                .catchError(FolderNotFoundException.class)
-                                .thenResult(outputsFolder::create)
-                                .await();
-                        }
-                        else
-                        {
-                            outputsFolder.create()
-                                .then(() ->
-                                {
-                                    compileEverything.set(true);
-                                    newJavaSourceFiles.addAll(javaSourceFiles);
-                                    parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, folderToBuild));
-                                })
-                                .catchErrorResult(FolderAlreadyExistsException.class, () ->
-                                {
-                                    verboseLog(console, "Parsing " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
-                                    return ParseJSON.parse(parseJsonFile)
-                                        .then((ParseJSON parseJson) ->
-                                        {
-                                            compileEverything.set(shouldCompileEverything(parseJson.getProjectJson(), projectJson));
-
-                                            for (final File javaSourceFile : javaSourceFiles)
-                                            {
-                                                final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
-
-                                                parseJson.getSourceFile(javaSourceFileRelativePath)
-                                                    .then((ParseJSONSourceFile parseJsonSource) ->
-                                                    {
-                                                        if (!javaSourceFile.getLastModified().await().equals(parseJsonSource.getLastModified()))
-                                                        {
-                                                            modifiedJavaSourceFiles.add(javaSourceFile);
-                                                            parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
-                                                        }
-                                                        else
-                                                        {
-                                                            nonModifiedJavaSourceFiles.add(javaSourceFile);
-                                                            parseJsonSourceFiles.add(parseJsonSource);
-                                                        }
-                                                    })
-                                                    .catchError(NotFoundException.class, () ->
-                                                    {
-                                                        newJavaSourceFiles.add(javaSourceFile);
-                                                        parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
-                                                    });
-                                            }
-
-                                            for (final ParseJSONSourceFile parseJsonSource : parseJson.getSourceFiles())
-                                            {
-                                                final Path parseJsonSourceFilePath = parseJsonSource.getRelativePath();
-                                                final File parseJsonSourceFile = folderToBuild.getFile(parseJsonSourceFilePath).await();
-                                                if (!javaSourceFiles.contains(parseJsonSourceFile))
-                                                {
-                                                    deletedJavaSourceFiles.add(parseJsonSourceFile);
-                                                }
-                                            }
-                                        })
-                                        .catchError(FileNotFoundException.class, () ->
-                                        {
-                                            compileEverything.set(true);
-                                            newJavaSourceFiles.addAll(javaSourceFiles);
-                                            parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, folderToBuild));
-                                        });
-                                })
-                                .await();
-
-                            verboseLog(console, "Updating " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
-                            verboseLog(console, "Setting project.json...").await();
-                            updatedParseJson.setProjectJson(projectJson);
-                            verboseLog(console, "Setting source files...").await();
-                            updatedParseJson.setSourceFiles(parseJsonSourceFiles);
-                            verboseLog(console, "Writing parse.json file...").await();
-                            updatedParseJson.write(parseJsonFile).await();
-                            verboseLog(console, "Done writing parse.json file...").await();
-                        }
-
-                        if (!Iterable.isNullOrEmpty(deletedJavaSourceFiles))
-                        {
-                            verboseLog(console, "Deleting class files for deleted source files...").await();
-                            for (final File deletedSourceFile : deletedJavaSourceFiles)
+                            String outputFolderName = "outputs";
+                            if (!Strings.isNullOrEmpty(projectJsonJava.getOutputFolder()))
                             {
-                                getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
-                                    .delete()
-                                    .catchError(FileNotFoundException.class, () -> {
-                                    })
+                                outputFolderName = projectJsonJava.getOutputFolder();
+                            }
+                            final Folder outputsFolder = folderToBuild.getFolder(outputFolderName).await();
+                            final File parseJsonFile = outputsFolder.getFile("parse.json").await();
+                            final List<File> newJavaSourceFiles = List.create();
+                            final List<File> deletedJavaSourceFiles = List.create();
+                            final List<File> modifiedJavaSourceFiles = List.create();
+                            final List<File> nonModifiedJavaSourceFiles = List.create();
+                            final List<ParseJSONSourceFile> parseJsonSourceFiles = List.create();
+                            final Value<Boolean> compileEverything = Value.create(false);
+                            final ParseJSON updatedParseJson = new ParseJSON();
+                            if (!useParseJson)
+                            {
+                                compileEverything.set(true);
+                                outputsFolder.delete()
+                                    .catchError(FolderNotFoundException.class)
+                                    .thenResult(outputsFolder::create)
                                     .await();
                             }
-                        }
-
-                        verboseLog(console, "Detecting java source files to compile...").await();
-                        final Set<File> javaSourceFilesToCompile = Set.create();
-                        if (compileEverything.get())
-                        {
-                            verboseLog(console, "Compiling all source files.").await();
-                            javaSourceFilesToCompile.addAll(javaSourceFiles);
-                        }
-                        else
-                        {
-                            javaSourceFilesToCompile.addAll(newJavaSourceFiles);
-                            javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
-                            javaSourceFilesToCompile.addAll(nonModifiedJavaSourceFiles.where((File javaSourceFile) ->
+                            else
                             {
-                                final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
-                                final ParseJSONSourceFile parseJsonSourceFile = updatedParseJson.getSourceFile(javaSourceFileRelativePath).await();
-                                final Iterable<Path> dependencyRelativeFilePaths = parseJsonSourceFile.getDependencies();
-                                boolean shouldCompile = false;
-                                if (!Iterable.isNullOrEmpty(dependencyRelativeFilePaths))
-                                {
-                                    final Iterable<File> dependencyFiles = dependencyRelativeFilePaths
-                                        .map((Path dependencyRelativeFilePath) ->
-                                            folderToBuild.getFile(dependencyRelativeFilePath).await());
-                                    for (final File dependencyFile : dependencyFiles)
+                                outputsFolder.create()
+                                    .then(() ->
                                     {
-                                        if (modifiedJavaSourceFiles.contains(dependencyFile) ||
-                                            deletedJavaSourceFiles.contains(dependencyFile))
-                                        {
-                                            shouldCompile = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                verboseLog(console, "Compile " + javaSourceFile + "?: " + shouldCompile);
-                                return shouldCompile;
-                            }));
-                        }
+                                        compileEverything.set(true);
+                                        newJavaSourceFiles.addAll(javaSourceFiles);
+                                        parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, folderToBuild));
+                                    })
+                                    .catchErrorResult(FolderAlreadyExistsException.class, () ->
+                                    {
+                                        verboseLog(console, "Parsing " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                                        return ParseJSON.parse(parseJsonFile)
+                                            .then((ParseJSON parseJson) ->
+                                            {
+                                                compileEverything.set(shouldCompileEverything(parseJson.getProjectJson(), projectJson));
 
-                        if (Iterable.isNullOrEmpty(javaSourceFilesToCompile))
-                        {
-                            verboseLog(console, "No source files need compilation.").await();
-                        }
-                        else
-                        {
-                            verboseLog(console, "Starting compilation...");
-                            final JavaCompilationResult compilationResult = javaCompiler
-                                .compile(javaSourceFilesToCompile, folderToBuild, outputsFolder, console)
-                                .await();
-                            verboseLog(console, "Compilation finished.").await();
-                            if (!Iterable.isNullOrEmpty(compilationResult.issues))
+                                                for (final File javaSourceFile : javaSourceFiles)
+                                                {
+                                                    final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
+
+                                                    parseJson.getSourceFile(javaSourceFileRelativePath)
+                                                        .then((ParseJSONSourceFile parseJsonSource) ->
+                                                        {
+                                                            if (!javaSourceFile.getLastModified().await().equals(parseJsonSource.getLastModified()))
+                                                            {
+                                                                modifiedJavaSourceFiles.add(javaSourceFile);
+                                                                parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                                            }
+                                                            else
+                                                            {
+                                                                nonModifiedJavaSourceFiles.add(javaSourceFile);
+                                                                parseJsonSourceFiles.add(parseJsonSource);
+                                                            }
+                                                        })
+                                                        .catchError(NotFoundException.class, () ->
+                                                        {
+                                                            newJavaSourceFiles.add(javaSourceFile);
+                                                            parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                                        });
+                                                }
+
+                                                for (final ParseJSONSourceFile parseJsonSource : parseJson.getSourceFiles())
+                                                {
+                                                    final Path parseJsonSourceFilePath = parseJsonSource.getRelativePath();
+                                                    final File parseJsonSourceFile = folderToBuild.getFile(parseJsonSourceFilePath).await();
+                                                    if (!javaSourceFiles.contains(parseJsonSourceFile))
+                                                    {
+                                                        deletedJavaSourceFiles.add(parseJsonSourceFile);
+                                                    }
+                                                }
+                                            })
+                                            .catchError(FileNotFoundException.class, () ->
+                                            {
+                                                compileEverything.set(true);
+                                                newJavaSourceFiles.addAll(javaSourceFiles);
+                                                parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, folderToBuild));
+                                            });
+                                    })
+                                    .await();
+
+                                verboseLog(console, "Updating " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                                verboseLog(console, "Setting project.json...").await();
+                                updatedParseJson.setProjectJson(projectJson);
+                                verboseLog(console, "Setting source files...").await();
+                                updatedParseJson.setSourceFiles(parseJsonSourceFiles);
+                                verboseLog(console, "Writing parse.json file...").await();
+                                updatedParseJson.write(parseJsonFile).await();
+                                verboseLog(console, "Done writing parse.json file...").await();
+                            }
+
+                            if (!Iterable.isNullOrEmpty(deletedJavaSourceFiles))
                             {
-                                for (final JavaCompilerIssue issue : compilationResult.issues)
+                                verboseLog(console, "Deleting class files for deleted source files...").await();
+                                for (final File deletedSourceFile : deletedJavaSourceFiles)
                                 {
-                                    console.writeLine(issue.sourceFilePath + " (Line " + issue.lineNumber + "): " + issue.message);
+                                    getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
+                                        .delete()
+                                        .catchError(FileNotFoundException.class, () -> {
+                                        })
+                                        .await();
                                 }
                             }
 
-                            if (createJar && compilationResult.exitCode == 0)
+                            verboseLog(console, "Detecting java source files to compile...").await();
+                            final Set<File> javaSourceFilesToCompile = Set.create();
+                            if (compileEverything.get())
                             {
-                                console.writeLine("Creating jar file...").await();
-                                final JarCreator jarCreator = getJarCreator(JavaJarCreator::new);
-                                jarCreator.setOutputsFolder(outputsFolder);
-
-                                String jarName = projectJson.getProject();
-                                if (Strings.isNullOrEmpty(jarName) && javaSourceFiles.getCount() == 1)
+                                verboseLog(console, "Compiling all source files.").await();
+                                javaSourceFilesToCompile.addAll(javaSourceFiles);
+                            }
+                            else
+                            {
+                                javaSourceFilesToCompile.addAll(newJavaSourceFiles);
+                                javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
+                                javaSourceFilesToCompile.addAll(nonModifiedJavaSourceFiles.where((File javaSourceFile) ->
                                 {
-                                    jarName = javaSourceFiles.first().getNameWithoutFileExtension();
-                                }
-                                if (Strings.isNullOrEmpty(jarName) && !folderToBuild.getPath().equals(folderToBuild.getRoot().getPath()))
+                                    final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
+                                    final ParseJSONSourceFile parseJsonSourceFile = updatedParseJson.getSourceFile(javaSourceFileRelativePath).await();
+                                    final Iterable<Path> dependencyRelativeFilePaths = parseJsonSourceFile.getDependencies();
+                                    boolean shouldCompile = false;
+                                    if (!Iterable.isNullOrEmpty(dependencyRelativeFilePaths))
+                                    {
+                                        final Iterable<File> dependencyFiles = dependencyRelativeFilePaths
+                                            .map((Path dependencyRelativeFilePath) ->
+                                                folderToBuild.getFile(dependencyRelativeFilePath).await());
+                                        for (final File dependencyFile : dependencyFiles)
+                                        {
+                                            if (modifiedJavaSourceFiles.contains(dependencyFile) ||
+                                                deletedJavaSourceFiles.contains(dependencyFile))
+                                            {
+                                                shouldCompile = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    verboseLog(console, "Compile " + javaSourceFile + "?: " + shouldCompile);
+                                    return shouldCompile;
+                                }));
+                            }
+
+                            if (Iterable.isNullOrEmpty(javaSourceFilesToCompile))
+                            {
+                                verboseLog(console, "No source files need compilation.").await();
+                            }
+                            else
+                            {
+                                verboseLog(console, "Starting compilation...");
+                                final JavaCompilationResult compilationResult = javaCompiler
+                                    .compile(javaSourceFilesToCompile, folderToBuild, outputsFolder, console)
+                                    .await();
+                                verboseLog(console, "Compilation finished.").await();
+                                if (!Iterable.isNullOrEmpty(compilationResult.issues))
                                 {
-                                    jarName = folderToBuild.getName();
+                                    for (final JavaCompilerIssue issue : compilationResult.issues)
+                                    {
+                                        console.writeLine(issue.sourceFilePath + " (Line " + issue.lineNumber + "): " + issue.message);
+                                    }
                                 }
-                                if (Strings.isNullOrEmpty(jarName))
+
+                                if (createJar && compilationResult.exitCode == 0)
                                 {
-                                    jarName = "project";
+                                    console.writeLine("Creating jar file...").await();
+                                    final JarCreator jarCreator = getJarCreator(JavaJarCreator::new);
+                                    jarCreator.setOutputsFolder(outputsFolder);
+
+                                    String jarName = projectJson.getProject();
+                                    if (Strings.isNullOrEmpty(jarName) && javaSourceFiles.getCount() == 1)
+                                    {
+                                        jarName = javaSourceFiles.first().getNameWithoutFileExtension();
+                                    }
+                                    if (Strings.isNullOrEmpty(jarName) && !folderToBuild.getPath().equals(folderToBuild.getRoot().getPath()))
+                                    {
+                                        jarName = folderToBuild.getName();
+                                    }
+                                    if (Strings.isNullOrEmpty(jarName))
+                                    {
+                                        jarName = "project";
+                                    }
+                                    jarCreator.setJarName(jarName);
+
+                                    File manifestFile = null;
+                                    final String mainClass = projectJsonJava.getMainClass();
+                                    if (!Strings.isNullOrEmpty(mainClass))
+                                    {
+                                        manifestFile = outputsFolder.getFile("META-INF/MANIFEST.MF").await();
+                                        final String manifestFileContents =
+                                            "Manifest-Version: 1.0\n" +
+                                                "Main-Class: " + mainClass + "\n";
+                                        manifestFile.setContentsAsString(manifestFileContents).await();
+                                        jarCreator.setManifestFile(manifestFile);
+                                    }
+
+                                    jarCreator.setClassFiles(outputsFolder.getFilesRecursively().await()
+                                        .where((File outputFile) -> Comparer.equal(outputFile.getFileExtension(), ".class")));
+
+                                    jarCreator.setSourceFiles(javaSourceFiles);
+
+                                    jarCreator.createJarFile(console, isVerbose(console).await()).await();
                                 }
-                                jarCreator.setJarName(jarName);
-
-                                File manifestFile = null;
-                                final String mainClass = projectJsonJava.getMainClass();
-                                if (!Strings.isNullOrEmpty(mainClass))
-                                {
-                                    manifestFile = outputsFolder.getFile("META-INF/MANIFEST.MF").await();
-                                    final String manifestFileContents =
-                                        "Manifest-Version: 1.0\n" +
-                                        "Main-Class: " + mainClass + "\n";
-                                    manifestFile.setContentsAsString(manifestFileContents).await();
-                                    jarCreator.setManifestFile(manifestFile);
-                                }
-
-                                jarCreator.setClassFiles(outputsFolder.getFilesRecursively().await()
-                                    .where((File outputFile) -> Comparer.equal(outputFile.getFileExtension(), ".class")));
-
-                                jarCreator.setSourceFiles(javaSourceFiles);
-
-                                jarCreator.createJarFile(console, isVerbose(console).await()).await();
                             }
                         }
                     }
