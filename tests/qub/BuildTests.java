@@ -658,13 +658,14 @@ public class BuildTests
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console, compiler);
-                        test.assertEqual(0, console.getExitCode());
+                        test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            "/sources/A.java (Line 1): This doesn't look right to me."),
+                            "/sources/A.java (Line 1): This doesn't look right to me.",
+                            "1 Issue"),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();

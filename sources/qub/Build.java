@@ -383,6 +383,8 @@ public class Build
                                 final JavaCompilationResult compilationResult = javaCompiler
                                     .compile(javaSourceFilesToCompile, folderToBuild, outputsFolder, console)
                                     .await();
+                                console.setExitCode(compilationResult.exitCode);
+
                                 verboseLog(console, "Compilation finished.").await();
                                 if (!Iterable.isNullOrEmpty(compilationResult.issues))
                                 {
@@ -390,9 +392,11 @@ public class Build
                                     {
                                         console.writeLine(issue.sourceFilePath + " (Line " + issue.lineNumber + "): " + issue.message);
                                     }
+                                    final int issueCount = compilationResult.issues.getCount();
+                                    console.writeLine(issueCount + " Issue" + (issueCount == 1 ? "" : "s"));
                                 }
 
-                                if (createJar && compilationResult.exitCode == 0)
+                                if (createJar && console.getExitCode() == 0)
                                 {
                                     console.writeLine("Creating jar file...").await();
                                     final JarCreator jarCreator = getJarCreator(JavaJarCreator::new);
