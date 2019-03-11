@@ -15,7 +15,7 @@ public class JavacJavaCompiler extends JavaCompiler
 
         return Result.create(() ->
         {
-            final ProcessBuilder javac = process.getProcessBuilder("javac").await();
+            final ProcessBuilder javac = process.getProcessBuilder("javac").awaitError();
             javac.setWorkingFolder(rootFolder);
 
             final InMemoryLineStream stdout = new InMemoryLineStream();
@@ -26,10 +26,10 @@ public class JavacJavaCompiler extends JavaCompiler
 
             javac.addArguments(getArguments(sourceFiles, rootFolder, outputFolder));
 
-            Build.verboseLog(process, " Running " + javac.getCommand() + "...").await();
-            final Integer exitCode = javac.run().await();
-            final String output = stdout.getText().await();
-            final String error = stderr.getText().await();
+            Build.verboseLog(process, " Running " + javac.getCommand() + "...").awaitError();
+            final Integer exitCode = javac.run().awaitError();
+            final String output = stdout.getText().awaitError();
+            final String error = stderr.getText().awaitError();
             final List<JavaCompilerIssue> issues = List.create();
 
             if (!Strings.isNullOrEmpty(error))

@@ -22,8 +22,8 @@ public class FakeJavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = null;
-                    final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
 
                     final FakeJavaCompiler compiler = new FakeJavaCompiler();
                     test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, new Console()), new PreConditionFailure("sourceFiles cannot be null."));
@@ -34,8 +34,8 @@ public class FakeJavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create();
-                    final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
 
                     final FakeJavaCompiler compiler = new FakeJavaCompiler();
                     test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, new Console()), new PreConditionFailure("sourceFiles cannot be empty."));
@@ -46,8 +46,8 @@ public class FakeJavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.createFile("/sources/a/B.java").throwErrorOrGetValue());
-                    final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
+                        fileSystem.createFile("/sources/a/B.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
                     final Folder outputFolder = null;
 
                     final FakeJavaCompiler compiler = new FakeJavaCompiler();
@@ -59,9 +59,9 @@ public class FakeJavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.createFile("/sources/a/B.java").throwErrorOrGetValue());
-                    final Folder rootFolder = fileSystem.getFolder("/").throwErrorOrGetValue();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").throwErrorOrGetValue();
+                        fileSystem.createFile("/sources/a/B.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
 
                     final FakeJavaCompiler compiler = new FakeJavaCompiler();
                     test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, null), new PreConditionFailure("process cannot be null."));
