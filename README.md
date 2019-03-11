@@ -1,2 +1,2 @@
-# qub-java-build
+# qub-java-qubBuild
 A console application for building source code.

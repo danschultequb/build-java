@@ -1,31 +1,31 @@
 package qub;
 
-public class BuildTests
+public class QubBuildTests
 {
     public static void test(TestRunner runner)
     {
-        runner.testGroup(Build.class, () ->
+        runner.testGroup(QubBuild.class, () ->
         {
             runner.testGroup("getShowTotalDuration()", () ->
             {
                 runner.test("when not set", (Test test) ->
                 {
-                    final Build build = new Build();
-                    test.assertTrue(build.getShowTotalDuration());
+                    final QubBuild qubBuild = new QubBuild();
+                    test.assertTrue(qubBuild.getShowTotalDuration());
                 });
 
                 runner.test("when set to false", (Test test) ->
                 {
-                    final Build build = new Build();
-                    build.setShowTotalDuration(false);
-                    test.assertFalse(build.getShowTotalDuration());
+                    final QubBuild qubBuild = new QubBuild();
+                    qubBuild.setShowTotalDuration(false);
+                    test.assertFalse(qubBuild.getShowTotalDuration());
                 });
 
                 runner.test("when set to true", (Test test) ->
                 {
-                    final Build build = new Build();
-                    build.setShowTotalDuration(true);
-                    test.assertTrue(build.getShowTotalDuration());
+                    final QubBuild qubBuild = new QubBuild();
+                    qubBuild.setShowTotalDuration(true);
+                    test.assertTrue(qubBuild.getShowTotalDuration());
                 });
             });
 
@@ -2410,7 +2410,7 @@ public class BuildTests
             {
                 runner.test("with null", (Test test) ->
                 {
-                    test.assertThrows(() -> Build.main((String[])null), new PreConditionFailure("args cannot be null."));
+                    test.assertThrows(() -> QubBuild.main((String[])null), new PreConditionFailure("args cannot be null."));
                 });
             });
         });
@@ -2560,10 +2560,10 @@ public class BuildTests
         PreCondition.assertNotNull(console, "console");
         PreCondition.assertNotNull(compiler, "compiler");
 
-        final Build build = new Build();
-        build.setJavaCompiler(compiler);
-        build.setJarCreator(new FakeJarCreator());
-        build.setShowTotalDuration(showTotalDuration);
-        build.main(console);
+        final QubBuild qubBuild = new QubBuild();
+        qubBuild.setJavaCompiler(compiler);
+        qubBuild.setJarCreator(new FakeJarCreator());
+        qubBuild.setShowTotalDuration(showTotalDuration);
+        qubBuild.main(console);
     }
 }

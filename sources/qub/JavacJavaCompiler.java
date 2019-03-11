@@ -26,7 +26,7 @@ public class JavacJavaCompiler extends JavaCompiler
 
             javac.addArguments(getArguments(sourceFiles, rootFolder, outputFolder));
 
-            Build.verboseLog(process, " Running " + javac.getCommand() + "...").awaitError();
+            QubBuild.verboseLog(process, " Running " + javac.getCommand() + "...").awaitError();
             final Integer exitCode = javac.run().awaitError();
             final String output = stdout.getText().awaitError();
             final String error = stderr.getText().awaitError();

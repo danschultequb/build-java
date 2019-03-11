@@ -118,7 +118,7 @@ public class JavacJavaCompilerTests
                                         "use --help for a list of possible options"),
                                     Strings.getLines(result.error));
                                 test.assertEqual(Iterable.create(), result.issues);
-                                test.assertSuccess(false, Build.getClassFile(aJava, rootFolder, outputFolder).exists());
+                                test.assertSuccess(false, QubBuild.getClassFile(aJava, rootFolder, outputFolder).exists());
                             });
                     }
                     finally
@@ -148,7 +148,7 @@ public class JavacJavaCompilerTests
                                 test.assertEqual("", result.output);
                                 test.assertEqual("", result.error);
                                 test.assertEqual(Iterable.create(), result.issues);
-                                test.assertSuccess(false, Build.getClassFile(bJava, rootFolder, outputFolder).exists());
+                                test.assertSuccess(false, QubBuild.getClassFile(bJava, rootFolder, outputFolder).exists());
                             });
                     }
                     finally
@@ -189,7 +189,7 @@ public class JavacJavaCompilerTests
                                 test.assertEqual("", result.output);
                                 test.assertEqual("", result.error);
                                 test.assertEqual(Iterable.create(), result.issues);
-                                test.assertSuccess(true, Build.getClassFile(cJava, rootFolder, outputFolder).exists());
+                                test.assertSuccess(true, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
                             });
                     }
                     finally
@@ -242,7 +242,7 @@ public class JavacJavaCompilerTests
                                             1, 8,
                                             "class MyTestClass is public, should be declared in a file named MyTestClass.java")),
                                     result.issues);
-                                test.assertSuccess(false, Build.getClassFile(cJava, rootFolder, outputFolder).exists());
+                                test.assertSuccess(false, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
                             });
                     }
                     finally
@@ -283,7 +283,7 @@ public class JavacJavaCompilerTests
                                         1, 1,
                                         "class, interface, or enum expected")),
                                     result.issues);
-                                test.assertSuccess(false, Build.getClassFile(cJava, rootFolder, outputFolder).exists());
+                                test.assertSuccess(false, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
                             });
                     }
                     finally
@@ -343,7 +343,7 @@ public class JavacJavaCompilerTests
                                             7, 4,
                                             "reached end of file while parsing")),
                                     result.issues);
-                                test.assertSuccess(false, Build.getClassFile(cJava, rootFolder, outputFolder).exists());
+                                test.assertSuccess(false, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
                             });
                     }
                     finally

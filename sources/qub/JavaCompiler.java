@@ -121,7 +121,7 @@ public abstract class JavaCompiler
             {
                 result = Result.error(new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."));
             }
-            else if (Build.isJava8(javaVersion))
+            else if (QubBuild.isJava8(javaVersion))
             {
                 setVersion("8");
 
@@ -142,7 +142,7 @@ public abstract class JavaCompiler
                         });
                 }
             }
-            else if (Build.isJava11(javaVersion))
+            else if (QubBuild.isJava11(javaVersion))
             {
                 setVersion("11");
             }

@@ -1,15 +1,15 @@
 package qub;
 
-public class Build
+public class QubBuild
 {
     private Boolean showTotalDuration;
     private JavaCompiler javaCompiler;
     private JarCreator jarCreator;
 
     /**
-     * Get whether or not to show the total duration of this Build command. This value will default
+     * Get whether or not to show the total duration of this QubBuild command. This value will default
      * to true if it hasn't been set.
-     * @return Whether or not to show the total duration of this Build command.
+     * @return Whether or not to show the total duration of this QubBuild command.
      */
     public boolean getShowTotalDuration()
     {
@@ -23,8 +23,8 @@ public class Build
     }
 
     /**
-     * Set whether or not to show the total duration of this Build command.
-     * @param showTotalDuration Whether or not to show the total duration of this Build command.
+     * Set whether or not to show the total duration of this QubBuild command.
+     * @param showTotalDuration Whether or not to show the total duration of this QubBuild command.
      */
     public void setShowTotalDuration(boolean showTotalDuration)
     {
@@ -105,7 +105,7 @@ public class Build
         PreCondition.assertNotNull(console, "console");
 
         final CommandLine commandLine = console.getCommandLine();
-        if (commandLine.contains(Build::showUsage))
+        if (commandLine.contains(QubBuild::showUsage))
         {
             console.writeLine("Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]");
             console.writeLine("  Used to compile and package source code projects.");
@@ -685,7 +685,7 @@ public class Build
 
     public static void main(String[] args)
     {
-        final Build build = new Build();
-        Console.run(args, build::main);
+        final QubBuild qubBuild = new QubBuild();
+        Console.run(args, qubBuild::main);
     }
 }

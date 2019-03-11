@@ -14,7 +14,7 @@ public class FakeJavaCompiler extends JavaCompiler
 
         for (final File sourceFile : sourceFiles)
         {
-            sourceFile.copyTo(Build.getClassFile(sourceFile, rootFolder, outputFolder));
+            sourceFile.copyTo(QubBuild.getClassFile(sourceFile, rootFolder, outputFolder));
         }
 
         return Result.success(
