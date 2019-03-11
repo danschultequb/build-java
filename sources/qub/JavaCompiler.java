@@ -9,6 +9,8 @@ public abstract class JavaCompiler
     private String bootClasspath;
     private Iterable<Dependency> dependencies;
     private Folder qubFolder;
+    private Integer maximumErrors;
+    private Integer maximumWarnings;
 
     public String getVersion()
     {
@@ -52,6 +54,52 @@ public abstract class JavaCompiler
     public Folder getQubFolder()
     {
         return qubFolder;
+    }
+
+    /**
+     * Set the maximum number of errors that the compiler should report before halting compilation.
+     * If nothing is specified (maximumErrors is null), then the default (100) will be used.
+     * @param maximumErrors The maximum number of errors that the compiler should report before
+     *                      halting compilation.
+     * @return This object for method chaining.
+     */
+    public JavaCompiler setMaximumErrors(Integer maximumErrors)
+    {
+        this.maximumErrors = maximumErrors;
+        return this;
+    }
+
+    /**
+     * Get the maximum number of errors that the compiler should report before halting compilation.
+     * If nothing is specified (maximumErrors is null), then the default (100) will be used.
+     * @return The maximum number of errors that the compiler should report before halting
+     * compilation.
+     */
+    public Integer getMaximumErrors()
+    {
+        return maximumErrors;
+    }
+
+    /**
+     * Set the maximum number of warnings that the compiler should report. If nothing is specified
+     * (maximumWarnings is null), then the default (100) will be used.
+     * @param maximumWarnings The maximum number of warnings that the compiler should report.
+     * @return This object for method chaining.
+     */
+    public JavaCompiler setMaximumWarnings(Integer maximumWarnings)
+    {
+        this.maximumWarnings = maximumWarnings;
+        return this;
+    }
+
+    /**
+     * Get the maximum number of warnings that the compiler should report. If nothing is specified
+     * (maximumWarnings is null), then the default (100) will be used.
+     * @return The maximum number of warnings that the compiler should report.
+     */
+    public Integer getMaximumWarnings()
+    {
+        return maximumWarnings;
     }
 
     /**
@@ -161,6 +209,16 @@ public abstract class JavaCompiler
             }));
         }
         result.addAll("-classpath", Strings.join(';', classPaths));
+
+        if (maximumErrors != null)
+        {
+            result.addAll("-Xmaxerrs", maximumErrors.toString());
+        }
+
+        if (maximumWarnings != null)
+        {
+            result.addAll("-Xmaxwarns", maximumWarnings.toString());
+        }
 
         result.addAll(sourceFiles.map((File sourceFile) -> sourceFile.relativeTo(rootFolder).toString()));
 

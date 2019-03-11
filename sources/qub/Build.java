@@ -152,7 +152,7 @@ public class Build
 
                     if (console.getExitCode() == 0)
                     {
-                        final JavaCompiler javaCompiler = getJavaCompiler(JavacJavaCompiler::new);
+                        javaCompiler = getJavaCompiler(JavacJavaCompiler::new);
                         javaCompiler.checkJavaVersion(projectJsonJava.getVersion(), console)
                             .catchError((Throwable error) ->
                             {
@@ -163,6 +163,9 @@ public class Build
 
                     if (console.getExitCode() == 0)
                     {
+                        javaCompiler.setMaximumErrors(projectJsonJava.getMaximumErrors());
+                        javaCompiler.setMaximumWarnings(projectJsonJava.getMaximumWarnings());
+
                         final Iterable<Dependency> dependencies = projectJsonJava.getDependencies();
                         if (!Iterable.isNullOrEmpty(dependencies))
                         {

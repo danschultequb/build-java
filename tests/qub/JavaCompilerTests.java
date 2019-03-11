@@ -312,6 +312,156 @@ public class JavaCompilerTests
                         ),
                         compiler.getArguments(sourceFiles, rootFolder, outputFolder));
                 });
+
+                runner.test("with negative maximumErrors", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    compiler.setMaximumErrors(-4);
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-target", "1.7",
+                            "-classpath","/outputs",
+                            "-Xmaxerrs", "-4",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
+
+                runner.test("with zero maximumErrors", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    compiler.setMaximumErrors(0);
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-target", "1.7",
+                            "-classpath","/outputs",
+                            "-Xmaxerrs", "0",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
+
+                runner.test("with positive maximumErrors", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    compiler.setMaximumErrors(10);
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-target", "1.7",
+                            "-classpath","/outputs",
+                            "-Xmaxerrs", "10",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
+
+                runner.test("with negative maximumWarnings", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    compiler.setMaximumWarnings(-5);
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-target", "1.7",
+                            "-classpath","/outputs",
+                            "-Xmaxwarns", "-5",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
+
+                runner.test("with zero maximumWarnings", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    compiler.setMaximumWarnings(0);
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-target", "1.7",
+                            "-classpath","/outputs",
+                            "-Xmaxwarns", "0",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
+
+                runner.test("with positive maximumWarnings", (Test test) ->
+                {
+                    final JavaCompiler compiler = creator.run();
+                    compiler.setVersion("1.7");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final Iterable<File> sourceFiles = Iterable.create(
+                        fileSystem.getFile("/sources/A.java").awaitError());
+                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    compiler.setMaximumWarnings(11);
+                    test.assertEqual(
+                        Iterable.create(
+                            "-d", "/outputs",
+                            "-Xlint:unchecked",
+                            "-Xlint:deprecation",
+                            "-source", "1.7",
+                            "-target", "1.7",
+                            "-classpath","/outputs",
+                            "-Xmaxwarns", "11",
+                            "sources/A.java"
+                        ),
+                        compiler.getArguments(sourceFiles, rootFolder, outputFolder));
+                });
             });
         });
     }
