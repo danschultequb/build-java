@@ -510,6 +510,190 @@ public class ProjectJSONTests
                                 java.getDependencies());
                         });
                 });
+
+                runner.test("with maximumErrors string value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumErrors\": \"50\" } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertNull(java.getMaximumErrors());
+                    test.assertNull(java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with maximumErrors negative number value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumErrors\": -2 } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertEqual(-2, java.getMaximumErrors());
+                    test.assertNull(java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with maximumErrors zero number value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumErrors\": 0 } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertEqual(0, java.getMaximumErrors());
+                    test.assertNull(java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with maximumErrors 100 number value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumErrors\": 100 } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertEqual(100, java.getMaximumErrors());
+                    test.assertNull(java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with maximumWarnings string value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumWarnings\": \"50\" } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertNull(java.getMaximumErrors());
+                    test.assertNull(java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with maximumWarnings negative number value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumWarnings\": -2 } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertNull(java.getMaximumErrors());
+                    test.assertEqual(-2, java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with maximumWarnings zero number value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumWarnings\": 0 } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertNull(java.getMaximumErrors());
+                    test.assertEqual(0, java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with maximumWarnings 100 number value", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").awaitError();
+                    file.setContentsAsString("{ \"java\": { \"maximumWarnings\": 100 } }").awaitError();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).awaitError();
+                    test.assertNotNull(projectJSON);
+                    test.assertEqual(null, projectJSON.getPublisher());
+                    test.assertEqual(null, projectJSON.getProject());
+                    test.assertEqual(null, projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertNull(java.getMaximumErrors());
+                    test.assertEqual(100, java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
             });
         });
     }

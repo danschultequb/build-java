@@ -6,6 +6,8 @@ public class ProjectJSONJava
     private String shortcutName;
     private String version;
     private String outputFolder;
+    private Integer maximumErrors;
+    private Integer maximumWarnings;
     private Iterable<PathPattern> sourceFilePatterns;
     private Iterable<Dependency> dependencies;
 
@@ -90,6 +92,52 @@ public class ProjectJSONJava
         return sourceFilePatterns;
     }
 
+    /**
+     * Set the maximum number of errors that the compiler should report before halting compilation.
+     * If nothing is specified (maximumErrors is null), then the default (100) will be used.
+     * @param maximumErrors The maximum number of errors that the compiler should report before
+     *                      halting compilation.
+     * @return This object for method chaining.
+     */
+    public ProjectJSONJava setMaximumErrors(Integer maximumErrors)
+    {
+        this.maximumErrors = maximumErrors;
+        return this;
+    }
+
+    /**
+     * Get the maximum number of errors that the compiler should report before halting compilation.
+     * If nothing is specified (maximumErrors is null), then the default (100) will be used.
+     * @return The maximum number of errors that the compiler should report before halting
+     * compilation.
+     */
+    public Integer getMaximumErrors()
+    {
+        return maximumErrors;
+    }
+
+    /**
+     * Set the maximum number of warnings that the compiler should report. If nothing is specified
+     * (maximumWarnings is null), then the default (100) will be used.
+     * @param maximumWarnings The maximum number of warnings that the compiler should report.
+     * @return This object for method chaining.
+     */
+    public ProjectJSONJava setMaximumWarnings(Integer maximumWarnings)
+    {
+        this.maximumWarnings = maximumWarnings;
+        return this;
+    }
+
+    /**
+     * Get the maximum number of warnings that the compiler should report. If nothing is specified
+     * (maximumWarnings is null), then the default (100) will be used.
+     * @return The maximum number of warnings that the compiler should report.
+     */
+    public Integer getMaximumWarnings()
+    {
+        return maximumWarnings;
+    }
+
     public ProjectJSONJava setSourceFilePatterns(Iterable<PathPattern> sourceFilePatterns)
     {
         this.sourceFilePatterns = sourceFilePatterns;
@@ -138,6 +186,14 @@ public class ProjectJSONJava
         if (!Iterable.isNullOrEmpty(sourceFilePatterns))
         {
             builder.stringArrayProperty("sourceFiles", sourceFilePatterns.map(PathPattern::toString));
+        }
+        if (maximumErrors != null)
+        {
+            builder.numberProperty("maximumErrors", maximumErrors);
+        }
+        if (maximumWarnings != null)
+        {
+            builder.numberProperty("maximumWarnings", maximumWarnings);
         }
         if (!Iterable.isNullOrEmpty(dependencies))
         {
@@ -196,6 +252,10 @@ public class ProjectJSONJava
                             .map(PathPattern::parse));
                     });
             });
+        javaObject.getNumberPropertyValue("maximumErrors")
+            .then((Double maximumErrors) -> result.setMaximumErrors(maximumErrors.intValue()));
+        javaObject.getNumberPropertyValue("maximumWarnings")
+            .then((Double maximumWarnings) -> result.setMaximumWarnings(maximumWarnings.intValue()));
         javaObject.getArrayPropertyValue("dependencies").then((JSONArray dependenciesArray) ->
         {
             result.setDependencies(dependenciesArray.getElements()
