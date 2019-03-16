@@ -11,7 +11,7 @@ public class FakeJarCreator extends JarCreator
             final String jarName = getJarName();
             final File jarFile = outputsFolder.getFile(jarName + ".jar").await();
 
-            try (final LineWriteStream writeStream = jarFile.getContentCharacterWriteStream().await().asLineWriteStream())
+            try (final CharacterWriteStream writeStream = jarFile.getContentCharacterWriteStream().await())
             {
                 final File manifestFile = getManifestFile();
                 if (manifestFile != null)

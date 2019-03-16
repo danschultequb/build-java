@@ -2520,7 +2520,7 @@ public class QubBuildTests
         PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
 
         final Console result = createConsole(commandLineArguments);
-        result.setOutput(output);
+        result.setOutputCharacterWriteStream(output);
 
         return result;
     }

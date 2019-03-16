@@ -18,18 +18,18 @@ public class JavacJavaCompiler extends JavaCompiler
             final ProcessBuilder javac = process.getProcessBuilder("javac").awaitError();
             javac.setWorkingFolder(rootFolder);
 
-            final InMemoryLineStream stdout = new InMemoryLineStream();
-            javac.redirectOutput(stdout.asByteWriteStream());
+            final InMemoryByteStream stdout = new InMemoryByteStream();
+            javac.redirectOutput(stdout);
 
-            final InMemoryLineStream stderr = new InMemoryLineStream();
-            javac.redirectError(stderr.asByteWriteStream());
+            final InMemoryByteStream stderr = new InMemoryByteStream();
+            javac.redirectError(stderr);
 
             javac.addArguments(getArguments(sourceFiles, rootFolder, outputFolder));
 
             QubBuild.verboseLog(process, " Running " + javac.getCommand() + "...").awaitError();
             final Integer exitCode = javac.run().awaitError();
-            final String output = stdout.getText().awaitError();
-            final String error = stderr.getText().awaitError();
+            final String output = stdout.asCharacterReadStream().getText().awaitError();
+            final String error = stderr.asCharacterReadStream().getText().awaitError();
             final List<JavaCompilerIssue> issues = List.create();
 
             if (!Strings.isNullOrEmpty(error))

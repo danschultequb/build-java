@@ -8,8 +8,8 @@ public class JavaJarCreator extends JarCreator
         return Result.create(() ->
         {
             final ProcessBuilder jar = console.getProcessBuilder("jar").await();
-            jar.redirectOutput(console.getOutputAsByteWriteStream());
-            jar.redirectError(console.getErrorAsByteWriteStream());
+            jar.redirectOutput(console.getOutputByteWriteStream());
+            jar.redirectError(console.getErrorByteWriteStream());
 
             final Folder outputsFolder = getOutputsFolder();
             jar.setWorkingFolder(outputsFolder);
