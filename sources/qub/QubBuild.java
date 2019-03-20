@@ -514,7 +514,7 @@ public class QubBuild
 
         final CommandLine commandLine = console.getCommandLine();
 
-        boolean result = false;
+        boolean result = true;
 
         CommandLineArgument useParseJsonArgument = commandLine.get("parsejson");
         if (useParseJsonArgument != null)
@@ -587,7 +587,8 @@ public class QubBuild
             {
                 Result<Iterable<File>> result;
                 final Iterable<File> javaSources = files
-                    .where((File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folder))));
+                    .where((File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folder))))
+                    .toArray();
                 if (!javaSources.any())
                 {
                     result = Result.error(new NotFoundException("No java source files found in " + folder + "."));

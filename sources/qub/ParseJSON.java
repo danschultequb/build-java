@@ -67,7 +67,7 @@ public class ParseJSON
 
         return Result.create(() ->
         {
-            try (final CharacterWriteStream writeStream = file.getContentCharacterWriteStream().await())
+            try (final CharacterWriteStream writeStream = new BufferedByteWriteStream(file.getContentByteWriteStream().await()).asCharacterWriteStream())
             {
                 JSON.object(writeStream, (JSONObjectBuilder parseJsonBuilder) ->
                 {

@@ -2399,7 +2399,8 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar"),
+                            "/outputs/A.jar",
+                            "/outputs/parse.json"),
                         currentFolder.getFolder("outputs").await()
                             .getFilesAndFoldersRecursively().await()
                             .map(FileSystemEntry::toString));
