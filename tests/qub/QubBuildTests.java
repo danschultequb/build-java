@@ -2457,7 +2457,10 @@ public class QubBuildTests
 
     private static void setFileContents(File file, String contents)
     {
-        CharacterEncoding.UTF_8.encode(contents).then(file::setContents);
+        final byte[] byteContents = Strings.isNullOrEmpty(contents)
+            ? new byte[0]
+            : CharacterEncoding.UTF_8.encode(contents).await();
+        file.setContents(byteContents).await();
     }
 
     private static String getFileContents(Folder folder, String relativeFilePath)
