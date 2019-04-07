@@ -391,12 +391,30 @@ public class QubBuild
                                 verboseLog(console, "Compilation finished.").await();
                                 if (!Iterable.isNullOrEmpty(compilationResult.issues))
                                 {
-                                    for (final JavaCompilerIssue issue : compilationResult.issues)
+                                    final Iterable<JavaCompilerIssue> sortedIssues = compilationResult.issues
+                                        .order((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
+
+                                    final Iterable<JavaCompilerIssue> warnings = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning);
+                                    final int warningCount = warnings.getCount();
+                                    if (warningCount > 0)
                                     {
-                                        console.writeLine(issue.sourceFilePath + " (Line " + issue.lineNumber + "): " + issue.message);
+                                        console.writeLine(warningCount + " Warning" + (warningCount == 1 ? "" : "s") + ":").await();
+                                        for (final JavaCompilerIssue warning : warnings)
+                                        {
+                                            console.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
+                                        }
                                     }
-                                    final int issueCount = compilationResult.issues.getCount();
-                                    console.writeLine(issueCount + " Issue" + (issueCount == 1 ? "" : "s"));
+
+                                    final Iterable<JavaCompilerIssue> errors = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error);
+                                    final int errorCount = errors.getCount();
+                                    if (errorCount > 0)
+                                    {
+                                        console.writeLine(errorCount + " Error" + (errorCount == 1 ? "" : "s") + ":").await();
+                                        for (final JavaCompilerIssue error : errors)
+                                        {
+                                            console.writeLine(error.sourceFilePath + " (Line " + error.lineNumber + "): " + error.message).await();
+                                        }
+                                    }
                                 }
 
                                 if (createJar && console.getExitCode() == 0)
