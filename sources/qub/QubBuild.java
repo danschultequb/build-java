@@ -652,23 +652,18 @@ public class QubBuild
         PreCondition.assertNotNull(folder, "folder");
         PreCondition.assertNotNullAndNotEmpty(sourceFilePatterns, "sourceFilePatterns");
 
-        return folder.getFilesRecursively()
-            .thenResult((Iterable<File> files) ->
+        return Result.create(() ->
+        {
+            final Iterable<File> files = folder.getFilesRecursively().await();
+            final Iterable<File> javaSourceFiles = files
+                .where((File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folder))))
+                .toList();
+            if (!javaSourceFiles.any())
             {
-                Result<Iterable<File>> result;
-                final Iterable<File> javaSources = files
-                    .where((File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folder))))
-                    .toArray();
-                if (!javaSources.any())
-                {
-                    result = Result.error(new NotFoundException("No java source files found in " + folder + "."));
-                }
-                else
-                {
-                    result = Result.success(javaSources);
-                }
-                return result;
-            });
+                throw new NotFoundException("No java source files found in " + folder + ".");
+            }
+            return javaSourceFiles;
+        });
     }
 
     public static File getClassFile(File sourceFile, Folder rootFolder, Folder outputFolder)
