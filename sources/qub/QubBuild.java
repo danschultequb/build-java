@@ -226,12 +226,17 @@ public class QubBuild
 
                     if (console.getExitCode() == 0)
                     {
-                        Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFilePatterns();
-                        if (Iterable.isNullOrEmpty(sourceFilePatterns))
+                        Function1<File,Boolean> sourceFileMatcher;
+                        final Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFilePatterns();
+                        if (!Iterable.isNullOrEmpty(sourceFilePatterns))
                         {
-                            sourceFilePatterns = Iterable.create(PathPattern.parse("**/*.java"));
+                            sourceFileMatcher = (File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folderToBuild)));
                         }
-                        final Iterable<File> javaSourceFiles = getJavaSourceFiles(folderToBuild, sourceFilePatterns)
+                        else
+                        {
+                            sourceFileMatcher = (File file) -> ".java".equalsIgnoreCase(file.getFileExtension());
+                        }
+                        final Iterable<File> javaSourceFiles = getJavaSourceFiles(folderToBuild, sourceFileMatcher)
                             .catchError((Throwable error) ->
                             {
                                 error(console, error.getMessage());
@@ -647,16 +652,16 @@ public class QubBuild
      * @param folder The folder to look for Java source files in.
      * @return All of the Java source files found in the provided folder.
      */
-    public static Result<Iterable<File>> getJavaSourceFiles(Folder folder, Iterable<PathPattern> sourceFilePatterns)
+    public static Result<Iterable<File>> getJavaSourceFiles(Folder folder, Function1<File,Boolean> sourceFileMatcher)
     {
         PreCondition.assertNotNull(folder, "folder");
-        PreCondition.assertNotNullAndNotEmpty(sourceFilePatterns, "sourceFilePatterns");
+        PreCondition.assertNotNull(sourceFileMatcher, "sourceFileMatcher");
 
         return Result.create(() ->
         {
             final Iterable<File> files = folder.getFilesRecursively().await();
             final Iterable<File> javaSourceFiles = files
-                .where((File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folder))))
+                .where(sourceFileMatcher)
                 .toList();
             if (!javaSourceFiles.any())
             {
