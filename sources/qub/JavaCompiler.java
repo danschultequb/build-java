@@ -125,8 +125,8 @@ public abstract class JavaCompiler
             {
                 setVersion("8");
 
-                final Folder javaFolder = process.getFileSystem().getFolder(javaHome).awaitError().getParentFolder().awaitError();
-                final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().awaitError();
+                final Folder javaFolder = process.getFileSystem().getFolder(javaHome).await().getParentFolder().await();
+                final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().await();
                 final Iterable<Folder> jre18Folders = jreAndJdkFolders.where((Folder jreOrJdkFolder) -> jreOrJdkFolder.getName().startsWith("jre1.8.0_"));
                 if (!jre18Folders.any())
                 {

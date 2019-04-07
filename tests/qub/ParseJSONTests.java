@@ -54,18 +54,16 @@ public class ParseJSONTests
                 {
                     final ParseJSON parseJson = new ParseJSON();
                     parseJson.setSourceFiles(null);
-                    test.assertError(
-                        new NotFoundException("No source file found in the ParseJSON object with the path \"sources/A.java\"."),
-                        parseJson.getSourceFile(Path.parse("sources/A.java")));
+                    test.assertThrows(() -> parseJson.getSourceFile(Path.parse("sources/A.java")).await(),
+                        new NotFoundException("No source file found in the ParseJSON object with the path \"sources/A.java\"."));
                 });
 
                 runner.test("with empty sourceFiles", (Test test) ->
                 {
                     final ParseJSON parseJson = new ParseJSON();
                     parseJson.setSourceFiles(Iterable.create());
-                    test.assertError(
-                        new NotFoundException("No source file found in the ParseJSON object with the path \"sources/A.java\"."),
-                        parseJson.getSourceFile(Path.parse("sources/A.java")));
+                    test.assertThrows(() -> parseJson.getSourceFile(Path.parse("sources/A.java")).await(),
+                        new NotFoundException("No source file found in the ParseJSON object with the path \"sources/A.java\"."));
                 });
 
                 runner.test("with non-empty sourceFiles and non-matching sourceFilePath", (Test test) ->
@@ -75,9 +73,8 @@ public class ParseJSONTests
                         new ParseJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
                             .setLastModified(DateTime.utc(10))));
-                    test.assertError(
-                        new NotFoundException("No source file found in the ParseJSON object with the path \"sources/B.java\"."),
-                        parseJson.getSourceFile(Path.parse("sources/B.java")));
+                    test.assertThrows(() -> parseJson.getSourceFile(Path.parse("sources/B.java")).await(),
+                        new NotFoundException("No source file found in the ParseJSON object with the path \"sources/B.java\"."));
                 });
 
                 runner.test("with non-empty sourceFiles and matching sourceFilePath", (Test test) ->
@@ -87,11 +84,11 @@ public class ParseJSONTests
                         new ParseJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
                             .setLastModified(DateTime.utc(10))));
-                    test.assertSuccess(
+                    test.assertEqual(
                         new ParseJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
                             .setLastModified(DateTime.utc(10)),
-                        parseJson.getSourceFile(Path.parse("sources/A.java")));
+                        parseJson.getSourceFile(Path.parse("sources/A.java")).await());
                 });
             });
         });

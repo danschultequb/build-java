@@ -13,7 +13,7 @@ public class JavaCompilerTests
                     final String javaVersion = null;
                     final Process process = new Process();
                     final JavaCompiler compiler = creator.run();
-                    test.assertSuccess(compiler.checkJavaVersion(javaVersion, process));
+                    compiler.checkJavaVersion(javaVersion, process).await();
                 });
 
                 runner.test("with empty javaVersion", (Test test) ->
@@ -21,7 +21,7 @@ public class JavaCompilerTests
                     final String javaVersion = null;
                     final Process process = new Process();
                     final JavaCompiler compiler = creator.run();
-                    test.assertSuccess(compiler.checkJavaVersion(javaVersion, process));
+                    compiler.checkJavaVersion(javaVersion, process).await();
                 });
 
                 runner.test("with null process", (Test test) ->
@@ -38,9 +38,8 @@ public class JavaCompilerTests
                     final Process process = new Process();
                     final JavaCompiler compiler = creator.run();
                     process.setEnvironmentVariables(Map.create());
-                    test.assertError(
-                        new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."),
-                        compiler.checkJavaVersion(javaVersion, process));
+                    test.assertThrows(() -> compiler.checkJavaVersion(javaVersion, process).await(),
+                        new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."));
                 });
 
                 runner.test("with null JAVA_HOME environment variable", (Test test) ->
@@ -49,9 +48,8 @@ public class JavaCompilerTests
                     final Process process = new Process();
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", null));
                     final JavaCompiler compiler = creator.run();
-                    test.assertError(
-                        new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."),
-                        compiler.checkJavaVersion(javaVersion, process));
+                    test.assertThrows(() -> compiler.checkJavaVersion(javaVersion, process).await(),
+                        new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."));
                 });
 
                 runner.test("with empty JAVA_HOME environment variable", (Test test) ->
@@ -60,9 +58,8 @@ public class JavaCompilerTests
                     final Process process = new Process();
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", ""));
                     final JavaCompiler compiler = creator.run();
-                    test.assertError(
-                        new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."),
-                        compiler.checkJavaVersion(javaVersion, process));
+                    test.assertThrows(() -> compiler.checkJavaVersion(javaVersion, process).await(),
+                        new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."));
                 });
 
                 runner.test("with unrecognized java version", (Test test) ->
@@ -75,9 +72,8 @@ public class JavaCompilerTests
                     process.setFileSystem(fileSystem);
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
-                    test.assertError(
-                        new NotFoundException("No bootclasspath runtime jar file could be found for Java version \"spam\"."),
-                        compiler.checkJavaVersion(javaVersion, process));
+                    test.assertThrows(() -> compiler.checkJavaVersion(javaVersion, process).await(),
+                        new NotFoundException("No bootclasspath runtime jar file could be found for Java version \"spam\"."));
                 });
 
                 runner.test("with not installed java version", (Test test) ->
@@ -90,9 +86,8 @@ public class JavaCompilerTests
                     process.setFileSystem(fileSystem);
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
-                    test.assertError(
-                        new NotFoundException("No installed JREs found for Java version \"1.8\"."),
-                        compiler.checkJavaVersion(javaVersion, process));
+                    test.assertThrows(() -> compiler.checkJavaVersion(javaVersion, process).await(),
+                        new NotFoundException("No installed JREs found for Java version \"1.8\"."));
                 });
 
                 runner.test("with multiple matching versions java version", (Test test) ->
@@ -107,7 +102,7 @@ public class JavaCompilerTests
                     process.setFileSystem(fileSystem);
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
-                    test.assertSuccess(null, compiler.checkJavaVersion(javaVersion, process));
+                    test.assertNull(compiler.checkJavaVersion(javaVersion, process).await());
                     test.assertEqual("/my/Java/jre1.8.0_201/lib/rt.jar", compiler.getBootClasspath());
                 });
             });
@@ -120,8 +115,8 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = null;
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
                         new PreConditionFailure("sourceFiles cannot be null."));
                 });
@@ -132,8 +127,8 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create();
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
                         new PreConditionFailure("sourceFiles cannot be empty."));
                 });
@@ -144,9 +139,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
+                        fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = null;
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
                         new PreConditionFailure("rootFolder cannot be null."));
                 });
@@ -157,8 +152,8 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
                     final Folder outputFolder = null;
                     test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
                         new PreConditionFailure("outputFolder cannot be null."));
@@ -170,9 +165,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "-d", "/outputs",
@@ -190,10 +185,10 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError(),
-                        fileSystem.getFile("/sources/B.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await(),
+                        fileSystem.getFile("/sources/B.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "-d", "/outputs",
@@ -213,9 +208,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "-d", "/outputs",
@@ -242,9 +237,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     test.assertThrows(() -> compiler.getArguments(sourceFiles, rootFolder, outputFolder),
                         new NotFoundException("Cannot resolve project dependencies without a qubFolder."));
                 });
@@ -262,10 +257,10 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
-                    compiler.setQubFolder(fileSystem.getFolder("/qub").awaitError());
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
+                    compiler.setQubFolder(fileSystem.getFolder("/qub").await());
                     test.assertEqual(
                         Iterable.create(
                             "-d", "/outputs",
@@ -296,10 +291,10 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
-                    compiler.setQubFolder(fileSystem.getFolder("/qub").awaitError());
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
+                    compiler.setQubFolder(fileSystem.getFolder("/qub").await());
                     test.assertEqual(
                         Iterable.create(
                             "-d", "/outputs",
@@ -320,9 +315,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     compiler.setMaximumErrors(-4);
                     test.assertEqual(
                         Iterable.create(
@@ -345,9 +340,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     compiler.setMaximumErrors(0);
                     test.assertEqual(
                         Iterable.create(
@@ -370,9 +365,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     compiler.setMaximumErrors(10);
                     test.assertEqual(
                         Iterable.create(
@@ -395,9 +390,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     compiler.setMaximumWarnings(-5);
                     test.assertEqual(
                         Iterable.create(
@@ -420,9 +415,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     compiler.setMaximumWarnings(0);
                     test.assertEqual(
                         Iterable.create(
@@ -445,9 +440,9 @@ public class JavaCompilerTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
                     fileSystem.createRoot("/");
                     final Iterable<File> sourceFiles = Iterable.create(
-                        fileSystem.getFile("/sources/A.java").awaitError());
-                    final Folder rootFolder = fileSystem.getFolder("/").awaitError();
-                    final Folder outputFolder = fileSystem.getFolder("/outputs").awaitError();
+                        fileSystem.getFile("/sources/A.java").await());
+                    final Folder rootFolder = fileSystem.getFolder("/").await();
+                    final Folder outputFolder = fileSystem.getFolder("/outputs").await();
                     compiler.setMaximumWarnings(11);
                     test.assertEqual(
                         Iterable.create(

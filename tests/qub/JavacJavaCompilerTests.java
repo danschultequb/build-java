@@ -17,8 +17,8 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
-                        .awaitError();
-                    final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
+                        .await();
+                    final Folder outputFolder = rootFolder.getFolder("outputs").await();
                     final Process process = new Process();
                     test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process), new PreConditionFailure("sourceFiles cannot be null."));
                 });
@@ -30,8 +30,8 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
-                        .awaitError();
-                    final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
+                        .await();
+                    final Folder outputFolder = rootFolder.getFolder("outputs").await();
                     final Process process = new Process();
                     test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process), new PreConditionFailure("sourceFiles cannot be empty."));
                 });
@@ -42,9 +42,9 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
-                        .awaitError();
-                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").awaitError());
-                    final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
+                        .await();
+                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
+                    final Folder outputFolder = rootFolder.getFolder("outputs").await();
                     final Process process = new Process();
                     test.assertThrows(() -> compiler.compile(sourceFiles, null, outputFolder, process), new PreConditionFailure("rootFolder cannot be null."));
                 });
@@ -55,11 +55,11 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
-                        .awaitError();
-                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").awaitError());
-                    final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
+                        .await();
+                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
+                    final Folder outputFolder = rootFolder.getFolder("outputs").await();
                     final Process process = null;
-                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).awaitError(),
+                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).await(),
                         new PreConditionFailure("process cannot be null."));
                 });
 
@@ -69,12 +69,12 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
-                        .awaitError();
-                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").awaitError());
-                    final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
+                        .await();
+                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
+                    final Folder outputFolder = rootFolder.getFolder("outputs").await();
                     final Process process = new Process();
                     process.setEnvironmentVariables(Map.create());
-                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).awaitError(),
+                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).await(),
                         new FileNotFoundException("javac"));
                 });
 
@@ -84,76 +84,64 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.getFolder("temp"))
-                        .awaitError();
-                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").awaitError());
-                    final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
+                        .await();
+                    final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
+                    final Folder outputFolder = rootFolder.getFolder("outputs").await();
                     final Process process = new Process();
                     process.setEnvironmentVariables(Map.<String,String>create().set("PATH", ""));
-                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).awaitError(),
+                    test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).await(),
                         new FileNotFoundException("javac"));
                 });
 
                 runner.test("with Java file that doesn't exist", (Test test) ->
                 {
                     final JavacJavaCompiler compiler = new JavacJavaCompiler();
-                    final Folder rootFolder = test.getProcess()
-                        .getCurrentFolder()
-                        .thenResult((Folder currentFolder) -> currentFolder.createFolder("temp"))
-                        .awaitError();
+                    final Folder rootFolder = test.getProcess().getCurrentFolder().await().createFolder("temp").await();
                     try
                     {
-                        final File aJava = rootFolder.getFile("sources/A.java").awaitError();
+                        final File aJava = rootFolder.getFile("sources/A.java").await();
                         final Iterable<File> sourceFiles = Iterable.create(aJava);
-                        final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
-                            (JavaCompilationResult result) ->
-                            {
-                                test.assertNotNull(result);
-                                test.assertEqual(2, result.exitCode);
-                                test.assertEqual("", result.output);
-                                test.assertEqual(
-                                    Iterable.create(
-                                        "error: file not found: sources\\A.java",
-                                        "Usage: javac <options> <source files>",
-                                        "use --help for a list of possible options"),
-                                    Strings.getLines(result.error));
-                                test.assertEqual(Iterable.create(), result.issues);
-                                test.assertSuccess(false, QubBuild.getClassFile(aJava, rootFolder, outputFolder).exists());
-                            });
+                        final Folder outputFolder = rootFolder.getFolder("outputs").await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        test.assertNotNull(result);
+                        test.assertEqual(2, result.exitCode);
+                        test.assertEqual("", result.output);
+                        test.assertEqual(
+                            Iterable.create(
+                                "error: file not found: sources\\A.java",
+                                "Usage: javac <options> <source files>",
+                                "use --help for a list of possible options"),
+                            Strings.getLines(result.error));
+                        test.assertEqual(Iterable.create(), result.issues);
+                        test.assertFalse(QubBuild.getClassFile(aJava, rootFolder, outputFolder).exists().await());
                     }
                     finally
                     {
-                        test.assertSuccess(rootFolder.delete());
+                        test.assertNull(rootFolder.delete().await());
                     }
                 });
 
                 runner.test("with empty Java file", (Test test) ->
                 {
                     final JavacJavaCompiler compiler = new JavacJavaCompiler();
-                    final Folder rootFolder = test.getProcess()
-                        .getCurrentFolder()
-                        .thenResult((Folder currentFolder) -> currentFolder.createFolder("temp"))
-                        .awaitError();
+                    final Folder rootFolder = test.getProcess().getCurrentFolder().await().createFolder("temp").await();
                     try
                     {
-                        final File bJava = rootFolder.getFile("sources/B.java").awaitError();
+                        final File bJava = rootFolder.getFile("sources/B.java").await();
                         bJava.create();
                         final Iterable<File> sourceFiles = Iterable.create(bJava);
-                        final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
-                            (JavaCompilationResult result) ->
-                            {
-                                test.assertNotNull(result);
-                                test.assertEqual(0, result.exitCode);
-                                test.assertEqual("", result.output);
-                                test.assertEqual("", result.error);
-                                test.assertEqual(Iterable.create(), result.issues);
-                                test.assertSuccess(false, QubBuild.getClassFile(bJava, rootFolder, outputFolder).exists());
-                            });
+                        final Folder outputFolder = rootFolder.getFolder("outputs").await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        test.assertNotNull(result);
+                        test.assertEqual(0, result.exitCode);
+                        test.assertEqual("", result.output);
+                        test.assertEqual("", result.error);
+                        test.assertEqual(Iterable.create(), result.issues);
+                        test.assertFalse(QubBuild.getClassFile(bJava, rootFolder, outputFolder).exists().await());
                     }
                     finally
                     {
-                        test.assertSuccess(rootFolder.delete());
+                        test.assertNull(rootFolder.delete().await());
                     }
                 });
 
@@ -163,10 +151,10 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.createFolder("temp"))
-                        .awaitError();
+                        .await();
                     try
                     {
-                        final File cJava = rootFolder.getFile("sources/C.java").awaitError();
+                        final File cJava = rootFolder.getFile("sources/C.java").await();
                         cJava.setContentsAsString(
                             Strings.join(
                                 '\n',
@@ -180,21 +168,18 @@ public class JavacJavaCompilerTests
                                     "  }",
                                     "}")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
-                        final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
-                            (JavaCompilationResult result) ->
-                            {
-                                test.assertNotNull(result);
-                                test.assertEqual(0, result.exitCode);
-                                test.assertEqual("", result.output);
-                                test.assertEqual("", result.error);
-                                test.assertEqual(Iterable.create(), result.issues);
-                                test.assertSuccess(true, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
-                            });
+                        final Folder outputFolder = rootFolder.getFolder("outputs").await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        test.assertNotNull(result);
+                        test.assertEqual(0, result.exitCode);
+                        test.assertEqual("", result.output);
+                        test.assertEqual("", result.error);
+                        test.assertEqual(Iterable.create(), result.issues);
+                        test.assertTrue(QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists().await());
                     }
                     finally
                     {
-                        test.assertSuccess(rootFolder.delete());
+                        test.assertNull(rootFolder.delete().await());
                     }
                 });
 
@@ -204,10 +189,10 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.createFolder("temp"))
-                        .awaitError();
+                        .await();
                     try
                     {
-                        final File cJava = rootFolder.getFile("sources/C.java").awaitError();
+                        final File cJava = rootFolder.getFile("sources/C.java").await();
                         cJava.setContentsAsString(
                             Strings.join(
                                 '\n',
@@ -221,33 +206,30 @@ public class JavacJavaCompilerTests
                                     "  }",
                                     "}")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
-                        final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
-                            (JavaCompilationResult result) ->
-                            {
-                                test.assertNotNull(result);
-                                test.assertEqual(1, result.exitCode);
-                                test.assertEqual("", result.output);
-                                test.assertEqual(
-                                    Iterable.create(
-                                        "sources\\C.java:1: error: class MyTestClass is public, should be declared in a file named MyTestClass.java",
-                                        "public class MyTestClass",
-                                        "       ^",
-                                        "1 error"),
-                                    Strings.getLines(result.error));
-                                test.assertEqual(
-                                    Iterable.create(
-                                        JavaCompiler.error(
-                                            "sources\\C.java",
-                                            1, 8,
-                                            "class MyTestClass is public, should be declared in a file named MyTestClass.java")),
-                                    result.issues);
-                                test.assertSuccess(false, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
-                            });
+                        final Folder outputFolder = rootFolder.getFolder("outputs").await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        test.assertNotNull(result);
+                        test.assertEqual(1, result.exitCode);
+                        test.assertEqual("", result.output);
+                        test.assertEqual(
+                            Iterable.create(
+                                "sources\\C.java:1: error: class MyTestClass is public, should be declared in a file named MyTestClass.java",
+                                "public class MyTestClass",
+                                "       ^",
+                                "1 error"),
+                            Strings.getLines(result.error));
+                        test.assertEqual(
+                            Iterable.create(
+                                JavaCompiler.error(
+                                    "sources\\C.java",
+                                    1, 8,
+                                    "class MyTestClass is public, should be declared in a file named MyTestClass.java")),
+                            result.issues);
+                        test.assertFalse(QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists().await());
                     }
                     finally
                     {
-                        test.assertSuccess(rootFolder.delete());
+                        test.assertNull(rootFolder.delete().await());
                     }
                 });
 
@@ -257,38 +239,35 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.createFolder("temp"))
-                        .awaitError();
+                        .await();
                     try
                     {
-                        final File cJava = rootFolder.getFile("sources/C.java").awaitError();
+                        final File cJava = rootFolder.getFile("sources/C.java").await();
                         cJava.setContentsAsString("Im not a valid Java file");
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
-                        final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
-                            (JavaCompilationResult result) ->
-                            {
-                                test.assertNotNull(result);
-                                test.assertEqual(1, result.exitCode);
-                                test.assertEqual("", result.output);
-                                test.assertEqual(
-                                    Iterable.create(
-                                        "sources\\C.java:1: error: class, interface, or enum expected",
-                                        "Im not a valid Java file",
-                                        "^",
-                                        "1 error"),
-                                    Strings.getLines(result.error));
-                                test.assertEqual(Iterable.create(
-                                    JavaCompiler.error(
-                                        "sources\\C.java",
-                                        1, 1,
-                                        "class, interface, or enum expected")),
-                                    result.issues);
-                                test.assertSuccess(false, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
-                            });
+                        final Folder outputFolder = rootFolder.getFolder("outputs").await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        test.assertNotNull(result);
+                        test.assertEqual(1, result.exitCode);
+                        test.assertEqual("", result.output);
+                        test.assertEqual(
+                            Iterable.create(
+                                "sources\\C.java:1: error: class, interface, or enum expected",
+                                "Im not a valid Java file",
+                                "^",
+                                "1 error"),
+                            Strings.getLines(result.error));
+                        test.assertEqual(Iterable.create(
+                            JavaCompiler.error(
+                                "sources\\C.java",
+                                1, 1,
+                                "class, interface, or enum expected")),
+                            result.issues);
+                        test.assertFalse(QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists().await());
                     }
                     finally
                     {
-                        test.assertSuccess(rootFolder.delete());
+                        test.assertNull(rootFolder.delete().await());
                     }
                 });
 
@@ -298,10 +277,10 @@ public class JavacJavaCompilerTests
                     final Folder rootFolder = test.getProcess()
                         .getCurrentFolder()
                         .thenResult((Folder currentFolder) -> currentFolder.createFolder("temp"))
-                        .awaitError();
+                        .await();
                     try
                     {
-                        final File cJava = rootFolder.getFile("sources/C.java").awaitError();
+                        final File cJava = rootFolder.getFile("sources/C.java").await();
                         cJava.setContentsAsString(
                             Strings.join(
                                 '\n',
@@ -315,40 +294,37 @@ public class JavacJavaCompilerTests
                                     "  }",
                                     "")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
-                        final Folder outputFolder = rootFolder.getFolder("outputs").awaitError();
-                        test.assertSuccess(compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()),
-                            (JavaCompilationResult result) ->
-                            {
-                                test.assertNotNull(result);
-                                test.assertEqual(1, result.exitCode);
-                                test.assertEqual("", result.output);
-                                test.assertEqual(
-                                    Iterable.create(
-                                        "sources\\C.java:6: error: \';\' expected",
-                                        "    return value",
-                                        "                ^",
-                                        "sources\\C.java:7: error: reached end of file while parsing",
-                                        "  }",
-                                        "   ^",
-                                        "2 errors"),
-                                    Strings.getLines(result.error));
-                                test.assertEqual(
-                                    Iterable.create(
-                                        JavaCompiler.error(
-                                            "sources\\C.java",
-                                            6, 17,
-                                            "';' expected"),
-                                        JavaCompiler.error(
-                                            "sources\\C.java",
-                                            7, 4,
-                                            "reached end of file while parsing")),
-                                    result.issues);
-                                test.assertSuccess(false, QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists());
-                            });
+                        final Folder outputFolder = rootFolder.getFolder("outputs").await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        test.assertNotNull(result);
+                        test.assertEqual(1, result.exitCode);
+                        test.assertEqual("", result.output);
+                        test.assertEqual(
+                            Iterable.create(
+                                "sources\\C.java:6: error: \';\' expected",
+                                "    return value",
+                                "                ^",
+                                "sources\\C.java:7: error: reached end of file while parsing",
+                                "  }",
+                                "   ^",
+                                "2 errors"),
+                            Strings.getLines(result.error));
+                        test.assertEqual(
+                            Iterable.create(
+                                JavaCompiler.error(
+                                    "sources\\C.java",
+                                    6, 17,
+                                    "';' expected"),
+                                JavaCompiler.error(
+                                    "sources\\C.java",
+                                    7, 4,
+                                    "reached end of file while parsing")),
+                            result.issues);
+                        test.assertFalse(QubBuild.getClassFile(cJava, rootFolder, outputFolder).exists().await());
                     }
                     finally
                     {
-                        test.assertSuccess(rootFolder.delete());
+                        test.assertNull(rootFolder.delete().await());
                     }
                 });
             });

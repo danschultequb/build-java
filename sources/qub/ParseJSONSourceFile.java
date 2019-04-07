@@ -134,7 +134,7 @@ public class ParseJSONSourceFile
 
         final ParseJSONSourceFile result = new ParseJSONSourceFile();
         result.setRelativePath(sourceFile.relativeTo(rootFolder));
-        result.setLastModified(sourceFile.getLastModified().awaitError());
+        result.setLastModified(sourceFile.getLastModified().await());
         sourceFile.getContentsAsString()
             .then(Strings::getWords)
             .then((Set<String> words) ->
