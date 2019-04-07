@@ -913,6 +913,530 @@ public class QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
+                runner.test("with multiple source files with errors and warnings and -warnings=SHOW", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/B.java",
+                            1, 5,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/sources/A.java",
+                            12, 2,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/ATests.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            20,7,
+                            Issue.Type.Error,
+                            "Can't be this."));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=SHOW"))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "2 Warnings:",
+                            "/tests/ATests.java (Line 10): Can't be this.",
+                            "/tests/C.java (Line 10): Can't be this.",
+                            "3 Errors:",
+                            "/sources/A.java (Line 12): Are you sure?",
+                            "/sources/B.java (Line 1): Are you sure?",
+                            "/tests/C.java (Line 20): Can't be this."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile), "Wrong parse.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                });
+
+                runner.test("with multiple source files with errors and warnings and -warnings", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/B.java",
+                            1, 5,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/sources/A.java",
+                            12, 2,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/ATests.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            20,7,
+                            Issue.Type.Error,
+                            "Can't be this."));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings"))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "2 Warnings:",
+                            "/tests/ATests.java (Line 10): Can't be this.",
+                            "/tests/C.java (Line 10): Can't be this.",
+                            "3 Errors:",
+                            "/sources/A.java (Line 12): Are you sure?",
+                            "/sources/B.java (Line 1): Are you sure?",
+                            "/tests/C.java (Line 20): Can't be this."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile), "Wrong parse.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                });
+
+                runner.test("with multiple source files with errors and warnings and -warnings=", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/B.java",
+                            1, 5,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/sources/A.java",
+                            12, 2,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/ATests.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            20,7,
+                            Issue.Type.Error,
+                            "Can't be this."));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings="))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "2 Warnings:",
+                            "/tests/ATests.java (Line 10): Can't be this.",
+                            "/tests/C.java (Line 10): Can't be this.",
+                            "3 Errors:",
+                            "/sources/A.java (Line 12): Are you sure?",
+                            "/sources/B.java (Line 1): Are you sure?",
+                            "/tests/C.java (Line 20): Can't be this."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile), "Wrong parse.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                });
+
+                runner.test("with multiple source files with errors and warnings and -warnings=spam", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/B.java",
+                            1, 5,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/sources/A.java",
+                            12, 2,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/ATests.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            20,7,
+                            Issue.Type.Error,
+                            "Can't be this."));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=spam"))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "2 Warnings:",
+                            "/tests/ATests.java (Line 10): Can't be this.",
+                            "/tests/C.java (Line 10): Can't be this.",
+                            "3 Errors:",
+                            "/sources/A.java (Line 12): Are you sure?",
+                            "/sources/B.java (Line 1): Are you sure?",
+                            "/tests/C.java (Line 20): Can't be this."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile), "Wrong parse.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                });
+
+                runner.test("with multiple source files with errors and warnings and -warnings=hide", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/B.java",
+                            1, 5,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/sources/A.java",
+                            12, 2,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/ATests.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            20,7,
+                            Issue.Type.Error,
+                            "Can't be this."));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=hide"))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "3 Errors:",
+                            "/sources/A.java (Line 12): Are you sure?",
+                            "/sources/B.java (Line 1): Are you sure?",
+                            "/tests/C.java (Line 20): Can't be this."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile), "Wrong parse.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                });
+
+                runner.test("with multiple source files with errors and warnings and -warnings=errOR", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/B.java",
+                            1, 5,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/sources/A.java",
+                            12, 2,
+                            Issue.Type.Error,
+                            "Are you sure?"),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/ATests.java",
+                            10,7,
+                            Issue.Type.Warning,
+                            "Can't be this."),
+                        new JavaCompilerIssue(
+                            "/tests/C.java",
+                            20,7,
+                            Issue.Type.Error,
+                            "Can't be this."));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=errOR"))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "5 Errors:",
+                            "/sources/A.java (Line 12): Are you sure?",
+                            "/sources/B.java (Line 1): Are you sure?",
+                            "/tests/ATests.java (Line 10): Can't be this.",
+                            "/tests/C.java (Line 10): Can't be this.",
+                            "/tests/C.java (Line 20): Can't be this."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile), "Wrong parse.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                });
+
                 runner.test("with multiple source files newer than their existing class files and with parse.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);

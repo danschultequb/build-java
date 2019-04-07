@@ -132,6 +132,7 @@ public class QubBuild
 
                 final boolean useParseJson = shouldUseParseJson(console);
                 final boolean createJar = shouldCreateJar(console);
+                final Warnings warnings = getWarnings(console);
                 final Folder folderToBuild = getFolderToBuild(console).await();
                 final File projectJsonFile = folderToBuild.getFile("project.json").await();
 
@@ -394,18 +395,18 @@ public class QubBuild
                                     final Iterable<JavaCompilerIssue> sortedIssues = compilationResult.issues
                                         .order((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
 
-                                    final Iterable<JavaCompilerIssue> warnings = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning);
-                                    final int warningCount = warnings.getCount();
-                                    if (warningCount > 0)
+                                    final Iterable<JavaCompilerIssue> warningIssues = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning);
+                                    final int warningCount = warningIssues.getCount();
+                                    if (warningCount > 0 && warnings == Warnings.Show)
                                     {
                                         console.writeLine(warningCount + " Warning" + (warningCount == 1 ? "" : "s") + ":").await();
-                                        for (final JavaCompilerIssue warning : warnings)
+                                        for (final JavaCompilerIssue warning : warningIssues)
                                         {
                                             console.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
                                         }
                                     }
 
-                                    final Iterable<JavaCompilerIssue> errors = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error);
+                                    final Iterable<JavaCompilerIssue> errors = warnings == Warnings.Error ? sortedIssues : sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error);
                                     final int errorCount = errors.getCount();
                                     if (errorCount > 0)
                                     {
@@ -521,6 +522,33 @@ public class QubBuild
         {
             result = Strings.isNullOrEmpty(createJarArgument.getValue()) ||
                 java.lang.Boolean.parseBoolean(createJarArgument.getValue());
+        }
+
+        return result;
+    }
+
+    public static Warnings getWarnings(Console console)
+    {
+        PreCondition.assertNotNull(console, "console");
+
+        final CommandLine commandLine = console.getCommandLine();
+
+        Warnings result = Warnings.Show;
+        final CommandLineArgument warningsArgument = commandLine.get("warnings");
+        if (warningsArgument != null)
+        {
+            final String warningsArgumentValue = warningsArgument.getValue();
+            if (!Strings.isNullOrEmpty(warningsArgumentValue))
+            {
+                if (warningsArgumentValue.equalsIgnoreCase(Warnings.Error.toString()))
+                {
+                    result = Warnings.Error;
+                }
+                else if (warningsArgumentValue.equalsIgnoreCase(Warnings.Hide.toString()))
+                {
+                    result = Warnings.Hide;
+                }
+            }
         }
 
         return result;

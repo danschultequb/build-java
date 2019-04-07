@@ -1,7 +1,7 @@
 {
   "publisher": "qub",
   "project": "qub-build",
-  "version": "59",
+  "version": "60",
   "java": {
     "mainClass": "qub.QubBuild",
     "shortcutName": "qub-build",
