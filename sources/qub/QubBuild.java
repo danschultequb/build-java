@@ -133,13 +133,13 @@ public class QubBuild
                 final boolean useParseJson = shouldUseParseJson(console);
                 final boolean createJar = shouldCreateJar(console);
                 final Warnings warnings = getWarnings(console);
-                final boolean profile = getProfile(console);
                 final Folder folderToBuild = getFolderToBuild(console).await();
                 final File projectJsonFile = folderToBuild.getFile("project.json").await();
 
+                final boolean profile = takeProfileArgument(console);
                 if (profile)
                 {
-                    console.writeLine("Attach a profiler now. Press enter to continue...").await();
+                    console.writeLine("Attach a profiler now to " + Types.getTypeName(QubBuild.class) + ". Press enter to continue...").await();
                     console.readLine().await();
                 }
 
@@ -566,14 +566,14 @@ public class QubBuild
         return result;
     }
 
-    public static boolean getProfile(Console console)
+    public static boolean takeProfileArgument(Console console)
     {
         PreCondition.assertNotNull(console, "console");
 
         final CommandLine commandLine = console.getCommandLine();
 
         boolean result = false;
-        final CommandLineArgument profileArgument = commandLine.get("profile");
+        final CommandLineArgument profileArgument = commandLine.remove("profile");
         if (profileArgument != null)
         {
             final String profileArgumentValue = profileArgument.getValue();
