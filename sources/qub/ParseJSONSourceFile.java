@@ -113,7 +113,8 @@ public class ParseJSONSourceFile
         PreCondition.assertNotNull(rootFolder, "rootFolder");
 
         final Iterable<ParseJSONSourceFile> result = sourceFiles
-            .map((File sourceFile) -> ParseJSONSourceFile.create(sourceFile, rootFolder, sourceFiles));
+            .map((File sourceFile) -> ParseJSONSourceFile.create(sourceFile, rootFolder, sourceFiles))
+            .toList();
 
         PostCondition.assertNotNull(result, "result");
 
@@ -135,16 +136,24 @@ public class ParseJSONSourceFile
         final ParseJSONSourceFile result = new ParseJSONSourceFile();
         result.setRelativePath(sourceFile.relativeTo(rootFolder));
         result.setLastModified(sourceFile.getLastModified().await());
-        sourceFile.getContentsAsString()
-            .then(Strings::getWords)
-            .then((Set<String> words) ->
+
+        final String sourceFileContents = sourceFile.getContentsAsString().await();
+        final Iterable<String> sourceFileWords = Strings.getWords(sourceFileContents);
+
+        final List<Path> sourceFileDependencyPaths = List.create();
+        for (final File otherSourceFile : sourceFiles)
+        {
+            if (sourceFile != otherSourceFile)
             {
-                result.setDependencies(sourceFiles
-                    .where((File otherSourceFile) ->
-                        otherSourceFile != sourceFile &&
-                            words.contains(otherSourceFile.getNameWithoutFileExtension()))
-                    .map((File sourceFileDependency) -> sourceFileDependency.relativeTo(rootFolder)));
-            });
+                final String otherSourceFileClassName = otherSourceFile.getNameWithoutFileExtension();
+                if (sourceFileWords.contains(otherSourceFileClassName))
+                {
+                    final Path otherSourceFilePath = otherSourceFile.relativeTo(rootFolder);
+                    sourceFileDependencyPaths.add(otherSourceFilePath);
+                }
+            }
+        }
+        result.setDependencies(sourceFileDependencyPaths);
 
         PostCondition.assertNotNull(result, "result");
 

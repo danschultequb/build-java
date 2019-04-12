@@ -1882,20 +1882,26 @@ public class QubBuildTests
                         "Wrong parse.json file contents");
                 });
 
-                runner.test("A depends on B, B depends on C, C is modified, only B and C should be compiled", (Test test) ->
+                runner.test("N depends on nothing, A depends on B, B depends on C, C.java is modified: A, B, and C should be compiled", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File nJavaFile = setFileContents(currentFolder, "sources/N.java", "N.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
 
+                    final File nClassFile = setFileContents(currentFolder, "outputs/N.class", "N.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
                     final File cClassFile = setFileContents(currentFolder, "outputs/C.class", "C.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
                     {
+                        parse.objectProperty("sources/N.java", nJava ->
+                        {
+                            nJava.numberProperty("lastModified", 0);
+                        });
                         parse.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
@@ -1934,11 +1940,15 @@ public class QubBuildTests
                             "/outputs/A.class",
                             "/outputs/B.class",
                             "/outputs/C.class",
+                            "/outputs/N.class",
                             "/outputs/parse.json",
                             "/outputs/project.jar"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("N.java source", getFileContents(nClassFile));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
 
                     test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
@@ -1968,6 +1978,117 @@ public class QubBuildTests
                             parse.objectProperty("sources/C.java", cJava ->
                             {
                                 cJava.numberProperty("lastModified", 60000);
+                            });
+                            parse.objectProperty("sources/N.java", nJava ->
+                            {
+                                nJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(parseFile),
+                        "Wrong parse.json file contents");
+                });
+
+                runner.test("N depends on nothing, A depends on B, B depends on C, C.java is deleted: A, B, and C should be compiled", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "sources/N.java", "N.java source");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
+
+                    final File nClassFile = setFileContents(currentFolder, "outputs/N.class", "N.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
+                    final File cClassFile = setFileContents(currentFolder, "outputs/C.class", "C.java source");
+                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/N.java", nJava ->
+                        {
+                            nJava.numberProperty("lastModified", 0);
+                        });
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
+                        });
+                        parse.objectProperty("sources/B.java", bJava ->
+                        {
+                            bJava.numberProperty("lastModified", 0);
+                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
+                        });
+                        parse.objectProperty("sources/C.java", cJava ->
+                        {
+                            cJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
+                    compiler.exitCode = 1;
+                    compiler.issues = Iterable.create(
+                        new JavaCompilerIssue(
+                            "/sources/B.java",
+                            1, 25,
+                            Issue.Type.Error,
+                            "Missing definition for C."));
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "1 Error:",
+                            "/sources/B.java (Line 1): Missing definition for C."),
+
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/B.class",
+                            "/outputs/N.class",
+                            "/outputs/parse.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("N.java source", getFileContents(nClassFile));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
+
+                    test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("B.java source, depends on C", getFileContents(bClassFile));
+
+                    test.assertFalse(cClassFile.exists().await());
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(parse ->
+                        {
+                            parse.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            parse.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
+                            });
+                            parse.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 0);
+                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
+                            });
+                            parse.objectProperty("sources/N.java", nJava ->
+                            {
+                                nJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
                         getFileContents(parseFile),
