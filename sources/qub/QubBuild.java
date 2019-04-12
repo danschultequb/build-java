@@ -400,6 +400,15 @@ public class QubBuild
                                         }
                                     }
                                 }
+
+                                for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
+                                {
+                                    final File classFile = getClassFile(nonModifiedJavaSourceFile, folderToBuild, outputsFolder);
+                                    if (!classFile.exists().await() && !javaSourceFilesToCompile.contains(nonModifiedJavaSourceFile))
+                                    {
+                                        javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
+                                    }
+                                }
                             }
 
                             if (Iterable.isNullOrEmpty(javaSourceFilesToCompile))
