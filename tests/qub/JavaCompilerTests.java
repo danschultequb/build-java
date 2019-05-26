@@ -66,9 +66,9 @@ public class JavaCompilerTests
                 {
                     final String javaVersion = "spam";
                     final Process process = new Process();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
-                    fileSystem.createFolder("/my/Java/jdk-11.0.1");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/my/Java/jdk-11.0.1").await();
                     process.setFileSystem(fileSystem);
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
@@ -80,9 +80,9 @@ public class JavaCompilerTests
                 {
                     final String javaVersion = "1.8";
                     final Process process = new Process();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
-                    fileSystem.createFolder("/my/Java/jdk-11.0.1");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/my/Java/jdk-11.0.1").await();
                     process.setFileSystem(fileSystem);
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
@@ -94,11 +94,11 @@ public class JavaCompilerTests
                 {
                     final String javaVersion = "1.8";
                     final Process process = new Process();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
-                    fileSystem.createFolder("/my/Java/jdk-11.0.1");
-                    fileSystem.createFolder("/my/Java/jre1.8.0_192");
-                    fileSystem.createFolder("/my/Java/jre1.8.0_201");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/my/Java/jdk-11.0.1").await();
+                    fileSystem.createFolder("/my/Java/jre1.8.0_192").await();
+                    fileSystem.createFolder("/my/Java/jre1.8.0_201").await();
                     process.setFileSystem(fileSystem);
                     process.setEnvironmentVariables(Map.<String,String>create().set("JAVA_HOME", "/my/Java/jdk-11.0.1"));
                     final JavaCompiler compiler = creator.run();
@@ -112,8 +112,8 @@ public class JavaCompilerTests
                 runner.test("with null sourceFiles", (Test test) ->
                 {
                     final JavaCompiler compiler = creator.run();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = null;
                     final Folder rootFolder = fileSystem.getFolder("/").await();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").await();
@@ -124,8 +124,8 @@ public class JavaCompilerTests
                 runner.test("with empty sourceFiles", (Test test) ->
                 {
                     final JavaCompiler compiler = creator.run();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create();
                     final Folder rootFolder = fileSystem.getFolder("/").await();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").await();
@@ -136,8 +136,8 @@ public class JavaCompilerTests
                 runner.test("with null rootFolder", (Test test) ->
                 {
                     final JavaCompiler compiler = creator.run();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = null;
@@ -149,8 +149,8 @@ public class JavaCompilerTests
                 runner.test("with null outputFolder", (Test test) ->
                 {
                     final JavaCompiler compiler = creator.run();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -162,8 +162,8 @@ public class JavaCompilerTests
                 runner.test("with one source file", (Test test) ->
                 {
                     final JavaCompiler compiler = creator.run();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -182,8 +182,8 @@ public class JavaCompilerTests
                 runner.test("with two source files", (Test test) ->
                 {
                     final JavaCompiler compiler = creator.run();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await(),
                         fileSystem.getFile("/sources/B.java").await());
@@ -205,8 +205,8 @@ public class JavaCompilerTests
                 {
                     final JavaCompiler compiler = creator.run();
                     compiler.setVersion("1.7");
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -234,8 +234,8 @@ public class JavaCompilerTests
                                 .setProject("a")
                                 .setPublisher("b")
                                 .setVersion("c")));
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -254,8 +254,8 @@ public class JavaCompilerTests
                                 .setProject("a")
                                 .setPublisher("b")
                                 .setVersion("c")));
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -288,8 +288,8 @@ public class JavaCompilerTests
                                 .setProject("x")
                                 .setPublisher("y")
                                 .setVersion("z")));
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -312,8 +312,8 @@ public class JavaCompilerTests
                 {
                     final JavaCompiler compiler = creator.run();
                     compiler.setVersion("1.7");
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -337,8 +337,8 @@ public class JavaCompilerTests
                 {
                     final JavaCompiler compiler = creator.run();
                     compiler.setVersion("1.7");
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -362,8 +362,8 @@ public class JavaCompilerTests
                 {
                     final JavaCompiler compiler = creator.run();
                     compiler.setVersion("1.7");
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -387,8 +387,8 @@ public class JavaCompilerTests
                 {
                     final JavaCompiler compiler = creator.run();
                     compiler.setVersion("1.7");
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -412,8 +412,8 @@ public class JavaCompilerTests
                 {
                     final JavaCompiler compiler = creator.run();
                     compiler.setVersion("1.7");
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -437,8 +437,8 @@ public class JavaCompilerTests
                 {
                     final JavaCompiler compiler = creator.run();
                     compiler.setVersion("1.7");
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.getFile("/sources/A.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();

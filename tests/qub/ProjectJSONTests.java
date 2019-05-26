@@ -113,7 +113,7 @@ public class ProjectJSONTests
 
                 runner.test("with non-existing file", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     final File file = fileSystem.getFile("/project.json").await();
                     test.assertThrows(() -> ProjectJSON.parse(file).await(),
                         new FileNotFoundException("/project.json"));
@@ -121,7 +121,7 @@ public class ProjectJSONTests
 
                 runner.test("with empty file", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     test.assertThrows(() -> ProjectJSON.parse(file).await(),
@@ -130,7 +130,7 @@ public class ProjectJSONTests
 
                 runner.test("with non-JSON file contents", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("hello there").await();
@@ -140,7 +140,7 @@ public class ProjectJSONTests
 
                 runner.test("with empty JSON array", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("[]").await();
@@ -150,7 +150,7 @@ public class ProjectJSONTests
 
                 runner.test("with empty JSON object", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{}").await();
@@ -164,7 +164,7 @@ public class ProjectJSONTests
 
                 runner.test("with number publisher", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"publisher\": 20 }").await();
@@ -178,7 +178,7 @@ public class ProjectJSONTests
 
                 runner.test("with quoted-string publisher", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"publisher\": \"bananas\" }").await();
@@ -192,7 +192,7 @@ public class ProjectJSONTests
 
                 runner.test("with number project", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"project\": 20 }").await();
@@ -206,7 +206,7 @@ public class ProjectJSONTests
 
                 runner.test("with quoted-string project", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"project\": \"bananas\" }").await();
@@ -220,7 +220,7 @@ public class ProjectJSONTests
 
                 runner.test("with number version", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"version\": 20 }").await();
@@ -234,7 +234,7 @@ public class ProjectJSONTests
 
                 runner.test("with quoted-string version", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"version\": \"bananas\" }").await();
@@ -248,7 +248,7 @@ public class ProjectJSONTests
 
                 runner.test("with empty java object", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": {} }").await();
@@ -267,7 +267,7 @@ public class ProjectJSONTests
 
                 runner.test("with java main class", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"mainClass\": \"a\" } }").await();
@@ -286,7 +286,7 @@ public class ProjectJSONTests
 
                 runner.test("with empty java sources object", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"sources\": {} } }").await();
@@ -305,7 +305,7 @@ public class ProjectJSONTests
 
                 runner.test("with java sources version quoted-string", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"sources\": { \"version\": \"1.8\" } } }").await();
@@ -324,7 +324,7 @@ public class ProjectJSONTests
 
                 runner.test("with java sources version number", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"sources\": { \"version\": 1.8 } } }").await();
@@ -343,7 +343,7 @@ public class ProjectJSONTests
 
                 runner.test("with empty java tests object", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"tests\": {} } }").await();
@@ -362,7 +362,7 @@ public class ProjectJSONTests
 
                 runner.test("with java tests version quoted-string", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"tests\": { \"version\": \"1.8\" } } }").await();
@@ -381,7 +381,7 @@ public class ProjectJSONTests
 
                 runner.test("with java tests version number", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"tests\": { \"version\": 1.8 } } }").await();
@@ -400,7 +400,7 @@ public class ProjectJSONTests
 
                 runner.test("with empty java dependencies", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"dependencies\": [] } }").await();
@@ -419,7 +419,7 @@ public class ProjectJSONTests
 
                 runner.test("with one empty java dependency", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"dependencies\": [ {} ] } }").await();
@@ -438,7 +438,7 @@ public class ProjectJSONTests
 
                 runner.test("with one non-empty java dependency", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"dependencies\": [ { \"publisher\": \"a\", \"project\": \"b\", \"version\": \"c\" } ] } }").await();
@@ -463,7 +463,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumErrors string value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumErrors\": \"50\" } }").await();
@@ -486,7 +486,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumErrors negative number value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumErrors\": -2 } }").await();
@@ -509,7 +509,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumErrors zero number value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumErrors\": 0 } }").await();
@@ -532,7 +532,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumErrors 100 number value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumErrors\": 100 } }").await();
@@ -555,7 +555,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumWarnings string value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumWarnings\": \"50\" } }").await();
@@ -578,7 +578,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumWarnings negative number value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumWarnings\": -2 } }").await();
@@ -601,7 +601,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumWarnings zero number value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumWarnings\": 0 } }").await();
@@ -624,7 +624,7 @@ public class ProjectJSONTests
 
                 runner.test("with maximumWarnings 100 number value", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/");
                     final File file = fileSystem.createFile("/project.json").await();
                     file.setContentsAsString("{ \"java\": { \"maximumWarnings\": 100 } }").await();

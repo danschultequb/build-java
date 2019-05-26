@@ -19,8 +19,8 @@ public class FakeJavaCompilerTests
             {
                 runner.test("with null sourceFiles", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = null;
                     final Folder rootFolder = fileSystem.getFolder("/").await();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").await();
@@ -31,8 +31,8 @@ public class FakeJavaCompilerTests
 
                 runner.test("with empty sourceFiles", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create();
                     final Folder rootFolder = fileSystem.getFolder("/").await();
                     final Folder outputFolder = fileSystem.getFolder("/outputs").await();
@@ -43,8 +43,8 @@ public class FakeJavaCompilerTests
 
                 runner.test("with null outputFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.createFile("/sources/a/B.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();
@@ -56,8 +56,8 @@ public class FakeJavaCompilerTests
 
                 runner.test("with null console", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getMainAsyncRunner());
-                    fileSystem.createRoot("/");
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final Iterable<File> sourceFiles = Iterable.create(
                         fileSystem.createFile("/sources/a/B.java").await());
                     final Folder rootFolder = fileSystem.getFolder("/").await();

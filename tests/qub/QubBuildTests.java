@@ -3393,12 +3393,12 @@ public class QubBuildTests
     {
         PreCondition.assertNotNull(test, "test");
 
-        return new ManualClock(test.getMainAsyncRunner(), DateTime.utc(0));
+        return new ManualClock(DateTime.utc(0), test.getMainAsyncRunner());
     }
 
     private static InMemoryCharacterStream getInMemoryCharacterStream(Test test)
     {
-        return new InMemoryCharacterStream(test.getParallelAsyncRunner());
+        return new InMemoryCharacterStream();
     }
 
     private static Folder getInMemoryCurrentFolder(Test test)
@@ -3411,8 +3411,8 @@ public class QubBuildTests
         PreCondition.assertNotNull(test, "test");
         PreCondition.assertNotNull(clock, "clock");
 
-        final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getParallelAsyncRunner(), clock);
-        fileSystem.createRoot("/");
+        final InMemoryFileSystem fileSystem = new InMemoryFileSystem(clock);
+        fileSystem.createRoot("/").await();
         return fileSystem.getFolder("/").await();
     }
 
@@ -3425,7 +3425,7 @@ public class QubBuildTests
 
     private static void setFileContents(Result<File> fileResult, String contents)
     {
-        fileResult.then((File file) -> setFileContents(file, contents));
+        fileResult.then((File file) -> setFileContents(file, contents)).await();
     }
 
     private static void setFileContents(File file, String contents)
