@@ -51,8 +51,6 @@ public class QubBuildTests
                             "  -folder: The folder to build. This can be specified either with the -folder",
                             "           argument name or without it. The current folder will be used if this",
                             "           isn't defined.",
-                            "  -createjar: Whether or not to create a jar file from the compiled source code",
-                            "              files.",
                             "  -verbose: Whether or not to show verbose logs."),
                         Strings.getLines(output.getText().await()));
                 });
@@ -72,8 +70,6 @@ public class QubBuildTests
                             "  -folder: The folder to build. This can be specified either with the -folder",
                             "           argument name or without it. The current folder will be used if this",
                             "           isn't defined.",
-                            "  -createjar: Whether or not to create a jar file from the compiled source code",
-                            "              files.",
                             "  -verbose: Whether or not to show verbose logs."),
                         Strings.getLines(output.getText().await()));
                 });
@@ -244,15 +240,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -288,15 +282,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("bin").await();
                     test.assertEqual(
                         Iterable.create(
                             "/bin/A.class",
-                            "/bin/A.jar",
                             "/bin/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -336,15 +328,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -382,8 +372,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -391,8 +380,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -433,8 +421,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -442,8 +429,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -488,15 +474,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
@@ -600,15 +584,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
@@ -1472,8 +1454,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -1481,8 +1462,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1548,8 +1528,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -1557,8 +1536,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -1623,8 +1601,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -1632,8 +1609,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1699,8 +1675,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -1708,8 +1683,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1773,15 +1747,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -1841,8 +1813,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -1850,8 +1821,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -1930,8 +1900,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -1941,8 +1910,7 @@ public class QubBuildTests
                             "/outputs/B.class",
                             "/outputs/C.class",
                             "/outputs/N.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
@@ -2142,8 +2110,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2153,8 +2120,7 @@ public class QubBuildTests
                             "/outputs/B.class",
                             "/outputs/C.class",
                             "/outputs/N.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
@@ -2467,15 +2433,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -2546,15 +2510,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -2870,15 +2832,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -2961,15 +2921,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
@@ -3039,8 +2997,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -3048,8 +3005,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -3098,8 +3054,7 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -3108,8 +3063,7 @@ public class QubBuildTests
                             "/outputs/A.class",
                             "/outputs/AB.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json",
-                            "/outputs/project.jar"),
+                            "/outputs/parse.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
@@ -3164,16 +3118,14 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/B.class",
-                            "/outputs/project.jar"),
+                            "/outputs/B.class"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
@@ -3205,55 +3157,13 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/B.class",
-                            "/outputs/project.jar"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "B.class"));
-                    test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
-
-                    test.assertFalse(outputs.fileExists("parse.json").await());
-                });
-
-                runner.test("with existing outputs folder, -parsejson=false, and -createjar=false", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"project\": \"fake-project\", \"java\": {} }");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    outputs.createFile("blah.txt").await();
-
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false", "-createjar=true"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/B.class",
-                            "/outputs/fake-project.jar"),
+                            "/outputs/B.class"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
@@ -3288,7 +3198,7 @@ public class QubBuildTests
                     }).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false", "-createjar=true"))
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("QUB_HOME", "/qub_home/"));
@@ -3331,7 +3241,7 @@ public class QubBuildTests
                     final Folder qubFolder = currentFolder.getFileSystem().createFolder("/qub_home/").await();
                     qubFolder.createFolder("qub").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false", "-createjar=true"))
+                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("QUB_HOME", qubFolder.toString()));
@@ -3364,14 +3274,12 @@ public class QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Creating jar file..."),
+                            "Compiling..."),
                         Strings.getLines(output.getText().await()));
 
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/A.jar",
                             "/outputs/parse.json"),
                         currentFolder.getFolder("outputs").await()
                             .getFilesAndFoldersRecursively().await()
@@ -3538,7 +3446,6 @@ public class QubBuildTests
 
         final QubBuild qubBuild = new QubBuild();
         qubBuild.setJavaCompiler(compiler);
-        qubBuild.setJarCreator(new FakeJarCreator());
         qubBuild.setShowTotalDuration(showTotalDuration);
         qubBuild.main(console);
     }

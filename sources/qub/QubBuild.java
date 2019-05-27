@@ -4,7 +4,6 @@ public class QubBuild
 {
     private Boolean showTotalDuration;
     private JavaCompiler javaCompiler;
-    private JarCreator jarCreator;
 
     /**
      * Get whether or not to show the total duration of this QubBuild command. This value will default
@@ -65,41 +64,6 @@ public class QubBuild
         this.javaCompiler = javaCompiler;
     }
 
-    /**
-     * Get the JarCreator that should be used to package compiled Java source (class) files. If no
-     * JarCreator has been set, then the provided creator function will be used to initialize the
-     * JarCreator and then the initialized JarCreator will be returned.
-     * @param creator The creator function that will initialize the JarCreator if it hasn't been set
-     *                yet.
-     * @return The JarCreator to use to package compiled java source (class) files.
-     */
-    private JarCreator getJarCreator(Function0<JarCreator> creator)
-    {
-        PreCondition.assertNotNull(creator, "creator");
-
-        if (jarCreator == null)
-        {
-            jarCreator = creator.run();
-        }
-        final JarCreator result = jarCreator;
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    /**
-     * Set the JarCreator that will be used to package compiled Java source (class) files.
-     * @param jarCreator The JarCreator that will be used to package compiled Java source (class)
-     *                   files.
-     */
-    public void setJarCreator(JarCreator jarCreator)
-    {
-        PreCondition.assertNotNull(jarCreator, "jarCreator");
-
-        this.jarCreator = jarCreator;
-    }
-
     public void main(Console console)
     {
         PreCondition.assertNotNull(console, "console");
@@ -112,8 +76,6 @@ public class QubBuild
             console.writeLine("  -folder: The folder to build. This can be specified either with the -folder");
             console.writeLine("           argument name or without it. The current folder will be used if this");
             console.writeLine("           isn't defined.");
-            console.writeLine("  -createjar: Whether or not to create a jar file from the compiled source code");
-            console.writeLine("              files.");
             console.writeLine("  -verbose: Whether or not to show verbose logs.");
             console.setExitCode(-1);
         }
@@ -131,7 +93,6 @@ public class QubBuild
                 console.writeLine("Compiling...").await();
 
                 final boolean useParseJson = shouldUseParseJson(console);
-                final boolean createJar = shouldCreateJar(console);
                 final Warnings warnings = getWarnings(console);
                 final Folder folderToBuild = getFolderToBuild(console).await();
                 final File projectJsonFile = folderToBuild.getFile("project.json").await();
@@ -451,47 +412,6 @@ public class QubBuild
                                         }
                                     }
                                 }
-
-                                if (createJar && console.getExitCode() == 0)
-                                {
-                                    console.writeLine("Creating jar file...").await();
-                                    final JarCreator jarCreator = getJarCreator(JavaJarCreator::new);
-                                    jarCreator.setOutputsFolder(outputsFolder);
-
-                                    String jarName = projectJson.getProject();
-                                    if (Strings.isNullOrEmpty(jarName) && javaSourceFiles.getCount() == 1)
-                                    {
-                                        jarName = javaSourceFiles.first().getNameWithoutFileExtension();
-                                    }
-                                    if (Strings.isNullOrEmpty(jarName) && !folderToBuild.getPath().equals(folderToBuild.getRoot().getPath()))
-                                    {
-                                        jarName = folderToBuild.getName();
-                                    }
-                                    if (Strings.isNullOrEmpty(jarName))
-                                    {
-                                        jarName = "project";
-                                    }
-                                    jarCreator.setJarName(jarName);
-
-                                    File manifestFile = null;
-                                    final String mainClass = projectJsonJava.getMainClass();
-                                    if (!Strings.isNullOrEmpty(mainClass))
-                                    {
-                                        manifestFile = outputsFolder.getFile("META-INF/MANIFEST.MF").await();
-                                        final String manifestFileContents =
-                                            "Manifest-Version: 1.0\n" +
-                                                "Main-Class: " + mainClass + "\n";
-                                        manifestFile.setContentsAsString(manifestFileContents).await();
-                                        jarCreator.setManifestFile(manifestFile);
-                                    }
-
-                                    jarCreator.setClassFiles(outputsFolder.getFilesRecursively().await()
-                                        .where((File outputFile) -> Comparer.equal(outputFile.getFileExtension(), ".class")));
-
-                                    jarCreator.setSourceFiles(javaSourceFiles);
-
-                                    jarCreator.createJarFile(console, isVerbose(console).await()).await();
-                                }
                             }
                         }
                     }
@@ -540,23 +460,6 @@ public class QubBuild
         final Result<Folder> result = fileSystem.getFolder(folderPathToBuild);
 
         PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    public static boolean shouldCreateJar(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        final CommandLine commandLine = console.getCommandLine();
-
-        boolean result = true;
-        CommandLineArgument createJarArgument = commandLine.get("createjar");
-        if (createJarArgument != null)
-        {
-            result = Strings.isNullOrEmpty(createJarArgument.getValue()) ||
-                java.lang.Boolean.parseBoolean(createJarArgument.getValue());
-        }
 
         return result;
     }
