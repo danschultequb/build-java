@@ -200,12 +200,7 @@ public abstract class JavaCompiler
 
             classPaths.addAll(dependencies.map((Dependency dependency) ->
             {
-                final String dependencyRelativePath =
-                    dependency.getPublisher() + "/" +
-                    dependency.getProject() + "/" +
-                    dependency.getVersion() + "/" +
-                    dependency.getProject() + ".jar";
-                return qubFolder.getFile(dependencyRelativePath).await().toString();
+                return QubBuild.resolveDependencyReference(qubFolder, dependency).toString();
             }));
         }
         result.addAll("-classpath", Strings.join(';', classPaths));

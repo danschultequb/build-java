@@ -662,6 +662,31 @@ public class QubBuild
         });
     }
 
+    public static String getDependencyRelativePathString(Dependency dependency)
+    {
+        PreCondition.assertNotNull(dependency, "dependency");
+
+        return dependency.getPublisher() + "/" +
+            dependency.getProject() + "/" +
+            dependency.getVersion() + "/" +
+            dependency.getProject() + ".jar";
+    }
+
+    public static Path getDependencyRelativePath(Dependency dependency)
+    {
+        PreCondition.assertNotNull(dependency, "dependency");
+
+        return Path.parse(getDependencyRelativePathString(dependency));
+    }
+
+    public static File resolveDependencyReference(Folder qubFolder, Dependency dependency)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+        PreCondition.assertNotNull(dependency, "dependency");
+
+        return qubFolder.getFile(getDependencyRelativePath(dependency)).await();
+    }
+
     public static void main(String[] args)
     {
         final QubBuild qubBuild = new QubBuild();

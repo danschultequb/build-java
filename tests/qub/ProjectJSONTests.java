@@ -111,9 +111,18 @@ public class ProjectJSONTests
                     test.assertThrows(() -> ProjectJSON.parse((File)null), new PreConditionFailure("projectJSONFile cannot be null."));
                 });
 
+                runner.test("with non-existing root", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    final File file = fileSystem.getFile("/project.json").await();
+                    test.assertThrows(() -> ProjectJSON.parse(file).await(),
+                        new RootNotFoundException("/"));
+                });
+
                 runner.test("with non-existing file", (Test test) ->
                 {
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
                     final File file = fileSystem.getFile("/project.json").await();
                     test.assertThrows(() -> ProjectJSON.parse(file).await(),
                         new FileNotFoundException("/project.json"));
