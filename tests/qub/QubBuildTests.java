@@ -3359,6 +3359,80 @@ public class QubBuildTests
                             .getFilesAndFoldersRecursively().await()
                             .map(FileSystemEntry::toString));
                 });
+
+                runner.test("with multiple versions of same project dependency", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    final ProjectJSON a1ProjectJSON = new ProjectJSON()
+                        .setProject("a")
+                        .setPublisher("me")
+                        .setVersion("1")
+                        .setJava(new ProjectJSONJava());
+                    final ProjectJSON a2ProjectJSON = new ProjectJSON()
+                        .setProject("a")
+                        .setPublisher("me")
+                        .setVersion("2")
+                        .setJava(new ProjectJSONJava());
+                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                        .setProject("b")
+                        .setPublisher("me")
+                        .setVersion("2")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new Dependency()
+                                    .setProject("a")
+                                    .setPublisher("me")
+                                    .setVersion("2"))));
+                    final ProjectJSON cProjectJson = new ProjectJSON()
+                        .setProject("c")
+                        .setPublisher("me")
+                        .setVersion("3")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new Dependency()
+                                    .setProject("a")
+                                    .setPublisher("me")
+                                    .setVersion("1"),
+                                new Dependency()
+                                    .setProject("b")
+                                    .setPublisher("me")
+                                    .setVersion("2"))));
+                    currentFolder.getFile("project.json").await()
+                        .setContentsAsString(JSON.object(cProjectJson::write).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+
+                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
+                        publisherFolder.create().await();
+                        publisherFolder.setFileContentsAsString("b/2/project.json", JSON.object(bProjectJSON::write).toString()).await();
+                        publisherFolder.createFile("b/2/b.jar").await();
+                        publisherFolder.setFileContentsAsString("a/1/project.json", JSON.object(a1ProjectJSON::write).toString()).await();
+                        publisherFolder.createFile("a/1/a.jar").await();
+                        publisherFolder.setFileContentsAsString("a/2/project.json", JSON.object(a2ProjectJSON::write).toString()).await();
+                        publisherFolder.createFile("a/2/a.jar").await();
+
+                        main(console, false);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE: Parsing project.json...",
+                            "ERROR: Found more than one required version for package me/a:",
+                            "1. me/a@1",
+                            "2. me/a@2",
+                            "     from me/b@2",
+                            ""),
+                        Strings.getLines(output.getText().await()));
+
+                    test.assertFalse(currentFolder.folderExists("outputs").await());
+                });
             });
 
             runner.testGroup("main(String[])", () ->

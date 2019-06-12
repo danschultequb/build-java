@@ -140,7 +140,41 @@ public class QubBuild
                                 final Folder qubFolder = console.getFileSystem().getFolder(qubHome).await();
                                 javaCompiler.setQubFolder(qubFolder);
 
-                                dependencies = getAllDependencies(qubFolder, dependencies);
+                                final Map<Dependency,Iterable<Dependency>> dependencyMap = getAllDependencies(qubFolder, dependencies);
+                                dependencies = dependencyMap.getKeys();
+
+                                final Set<Dependency> errorDependencies = Set.create();
+                                for (final Dependency dependency : dependencies)
+                                {
+                                    if (!errorDependencies.contains(dependency))
+                                    {
+                                        final Iterable<Dependency> matchingDependencies = dependencies.where((Dependency otherDependency) ->
+                                            Comparer.equal(dependency.getPublisher(), otherDependency.getPublisher()) &&
+                                                Comparer.equal(dependency.getProject(), otherDependency.getProject()))
+                                            .toList();
+                                        if (matchingDependencies.getCount() > 1)
+                                        {
+                                            errorDependencies.addAll(matchingDependencies);
+                                            final InMemoryCharacterStream errorMessage = new InMemoryCharacterStream();
+                                            errorMessage.writeLine("Found more than one required version for package " + dependency.getPublisher() + "/" + dependency.getProject() + ":").await();
+                                            int number = 0;
+                                            final String initialIndent = Strings.repeat(' ', Integers.toString(matchingDependencies.getCount()).length() + 2);
+                                            for (final Dependency matchingDependency : matchingDependencies)
+                                            {
+                                                ++number;
+                                                errorMessage.writeLine(number + ". " + matchingDependency.getPublisher() + "/" + matchingDependency.getProject() + "@" + matchingDependency.getVersion()).await();
+                                                final Iterable<Dependency> path = dependencyMap.get(matchingDependency).await();
+                                                String indent = initialIndent;
+                                                for (final Dependency pathDependency : path)
+                                                {
+                                                    indent += "  ";
+                                                    errorMessage.writeLine(indent + "from " + matchingDependency.getPublisher() + "/" + pathDependency.getProject() + "@" + pathDependency.getVersion()).await();
+                                                }
+                                            }
+                                            error(console, errorMessage.getText().await()).await();
+                                        }
+                                    }
+                                }
 
                                 for (final Dependency dependency : dependencies)
                                 {
@@ -719,49 +753,54 @@ public class QubBuild
         return qubFolder.getFile(getDependencyRelativePath(dependency)).await();
     }
 
-    public static Iterable<Dependency> getAllDependencies(Folder qubFolder, Iterable<Dependency> initialDependencies)
+    public static Map<Dependency,Iterable<Dependency>> getAllDependencies(Folder qubFolder, Iterable<Dependency> dependencies)
     {
         PreCondition.assertNotNull(qubFolder, "qubFolder");
 
-        final Set<Dependency> result = Set.create();
-        if (!Iterable.isNullOrEmpty(initialDependencies))
+        final MutableMap<Dependency,Iterable<Dependency>> result = Map.create();
+        if (!Iterable.isNullOrEmpty(dependencies))
         {
-            final Queue<Dependency> toVisit = Queue.create(initialDependencies);
-            while (toVisit.any())
-            {
-                final Dependency dependency = toVisit.dequeue();
-                if (!result.contains(dependency))
-                {
-                    result.add(dependency);
-                    final File dependencyProjectJsonFile = getDependencyProjectJsonFile(qubFolder, dependency);
-                    final ProjectJSON dependencyProjectJson = ProjectJSON.parse(dependencyProjectJsonFile)
-                        .catchError(NotFoundException.class)
-                        .await();
-                    if (dependencyProjectJson != null)
-                    {
-                        final ProjectJSONJava dependencyProjectJsonJava = dependencyProjectJson.getJava();
-                        if (dependencyProjectJsonJava != null)
-                        {
-                            final Iterable<Dependency> nextDependencies = dependencyProjectJsonJava.getDependencies();
-                            if (!Iterable.isNullOrEmpty(nextDependencies))
-                            {
-                                for (final Dependency nextDependency : nextDependencies)
-                                {
-                                    if (!result.contains(nextDependency))
-                                    {
-                                        toVisit.enqueue(nextDependency);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            getAllDependencies(qubFolder, dependencies, result, List.create());
         }
 
         PostCondition.assertNotNull(result, "result");
 
         return result;
+    }
+
+    public static void getAllDependencies(Folder qubFolder, Iterable<Dependency> dependencies, MutableMap<Dependency,Iterable<Dependency>> resultMap, List<Dependency> currentPath)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+        PreCondition.assertNotNullAndNotEmpty(dependencies, "dependencies");
+        PreCondition.assertNotNull(resultMap, "resultMap");
+        PreCondition.assertNotNull(currentPath, "currentPath");
+
+        for (final Dependency dependency : dependencies)
+        {
+            if (!resultMap.containsKey(dependency))
+            {
+                resultMap.set(dependency, currentPath.toArray());
+
+                final File dependencyProjectJsonFile = getDependencyProjectJsonFile(qubFolder, dependency);
+                final ProjectJSON dependencyProjectJson = ProjectJSON.parse(dependencyProjectJsonFile)
+                    .catchError(NotFoundException.class)
+                    .await();
+                if (dependencyProjectJson != null)
+                {
+                    final ProjectJSONJava dependencyProjectJsonJava = dependencyProjectJson.getJava();
+                    if (dependencyProjectJsonJava != null)
+                    {
+                        final Iterable<Dependency> nextDependencies = dependencyProjectJsonJava.getDependencies();
+                        if (!Iterable.isNullOrEmpty(nextDependencies))
+                        {
+                            currentPath.add(dependency);
+                            getAllDependencies(qubFolder, nextDependencies, resultMap, currentPath);
+                            currentPath.removeLast();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void main(String[] args)
