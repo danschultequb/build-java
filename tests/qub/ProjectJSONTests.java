@@ -1,8 +1,6 @@
 package qub;
 
-import java.text.ParseException;
-
-public class ProjectJSONTests
+public interface ProjectJSONTests
 {
     public static void test(TestRunner runner)
     {
@@ -19,21 +17,21 @@ public class ProjectJSONTests
                 runner.test("with null", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setPublisher(null);
+                    test.assertSame(projectJSON, projectJSON.setPublisher(null));
                     test.assertNull(projectJSON.getPublisher());
                 });
 
                 runner.test("with empty", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setPublisher("");
+                    test.assertSame(projectJSON, projectJSON.setPublisher(""));
                     test.assertEqual("", projectJSON.getPublisher());
                 });
 
                 runner.test("with non-empty", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setPublisher("apples");
+                    test.assertSame(projectJSON, projectJSON.setPublisher("apples"));
                     test.assertEqual("apples", projectJSON.getPublisher());
                 });
             });
@@ -43,21 +41,21 @@ public class ProjectJSONTests
                 runner.test("with null", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setProject(null);
+                    test.assertSame(projectJSON, projectJSON.setProject(null));
                     test.assertNull(projectJSON.getProject());
                 });
 
                 runner.test("with empty", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setProject("");
+                    test.assertSame(projectJSON, projectJSON.setProject(""));
                     test.assertEqual("", projectJSON.getProject());
                 });
 
                 runner.test("with non-empty", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setProject("apples");
+                    test.assertSame(projectJSON, projectJSON.setProject("apples"));
                     test.assertEqual("apples", projectJSON.getProject());
                 });
             });
@@ -67,21 +65,21 @@ public class ProjectJSONTests
                 runner.test("with null", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setVersion(null);
+                    test.assertSame(projectJSON, projectJSON.setVersion(null));
                     test.assertNull(projectJSON.getVersion());
                 });
 
                 runner.test("with empty", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setVersion("");
+                    test.assertSame(projectJSON, projectJSON.setVersion(""));
                     test.assertEqual("", projectJSON.getVersion());
                 });
 
                 runner.test("with non-empty", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setVersion("apples");
+                    test.assertSame(projectJSON, projectJSON.setVersion("apples"));
                     test.assertEqual("apples", projectJSON.getVersion());
                 });
             });
@@ -91,7 +89,7 @@ public class ProjectJSONTests
                 runner.test("with null", (Test test) ->
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setJava(null);
+                    test.assertSame(projectJSON, projectJSON.setJava(null));
                     test.assertNull(projectJSON.getJava());
                 });
 
@@ -99,7 +97,7 @@ public class ProjectJSONTests
                 {
                     final ProjectJSON projectJSON = new ProjectJSON();
                     final ProjectJSONJava java = new ProjectJSONJava();
-                    projectJSON.setJava(java);
+                    test.assertSame(projectJSON, projectJSON.setJava(java));
                     test.assertSame(java, projectJSON.getJava());
                 });
             });
@@ -108,7 +106,8 @@ public class ProjectJSONTests
             {
                 runner.test("with null file", (Test test) ->
                 {
-                    test.assertThrows(() -> ProjectJSON.parse((File)null), new PreConditionFailure("projectJSONFile cannot be null."));
+                    test.assertThrows(() -> ProjectJSON.parse((File)null),
+                        new PreConditionFailure("projectJSONFile cannot be null."));
                 });
 
                 runner.test("with non-existing root", (Test test) ->

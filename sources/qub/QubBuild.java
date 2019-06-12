@@ -127,7 +127,7 @@ public class QubBuild
                         javaCompiler.setMaximumErrors(projectJsonJava.getMaximumErrors());
                         javaCompiler.setMaximumWarnings(projectJsonJava.getMaximumWarnings());
 
-                        final Iterable<Dependency> dependencies = projectJsonJava.getDependencies();
+                        Iterable<Dependency> dependencies = projectJsonJava.getDependencies();
                         if (!Iterable.isNullOrEmpty(dependencies))
                         {
                             final String qubHome = console.getEnvironmentVariable("QUB_HOME");
@@ -139,6 +139,8 @@ public class QubBuild
                             {
                                 final Folder qubFolder = console.getFileSystem().getFolder(qubHome).await();
                                 javaCompiler.setQubFolder(qubFolder);
+
+                                dependencies = getAllDependencies(qubFolder, dependencies);
 
                                 for (final Dependency dependency : dependencies)
                                 {
@@ -159,7 +161,7 @@ public class QubBuild
                                             final Folder versionFolder = projectFolder.getFolder(dependency.getVersion()).await();
                                             if (!versionFolder.exists().await())
                                             {
-                                                error(console, "No version folder named " + Strings.escapeAndQuote(dependency.getVersion()) + " found in the " + Strings.escapeAndQuote(dependency.getPublisher()) + " project folder (" + projectFolder + ").").await();
+                                                error(console, "No version folder named " + Strings.escapeAndQuote(dependency.getVersion()) + " found in the " + Strings.escapeAndQuote(dependency.getProject()) + " project folder (" + projectFolder + ").").await();
                                             }
                                             else
                                             {
@@ -662,13 +664,43 @@ public class QubBuild
         });
     }
 
-    public static String getDependencyRelativePathString(Dependency dependency)
+    public static String getDependencyRelativeFolderPathString(Dependency dependency)
     {
         PreCondition.assertNotNull(dependency, "dependency");
 
         return dependency.getPublisher() + "/" +
             dependency.getProject() + "/" +
-            dependency.getVersion() + "/" +
+            dependency.getVersion();
+    }
+
+    public static Path getDependencyRelativeFolderPath(Dependency dependency)
+    {
+        PreCondition.assertNotNull(dependency, "dependency");
+
+        return Path.parse(getDependencyRelativeFolderPathString(dependency));
+    }
+
+    public static Folder getDependencyFolder(Folder qubFolder, Dependency dependency)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+        PreCondition.assertNotNull(dependency, "dependency");
+
+        return qubFolder.getFolder(getDependencyRelativeFolderPath(dependency)).await();
+    }
+
+    public static File getDependencyProjectJsonFile(Folder qubFolder, Dependency dependency)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+        PreCondition.assertNotNull(dependency, "dependency");
+
+        return getDependencyFolder(qubFolder, dependency).getFile("project.json").await();
+    }
+
+    public static String getDependencyRelativePathString(Dependency dependency)
+    {
+        PreCondition.assertNotNull(dependency, "dependency");
+
+        return getDependencyRelativeFolderPathString(dependency) + "/" +
             dependency.getProject() + ".jar";
     }
 
@@ -685,6 +717,51 @@ public class QubBuild
         PreCondition.assertNotNull(dependency, "dependency");
 
         return qubFolder.getFile(getDependencyRelativePath(dependency)).await();
+    }
+
+    public static Iterable<Dependency> getAllDependencies(Folder qubFolder, Iterable<Dependency> initialDependencies)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+
+        final Set<Dependency> result = Set.create();
+        if (!Iterable.isNullOrEmpty(initialDependencies))
+        {
+            final Queue<Dependency> toVisit = Queue.create(initialDependencies);
+            while (toVisit.any())
+            {
+                final Dependency dependency = toVisit.dequeue();
+                if (!result.contains(dependency))
+                {
+                    result.add(dependency);
+                    final File dependencyProjectJsonFile = getDependencyProjectJsonFile(qubFolder, dependency);
+                    final ProjectJSON dependencyProjectJson = ProjectJSON.parse(dependencyProjectJsonFile)
+                        .catchError(NotFoundException.class)
+                        .await();
+                    if (dependencyProjectJson != null)
+                    {
+                        final ProjectJSONJava dependencyProjectJsonJava = dependencyProjectJson.getJava();
+                        if (dependencyProjectJsonJava != null)
+                        {
+                            final Iterable<Dependency> nextDependencies = dependencyProjectJsonJava.getDependencies();
+                            if (!Iterable.isNullOrEmpty(nextDependencies))
+                            {
+                                for (final Dependency nextDependency : nextDependencies)
+                                {
+                                    if (!result.contains(nextDependency))
+                                    {
+                                        toVisit.enqueue(nextDependency);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        PostCondition.assertNotNull(result, "result");
+
+        return result;
     }
 
     public static void main(String[] args)

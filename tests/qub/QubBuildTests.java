@@ -3285,6 +3285,80 @@ public class QubBuildTests
                             .getFilesAndFoldersRecursively().await()
                             .map(FileSystemEntry::toString));
                 });
+
+                runner.test("with transitive dependency", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    final ProjectJSON aProjectJSON = new ProjectJSON()
+                        .setProject("a")
+                        .setPublisher("me")
+                        .setVersion("1")
+                        .setJava(new ProjectJSONJava());
+                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                        .setProject("b")
+                        .setPublisher("me")
+                        .setVersion("2")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new Dependency()
+                                    .setProject("a")
+                                    .setPublisher("me")
+                                    .setVersion("1"))));
+                    final ProjectJSON cProjectJson = new ProjectJSON()
+                        .setProject("c")
+                        .setPublisher("me")
+                        .setVersion("3")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new Dependency()
+                                .setProject("b")
+                                .setPublisher("me")
+                                .setVersion("2"))));
+                    currentFolder.getFile("project.json").await()
+                        .setContentsAsString(JSON.object(cProjectJson::write).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+
+                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
+                    {
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
+                        publisherFolder.create().await();
+                        publisherFolder.setFileContentsAsString("b/2/project.json", JSON.object(bProjectJSON::write).toString()).await();
+                        publisherFolder.createFile("b/2/b.jar").await();
+                        publisherFolder.setFileContentsAsString("a/1/project.json", JSON.object(aProjectJSON::write).toString()).await();
+                        publisherFolder.createFile("a/1/a.jar").await();
+
+                        main(console, false);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Updating outputs/parse.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Writing parse.json file...",
+                            "VERBOSE: Done writing parse.json file...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "VERBOSE: Compiling all source files.",
+                            "VERBOSE: Starting compilation...",
+                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar sources/A.java...",
+                            "VERBOSE: Compilation finished."),
+                        Strings.getLines(output.getText().await()));
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/parse.json"),
+                        currentFolder.getFolder("outputs").await()
+                            .getFilesAndFoldersRecursively().await()
+                            .map(FileSystemEntry::toString));
+                });
             });
 
             runner.testGroup("main(String[])", () ->

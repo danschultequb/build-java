@@ -12,6 +12,8 @@ public class FakeJavaCompiler extends JavaCompiler
         PreCondition.assertNotNull(outputFolder, "outputFolder");
         PreCondition.assertNotNull(process, "process");
 
+        final Iterable<String> arguments = getArguments(sourceFiles, rootFolder, outputFolder);
+        QubBuild.verboseLog(process, "Running javac " + Strings.join(' ', arguments) + "...").await();
         for (final File sourceFile : sourceFiles)
         {
             sourceFile.copyTo(QubBuild.getClassFile(sourceFile, rootFolder, outputFolder));

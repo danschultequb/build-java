@@ -20,9 +20,10 @@ public class ProjectJSON
      * Set the publisher.
      * @param publisher The publisher.
      */
-    public void setPublisher(String publisher)
+    public ProjectJSON setPublisher(String publisher)
     {
         this.publisher = publisher;
+        return this;
     }
 
     /**
@@ -38,9 +39,10 @@ public class ProjectJSON
      * Set the project name.
      * @param project The name of the project.
      */
-    public void setProject(String project)
+    public ProjectJSON setProject(String project)
     {
         this.project = project;
+        return this;
     }
 
     /**
@@ -56,18 +58,20 @@ public class ProjectJSON
      * Set the version.
      * @param version The version.
      */
-    public void setVersion(String version)
+    public ProjectJSON setVersion(String version)
     {
         this.version = version;
+        return this;
     }
 
     /**
      * Set the Java options.
      * @param java The Java options.
      */
-    public void setJava(ProjectJSONJava java)
+    public ProjectJSON setJava(ProjectJSONJava java)
     {
         this.java = java;
+        return this;
     }
 
     /**
