@@ -70,48 +70,12 @@ public class QubBuild
 
         final CommandLineParameters parameters = console.getCommandLineParameters();
 
-        final CommandLineParameter<Folder> folderToBuildParameter = parameters.addPositional("folder", (String value) ->
-        {
-            return Result.create(() ->
-            {
-                Folder result;
-                if (Strings.isNullOrEmpty(value))
-                {
-                    result = console.getCurrentFolder().await();
-                }
-                else
-                {
-                    final FileSystem fileSystem = console.getFileSystem();
-                    final Path path = Path.parse(value);
-                    if (path.isRooted())
-                    {
-                        result = fileSystem.getFolder(path).await();
-                    }
-                    else
-                    {
-                        final Path rootedPath = console.getCurrentFolderPath().resolve(path).await();
-                        result = fileSystem.getFolder(rootedPath).await();
-                    }
-                }
-                return result;
-            });
-        });
-        folderToBuildParameter.setValueName("<folder-path-to-build>");
-        folderToBuildParameter.setDescription("The folder to build. The current folder will be used if this isn't defined.");
-        final CommandLineParameter<Warnings> warningsParameter = parameters.add("warnings", (String value) ->
-        {
-            Warnings result = Warnings.Show;
-            if (Warnings.Error.toString().equalsIgnoreCase(value))
-            {
-                result = Warnings.Error;
-            }
-            else if (Warnings.Hide.toString().equalsIgnoreCase(value))
-            {
-                result = Warnings.Hide;
-            }
-            return Result.success(result);
-        });
-        warningsParameter.setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
+        final CommandLineParameter<Folder> folderToBuildParameter = parameters.addPositionalFolder("folder", console)
+            .setValueName("<folder-path-to-build>")
+            .setDescription("The folder to build. The current folder will be used if this isn't defined.");
+        final CommandLineParameter<Warnings> warningsParameter = parameters.addEnum("warnings", Warnings.Show)
+            .setValueName("<show|error|hide>")
+            .setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
         final CommandLineParameterBoolean useParseJsonParameter = parameters.addBoolean("parsejson", true)
             .setDescription("Whether or not to read and write a parse.json file. Defaults to true.");
         final CommandLineParameterVerbose verbose = parameters.addVerbose(console);

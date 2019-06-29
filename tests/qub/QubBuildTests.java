@@ -46,7 +46,7 @@ public class QubBuildTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings] [--parsejson] [--verbose] [--profiler] [--help]",
+                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--parsejson] [--verbose] [--profiler] [--help]",
                             "  Used to compile and package source code projects.",
                             "  --folder: The folder to build. The current folder will be used if this isn't defined.",
                             "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
@@ -67,7 +67,7 @@ public class QubBuildTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings] [--parsejson] [--verbose] [--profiler] [--help]",
+                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--parsejson] [--verbose] [--profiler] [--help]",
                             "  Used to compile and package source code projects.",
                             "  --folder: The folder to build. The current folder will be used if this isn't defined.",
                             "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
