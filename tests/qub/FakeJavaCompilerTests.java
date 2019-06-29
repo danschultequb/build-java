@@ -11,8 +11,9 @@ public class FakeJavaCompilerTests
             runner.test("constructor()", (Test test) ->
             {
                 final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                test.assertEqual(0, compiler.exitCode);
-                test.assertEqual(null, compiler.issues);
+                test.assertEqual(0, compiler.getExitCode());
+                test.assertEqual(null, compiler.getIssues());
+                test.assertNull(compiler.getVerbose());
             });
 
             runner.testGroup("compile()", () ->

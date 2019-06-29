@@ -2,8 +2,37 @@ package qub;
 
 public class FakeJavaCompiler extends JavaCompiler
 {
-    public int exitCode;
-    public Iterable<JavaCompilerIssue> issues;
+    private int exitCode;
+    private Iterable<JavaCompilerIssue> issues;
+
+    public int getExitCode()
+    {
+        return exitCode;
+    }
+
+    public FakeJavaCompiler setExitCode(int exitCode)
+    {
+        this.exitCode = exitCode;
+        return this;
+    }
+
+    public Iterable<JavaCompilerIssue> getIssues()
+    {
+        return issues;
+    }
+
+    public FakeJavaCompiler setIssues(Iterable<JavaCompilerIssue> issues)
+    {
+        this.issues = issues;
+        return this;
+    }
+
+    @Override
+    public FakeJavaCompiler setVerbose(CommandLineParameterVerbose verbose)
+    {
+        super.setVerbose(verbose);
+        return this;
+    }
 
     public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Process process)
     {
@@ -13,7 +42,7 @@ public class FakeJavaCompiler extends JavaCompiler
         PreCondition.assertNotNull(process, "process");
 
         final Iterable<String> arguments = getArguments(sourceFiles, rootFolder, outputFolder);
-        QubBuild.verboseLog(process, "Running javac " + Strings.join(' ', arguments) + "...").await();
+        writeVerboseLine("Running javac " + Strings.join(' ', arguments) + "...").await();
         for (final File sourceFile : sourceFiles)
         {
             sourceFile.copyTo(QubBuild.getClassFile(sourceFile, rootFolder, outputFolder));
@@ -21,9 +50,9 @@ public class FakeJavaCompiler extends JavaCompiler
 
         return Result.success(
             new JavaCompilationResult(
-                exitCode,
+                getExitCode(),
                 "",
                 "",
-                issues));
+                getIssues()));
     }
 }

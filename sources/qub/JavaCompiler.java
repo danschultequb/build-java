@@ -11,6 +11,7 @@ public abstract class JavaCompiler
     private Folder qubFolder;
     private Integer maximumErrors;
     private Integer maximumWarnings;
+    private CommandLineParameterVerbose verbose;
 
     public String getVersion()
     {
@@ -100,6 +101,28 @@ public abstract class JavaCompiler
     public Integer getMaximumWarnings()
     {
         return maximumWarnings;
+    }
+
+    public CommandLineParameterVerbose getVerbose()
+    {
+        return verbose;
+    }
+
+    public JavaCompiler setVerbose(CommandLineParameterVerbose verbose)
+    {
+        this.verbose = verbose;
+        return this;
+    }
+
+    public Result<Void> writeVerboseLine(String message)
+    {
+        return Result.create(() ->
+        {
+            if (verbose != null)
+            {
+                verbose.writeLine(message).await();
+            }
+        });
     }
 
     /**

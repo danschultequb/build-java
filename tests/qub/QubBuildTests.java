@@ -36,22 +36,24 @@ public class QubBuildTests
                     test.assertThrows(() -> main((Console)null), new PreConditionFailure("console cannot be null."));
                 });
 
-                runner.test("with /? command line argument", (Test test) ->
+                runner.test("with --help command line argument", (Test test) ->
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    try (final Console console = createConsole(output, "/?"))
+                    try (final Console console = createConsole(output, "--help"))
                     {
                         main(console);
                         test.assertEqual(-1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]",
+                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings] [--parsejson] [--verbose] [--profiler] [--help]",
                             "  Used to compile and package source code projects.",
-                            "  -folder: The folder to build. This can be specified either with the -folder",
-                            "           argument name or without it. The current folder will be used if this",
-                            "           isn't defined.",
-                            "  -verbose: Whether or not to show verbose logs."),
+                            "  --folder: The folder to build. The current folder will be used if this isn't defined.",
+                            "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
+                            "  --parsejson: Whether or not to read and write a parse.json file. Defaults to true.",
+                            "  --verbose: Whether or not to show verbose logs.",
+                            "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
+                            "  --help(?): Show the help message for this application."),
                         Strings.getLines(output.getText().await()));
                 });
 
@@ -65,12 +67,14 @@ public class QubBuildTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]",
+                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings] [--parsejson] [--verbose] [--profiler] [--help]",
                             "  Used to compile and package source code projects.",
-                            "  -folder: The folder to build. This can be specified either with the -folder",
-                            "           argument name or without it. The current folder will be used if this",
-                            "           isn't defined.",
-                            "  -verbose: Whether or not to show verbose logs."),
+                            "  --folder: The folder to build. The current folder will be used if this isn't defined.",
+                            "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
+                            "  --parsejson: Whether or not to read and write a parse.json file. Defaults to true.",
+                            "  --verbose: Whether or not to show verbose logs.",
+                            "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
+                            "  --help(?): Show the help message for this application."),
                         Strings.getLines(output.getText().await()));
                 });
 
@@ -614,14 +618,14 @@ public class QubBuildTests
                 runner.test("with one source file with one error", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "This doesn't look right to me."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "This doesn't look right to me.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -677,14 +681,14 @@ public class QubBuildTests
                 runner.test("with one source file with one warning", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            1, 5,
-                            Issue.Type.Warning,
-                            "Are you sure?"));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                1, 5,
+                                Issue.Type.Warning,
+                                "Are you sure?")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -740,19 +744,19 @@ public class QubBuildTests
                 runner.test("with two source files with one error and one warning", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -810,34 +814,34 @@ public class QubBuildTests
                 runner.test("with multiple source files with errors and warnings", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            12, 2,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            20,7,
-                            Issue.Type.Error,
-                            "Can't be this."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                20,7,
+                                Issue.Type.Error,
+                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -898,34 +902,34 @@ public class QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=SHOW", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            12, 2,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            20,7,
-                            Issue.Type.Error,
-                            "Can't be this."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                20,7,
+                                Issue.Type.Error,
+                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -986,34 +990,34 @@ public class QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            12, 2,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            20,7,
-                            Issue.Type.Error,
-                            "Can't be this."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                20,7,
+                                Issue.Type.Error,
+                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -1074,34 +1078,34 @@ public class QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            12, 2,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            20,7,
-                            Issue.Type.Error,
-                            "Can't be this."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                20,7,
+                                Issue.Type.Error,
+                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -1162,34 +1166,34 @@ public class QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=spam", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            12, 2,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            20,7,
-                            Issue.Type.Error,
-                            "Can't be this."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                20,7,
+                                Issue.Type.Error,
+                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -1250,34 +1254,34 @@ public class QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=hide", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            12, 2,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            20,7,
-                            Issue.Type.Error,
-                            "Can't be this."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                20,7,
+                                Issue.Type.Error,
+                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -1335,34 +1339,34 @@ public class QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=errOR", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 5,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/sources/A.java",
-                            12, 2,
-                            Issue.Type.Error,
-                            "Are you sure?"),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/ATests.java",
-                            10,7,
-                            Issue.Type.Warning,
-                            "Can't be this."),
-                        new JavaCompilerIssue(
-                            "/tests/C.java",
-                            20,7,
-                            Issue.Type.Error,
-                            "Can't be this."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 5,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?"),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/ATests.java",
+                                10,7,
+                                Issue.Type.Warning,
+                                "Can't be this."),
+                            new JavaCompilerIssue(
+                                "/tests/C.java",
+                                20,7,
+                                Issue.Type.Error,
+                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -1994,14 +1998,14 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler();
-                    compiler.exitCode = 1;
-                    compiler.issues = Iterable.create(
-                        new JavaCompilerIssue(
-                            "/sources/B.java",
-                            1, 25,
-                            Issue.Type.Error,
-                            "Missing definition for C."));
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "/sources/B.java",
+                                1, 25,
+                                Issue.Type.Error,
+                                "Missing definition for C.")));
                     try (final Console console = createConsole(output, currentFolder, "-parsejson"))
                     {
                         main(console, compiler);
@@ -3559,7 +3563,7 @@ public class QubBuildTests
 
     private static Console createConsole(String... commandLineArguments)
     {
-        final Console result = new Console(Iterable.create(commandLineArguments));
+        final Console result = new Console(CommandLineArguments.create(commandLineArguments));
         result.setLineSeparator("\n");
 
         return result;

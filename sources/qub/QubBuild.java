@@ -68,15 +68,59 @@ public class QubBuild
     {
         PreCondition.assertNotNull(console, "console");
 
-        final CommandLine commandLine = console.getCommandLine();
-        if (commandLine.contains(QubBuild::showUsage))
+        final CommandLineParameters parameters = console.getCommandLineParameters();
+
+        final CommandLineParameter<Folder> folderToBuildParameter = parameters.addPositional("folder", (String value) ->
         {
-            console.writeLine("Usage: qub-build [[-folder=]<folder-path-to-build>] [-verbose]");
-            console.writeLine("  Used to compile and package source code projects.");
-            console.writeLine("  -folder: The folder to build. This can be specified either with the -folder");
-            console.writeLine("           argument name or without it. The current folder will be used if this");
-            console.writeLine("           isn't defined.");
-            console.writeLine("  -verbose: Whether or not to show verbose logs.");
+            return Result.create(() ->
+            {
+                Folder result;
+                if (Strings.isNullOrEmpty(value))
+                {
+                    result = console.getCurrentFolder().await();
+                }
+                else
+                {
+                    final FileSystem fileSystem = console.getFileSystem();
+                    final Path path = Path.parse(value);
+                    if (path.isRooted())
+                    {
+                        result = fileSystem.getFolder(path).await();
+                    }
+                    else
+                    {
+                        final Path rootedPath = console.getCurrentFolderPath().resolve(path).await();
+                        result = fileSystem.getFolder(rootedPath).await();
+                    }
+                }
+                return result;
+            });
+        });
+        folderToBuildParameter.setValueName("<folder-path-to-build>");
+        folderToBuildParameter.setDescription("The folder to build. The current folder will be used if this isn't defined.");
+        final CommandLineParameter<Warnings> warningsParameter = parameters.add("warnings", (String value) ->
+        {
+            Warnings result = Warnings.Show;
+            if (Warnings.Error.toString().equalsIgnoreCase(value))
+            {
+                result = Warnings.Error;
+            }
+            else if (Warnings.Hide.toString().equalsIgnoreCase(value))
+            {
+                result = Warnings.Hide;
+            }
+            return Result.success(result);
+        });
+        warningsParameter.setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
+        final CommandLineParameterBoolean useParseJsonParameter = parameters.addBoolean("parsejson", true)
+            .setDescription("Whether or not to read and write a parse.json file. Defaults to true.");
+        final CommandLineParameterVerbose verbose = parameters.addVerbose(console);
+        final CommandLineParameterProfiler profiler = parameters.addProfiler(console, QubBuild.class);
+        final CommandLineParameter<Boolean> help = parameters.addHelp();
+
+        if (help.getValue().await())
+        {
+            parameters.writeHelpLines(console, "qub-build", "Used to compile and package source code projects.").await();
             console.setExitCode(-1);
         }
         else
@@ -88,21 +132,16 @@ public class QubBuild
                 stopwatch.start();
             }
 
+            profiler.await();
+
             try
             {
                 console.writeLine("Compiling...").await();
 
-                final boolean useParseJson = shouldUseParseJson(console);
-                final Warnings warnings = getWarnings(console);
-                final Folder folderToBuild = getFolderToBuild(console).await();
+                final Folder folderToBuild = folderToBuildParameter.getValue().await();
                 final File projectJsonFile = folderToBuild.getFile("project.json").await();
 
-                if (Profiler.takeProfilerArgument(console))
-                {
-                    Profiler.waitForProfiler(console, QubBuild.class).await();
-                }
-
-                verboseLog(console, "Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...", false).await();
+                verbose.writeLine("Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...").await();
                 final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile)
                     .catchError((Throwable error) -> error(console, error.getMessage()).await())
                     .await();
@@ -117,6 +156,7 @@ public class QubBuild
                     if (console.getExitCode() == 0)
                     {
                         javaCompiler = getJavaCompiler(JavacJavaCompiler::new);
+                        javaCompiler.setVerbose(verbose);
                         javaCompiler.checkJavaVersion(projectJsonJava.getVersion(), console)
                             .catchError((Throwable error) -> error(console, error.getMessage()).await())
                             .await();
@@ -249,7 +289,7 @@ public class QubBuild
                             final List<ParseJSONSourceFile> parseJsonSourceFiles = List.create();
                             boolean compileEverything = false;
                             final ParseJSON updatedParseJson = new ParseJSON();
-                            if (!useParseJson)
+                            if (!useParseJsonParameter.getValue().await())
                             {
                                 compileEverything = true;
                                 outputsFolder.delete()
@@ -267,7 +307,7 @@ public class QubBuild
                                 }
                                 else
                                 {
-                                    verboseLog(console, "Parsing " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                                    verbose.writeLine("Parsing " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
 
                                     final ParseJSON parseJson = ParseJSON.parse(parseJsonFile)
                                         .catchError(FileNotFoundException.class)
@@ -318,7 +358,7 @@ public class QubBuild
 
                                         if (!Iterable.isNullOrEmpty(deletedJavaSourceFiles))
                                         {
-                                            verboseLog(console, "Deleting class files for deleted source files...").await();
+                                            verbose.writeLine("Deleting class files for deleted source files...").await();
                                             for (final File deletedSourceFile : deletedJavaSourceFiles)
                                             {
                                                 getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
@@ -330,21 +370,21 @@ public class QubBuild
                                     }
                                 }
 
-                                verboseLog(console, "Updating " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
-                                verboseLog(console, "Setting project.json...").await();
+                                verbose.writeLine("Updating " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                                verbose.writeLine("Setting project.json...").await();
                                 updatedParseJson.setProjectJson(projectJson);
-                                verboseLog(console, "Setting source files...").await();
+                                verbose.writeLine("Setting source files...").await();
                                 updatedParseJson.setSourceFiles(parseJsonSourceFiles);
-                                verboseLog(console, "Writing parse.json file...").await();
+                                verbose.writeLine("Writing parse.json file...").await();
                                 updatedParseJson.write(parseJsonFile).await();
-                                verboseLog(console, "Done writing parse.json file...").await();
+                                verbose.writeLine("Done writing parse.json file...").await();
                             }
 
-                            verboseLog(console, "Detecting java source files to compile...").await();
+                            verbose.writeLine("Detecting java source files to compile...").await();
                             final Set<File> javaSourceFilesToCompile = Set.create();
                             if (compileEverything)
                             {
-                                verboseLog(console, "Compiling all source files.").await();
+                                verbose.writeLine("Compiling all source files.").await();
                                 javaSourceFilesToCompile.addAll(javaSourceFiles);
                             }
                             else
@@ -410,17 +450,17 @@ public class QubBuild
 
                             if (Iterable.isNullOrEmpty(javaSourceFilesToCompile))
                             {
-                                verboseLog(console, "No source files need compilation.").await();
+                                verbose.writeLine("No source files need compilation.").await();
                             }
                             else
                             {
-                                verboseLog(console, "Starting compilation...");
+                                verbose.writeLine("Starting compilation...").await();
                                 final JavaCompilationResult compilationResult = javaCompiler
                                     .compile(javaSourceFilesToCompile, folderToBuild, outputsFolder, console)
                                     .await();
                                 console.setExitCode(compilationResult.exitCode);
 
-                                verboseLog(console, "Compilation finished.").await();
+                                verbose.writeLine("Compilation finished.").await();
                                 if (!Iterable.isNullOrEmpty(compilationResult.issues))
                                 {
                                     final Iterable<JavaCompilerIssue> sortedIssues = compilationResult.issues
@@ -428,6 +468,7 @@ public class QubBuild
 
                                     final Iterable<JavaCompilerIssue> warningIssues = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning);
                                     final int warningCount = warningIssues.getCount();
+                                    final Warnings warnings = warningsParameter.getValue().await();
                                     if (warningCount > 0 && warnings == Warnings.Show)
                                     {
                                         console.writeLine(warningCount + " Warning" + (warningCount == 1 ? "" : "s") + ":").await();
@@ -462,87 +503,6 @@ public class QubBuild
                 }
             }
         }
-    }
-
-    public static Result<Folder> getFolderToBuild(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        final CommandLine commandLine = console.getCommandLine();
-        Path folderPathToBuild = null;
-
-        CommandLineArgument folderArgument = commandLine.get("folder");
-        if (folderArgument == null)
-        {
-            folderArgument = commandLine.getArguments()
-                .first((CommandLineArgument argument) -> argument.getName() == null);
-        }
-        if (folderArgument != null)
-        {
-            folderPathToBuild = Path.parse(folderArgument.getValue());
-        }
-
-        if (folderPathToBuild == null)
-        {
-            folderPathToBuild = console.getCurrentFolderPath();
-        }
-
-        if (!folderPathToBuild.isRooted())
-        {
-            folderPathToBuild = console.getCurrentFolderPath().resolve(folderPathToBuild).await();
-        }
-
-        final FileSystem fileSystem = console.getFileSystem();
-        final Result<Folder> result = fileSystem.getFolder(folderPathToBuild);
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    public static Warnings getWarnings(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        final CommandLine commandLine = console.getCommandLine();
-
-        Warnings result = Warnings.Show;
-        final CommandLineArgument warningsArgument = commandLine.get("warnings");
-        if (warningsArgument != null)
-        {
-            final String warningsArgumentValue = warningsArgument.getValue();
-            if (!Strings.isNullOrEmpty(warningsArgumentValue))
-            {
-                if (warningsArgumentValue.equalsIgnoreCase(Warnings.Error.toString()))
-                {
-                    result = Warnings.Error;
-                }
-                else if (warningsArgumentValue.equalsIgnoreCase(Warnings.Hide.toString()))
-                {
-                    result = Warnings.Hide;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public static boolean shouldUseParseJson(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        final CommandLine commandLine = console.getCommandLine();
-
-        boolean result = true;
-
-        CommandLineArgument useParseJsonArgument = commandLine.get("parsejson");
-        if (useParseJsonArgument != null)
-        {
-            result = Strings.isNullOrEmpty(useParseJsonArgument.getValue()) ||
-                java.lang.Boolean.parseBoolean(useParseJsonArgument.getValue());
-        }
-
-        return result;
     }
 
     public static boolean shouldCompileEverything(ProjectJSON oldProjectJson, ProjectJSON newProjectJson)
@@ -624,42 +584,6 @@ public class QubBuild
         return outputFolder.getFile(sourceFileRelativeToSourcePath.changeFileExtension(".class")).await();
     }
 
-    private static boolean showUsage(CommandLineArgument argument)
-    {
-        final String argumentString = argument.toString();
-        return argumentString.equals("/?") || argumentString.equals("-?");
-    }
-
-    public static Result<Void> verboseLog(Process process, String message)
-    {
-        return process instanceof Console
-            ? verboseLog((Console)process, message)
-            : Result.success();
-    }
-
-    public static Result<Void> verboseLog(Console console, String message)
-    {
-        return verboseLog(console, message, false);
-    }
-
-    public static Result<Void> verboseLog(Console console, String message, boolean showTimestamp)
-    {
-        return isVerbose(console)
-            .thenResult((Boolean verbose) ->
-            {
-                Result<Void> result;
-                if (verbose)
-                {
-                    result = console.writeLine("VERBOSE" + (showTimestamp ? "(" + System.currentTimeMillis() + ")" : "") + ": " + message).then(() -> {});
-                }
-                else
-                {
-                    result = Result.success();
-                }
-                return result;
-            });
-    }
-
     public static Result<Void> error(Console console, String message)
     {
         return error(console, message, false);
@@ -670,32 +594,6 @@ public class QubBuild
         final Result<Void> result = console.writeLine("ERROR" + (showTimestamp ? "(" + System.currentTimeMillis() + ")" : "") + ": " + message).then(() -> {});
         console.incrementExitCode();
         return result;
-    }
-
-    private static Result<Boolean> isVerbose(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        return isVerbose(console.getCommandLine());
-    }
-
-    private static Result<Boolean> isVerbose(CommandLine commandLine)
-    {
-        PreCondition.assertNotNull(commandLine, "commandLine");
-
-        return Result.create(() ->
-        {
-            boolean verbose = false;
-
-            final CommandLineArgument verboseArgument = commandLine.get("verbose");
-            if (verboseArgument != null)
-            {
-                final String verboseArgumentValue = verboseArgument.getValue();
-                verbose = Strings.isNullOrEmpty(verboseArgumentValue) || Comparer.equal(verboseArgumentValue, "true");
-            }
-
-            return verbose;
-        });
     }
 
     public static String getDependencyRelativeFolderPathString(Dependency dependency)
