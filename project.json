@@ -1,7 +1,7 @@
 {
   "publisher": "qub",
   "project": "qub-java-build",
-  "version": "5",
+  "version": "6",
   "java": {
     "mainClass": "qub.QubBuild",
     "shortcutName": "qub-build",
@@ -10,7 +10,7 @@
       {
         "publisher": "qub",
         "project": "qub-java",
-        "version": "81"
+        "version": "83"
       }
     ]
   }

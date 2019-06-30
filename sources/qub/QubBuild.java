@@ -68,7 +68,7 @@ public class QubBuild
     {
         PreCondition.assertNotNull(console, "console");
 
-        final CommandLineParameters parameters = console.getCommandLineParameters();
+        final CommandLineParameters parameters = console.createCommandLineParameters();
 
         final CommandLineParameter<Folder> folderToBuildParameter = parameters.addPositionalFolder("folder", console)
             .setValueName("<folder-path-to-build>")
