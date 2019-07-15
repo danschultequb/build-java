@@ -245,14 +245,14 @@ public class QubBuild
                                 outputFolderName = projectJsonJava.getOutputFolder();
                             }
                             final Folder outputsFolder = folderToBuild.getFolder(outputFolderName).await();
-                            final File parseJsonFile = outputsFolder.getFile("build.json").await();
+                            final File buildJsonFile = outputsFolder.getFile("build.json").await();
                             final List<File> newJavaSourceFiles = List.create();
                             final List<File> deletedJavaSourceFiles = List.create();
                             final List<File> modifiedJavaSourceFiles = List.create();
                             final List<File> nonModifiedJavaSourceFiles = List.create();
                             final List<BuildJSONSourceFile> parseJsonSourceFiles = List.create();
                             boolean compileEverything = false;
-                            final BuildJSON updatedParseJson = new BuildJSON();
+                            final BuildJSON updatedBuildJson = new BuildJSON();
                             if (!buildJsonParameter.getValue().await())
                             {
                                 compileEverything = true;
@@ -271,9 +271,9 @@ public class QubBuild
                                 }
                                 else
                                 {
-                                    verbose.writeLine("Parsing " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                                    verbose.writeLine("Parsing " + buildJsonFile.relativeTo(folderToBuild).toString() + "...").await();
 
-                                    final BuildJSON buildJson = BuildJSON.parse(parseJsonFile)
+                                    final BuildJSON buildJson = BuildJSON.parse(buildJsonFile)
                                         .catchError(FileNotFoundException.class)
                                         .await();
                                     if (buildJson == null)
@@ -334,14 +334,11 @@ public class QubBuild
                                     }
                                 }
 
-                                verbose.writeLine("Updating " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                                verbose.writeLine("Updating " + buildJsonFile.relativeTo(folderToBuild).toString() + "...").await();
                                 verbose.writeLine("Setting project.json...").await();
-                                updatedParseJson.setProjectJson(projectJson);
+                                updatedBuildJson.setProjectJson(projectJson);
                                 verbose.writeLine("Setting source files...").await();
-                                updatedParseJson.setSourceFiles(parseJsonSourceFiles);
-                                verbose.writeLine("Writing build.json file...").await();
-                                updatedParseJson.write(parseJsonFile).await();
-                                verbose.writeLine("Done writing build.json file...").await();
+                                updatedBuildJson.setSourceFiles(parseJsonSourceFiles);
                             }
 
                             verbose.writeLine("Detecting java source files to compile...").await();
@@ -359,7 +356,7 @@ public class QubBuild
                                 for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
                                 {
                                     final Path relativePath = nonModifiedJavaSourceFile.relativeTo(folderToBuild);
-                                    final BuildJSONSourceFile parseJSONSourceFile = updatedParseJson.getSourceFile(relativePath).await();
+                                    final BuildJSONSourceFile parseJSONSourceFile = updatedBuildJson.getSourceFile(relativePath).await();
                                     final Iterable<Path> dependencies = parseJSONSourceFile.getDependencies();
                                     if (!Iterable.isNullOrEmpty(dependencies))
                                     {
@@ -383,7 +380,7 @@ public class QubBuild
                                     for (final File fileToNotCompile : List.create(filesToNotCompile))
                                     {
                                         final Path relativePath = fileToNotCompile.relativeTo(folderToBuild);
-                                        final BuildJSONSourceFile parseJSONSourceFile = updatedParseJson.getSourceFile(relativePath).await();
+                                        final BuildJSONSourceFile parseJSONSourceFile = updatedBuildJson.getSourceFile(relativePath).await();
                                         final Iterable<Path> dependencies = parseJSONSourceFile.getDependencies();
                                         if (!Iterable.isNullOrEmpty(dependencies))
                                         {
@@ -453,6 +450,13 @@ public class QubBuild
                                         }
                                     }
                                 }
+                            }
+
+                            if (buildJsonParameter.getValue().await())
+                            {
+                                verbose.writeLine("Writing build.json file...").await();
+                                updatedBuildJson.write(buildJsonFile).await();
+                                verbose.writeLine("Done writing build.json file...").await();
                             }
                         }
                     }

@@ -3346,13 +3346,13 @@ public class QubBuildTests
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "VERBOSE: Starting compilation...",
                             "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar sources/A.java...",
-                            "VERBOSE: Compilation finished."),
+                            "VERBOSE: Compilation finished.",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file..."),
                         Strings.getLines(output.getText().await()));
 
                     test.assertEqual(

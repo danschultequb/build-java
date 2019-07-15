@@ -1,11 +1,30 @@
 package qub;
 
+/**
+ * An issue that occurred while compiling Java source code.
+ */
 public class JavaCompilerIssue
 {
+    /**
+     * The path to the source file that contains this issue. This path will be relative to the
+     * project root folder.
+     */
     public final String sourceFilePath;
+    /**
+     * The line number that the issue occurred at.
+     */
     public final int lineNumber;
+    /**
+     * The column number that the issue occurred at.
+     */
     public final int columnNumber;
+    /**
+     * The type of the issue.
+     */
     public final Issue.Type type;
+    /**
+     * The message that explains the issue.
+     */
     public final String message;
 
     public JavaCompilerIssue(String sourceFilePath, int lineNumber, int columnNumber, Issue.Type type, String message)
