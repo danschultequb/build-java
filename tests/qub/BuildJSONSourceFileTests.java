@@ -1,14 +1,14 @@
 package qub;
 
-public class ParseJSONSourceFileTests
+public class BuildJSONSourceFileTests
 {
     public static void test(TestRunner runner)
     {
-        runner.testGroup(ParseJSONSourceFile.class, () ->
+        runner.testGroup(BuildJSONSourceFile.class, () ->
         {
             runner.test("constructor()", (Test test) ->
             {
-                final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile();
+                final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile();
                 test.assertNull(parseJsonSourceFile.getRelativePath());
                 test.assertNull(parseJsonSourceFile.getLastModified());
                 test.assertNull(parseJsonSourceFile.getDependencies());
@@ -18,15 +18,15 @@ public class ParseJSONSourceFileTests
             {
                 runner.test("with null", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(parseJsonSourceFile.equals((Object)null));
                 });
 
-                runner.test("with non-ParseJSONSourceFile", (Test test) ->
+                runner.test("with non-BuildJSONSourceFile", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(parseJsonSourceFile.equals("Hello"));
@@ -34,36 +34,36 @@ public class ParseJSONSourceFileTests
 
                 runner.test("with different relativePath", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(
                         parseJsonSourceFile.equals((Object)
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("b"))
                                 .setLastModified(DateTime.utc(5))));
                 });
 
                 runner.test("with different lastModified", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(
                         parseJsonSourceFile.equals((Object)
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(6))));
                 });
 
                 runner.test("with different dependencies", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(
                         parseJsonSourceFile.equals((Object)
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(6))
                                 .setDependencies(Iterable.create())));
@@ -71,19 +71,19 @@ public class ParseJSONSourceFileTests
 
                 runner.test("with equal", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertTrue(
                         parseJsonSourceFile.equals((Object)
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(5))));
                 });
 
                 runner.test("with same", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertTrue(parseJsonSourceFile.equals((Object)parseJsonSourceFile));
@@ -94,44 +94,44 @@ public class ParseJSONSourceFileTests
             {
                 runner.test("with null", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
-                    test.assertFalse(parseJsonSourceFile.equals((ParseJSONSourceFile)null));
+                    test.assertFalse(parseJsonSourceFile.equals((BuildJSONSourceFile)null));
                 });
 
                 runner.test("with different relativePath", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(
                         parseJsonSourceFile.equals(
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("b"))
                                 .setLastModified(DateTime.utc(5))));
                 });
 
                 runner.test("with different lastModified", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(
                         parseJsonSourceFile.equals(
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(6))));
                 });
 
                 runner.test("with different dependencies", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertFalse(
                         parseJsonSourceFile.equals(
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(6))
                                 .setDependencies(Iterable.create())));
@@ -139,19 +139,19 @@ public class ParseJSONSourceFileTests
 
                 runner.test("with equal", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertTrue(
                         parseJsonSourceFile.equals(
-                            new ParseJSONSourceFile()
+                            new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
                                 .setLastModified(DateTime.utc(5))));
                 });
 
                 runner.test("with same", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(5));
                     test.assertTrue(parseJsonSourceFile.equals(parseJsonSourceFile));
@@ -162,13 +162,13 @@ public class ParseJSONSourceFileTests
             {
                 runner.test("with no properties", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile();
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile();
                     test.assertEqual("{}", parseJsonSourceFile.toString());
                 });
 
                 runner.test("with all properties", (Test test) ->
                 {
-                    final ParseJSONSourceFile parseJsonSourceFile = new ParseJSONSourceFile()
+                    final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
                         .setLastModified(DateTime.utc(20))
                         .setDependencies(Iterable.create(Path.parse("b"), Path.parse("c")));

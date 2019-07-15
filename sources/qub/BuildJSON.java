@@ -1,12 +1,12 @@
 package qub;
 
-public class ParseJSON
+public class BuildJSON
 {
     private ProjectJSON projectJson;
-    private Iterable<ParseJSONSourceFile> sourceFiles;
-    private Map<Path,ParseJSONSourceFile> pathMap;
+    private Iterable<BuildJSONSourceFile> sourceFiles;
+    private Map<Path,BuildJSONSourceFile> pathMap;
 
-    public ParseJSON setProjectJson(ProjectJSON projectJson)
+    public BuildJSON setProjectJson(ProjectJSON projectJson)
     {
         this.projectJson = projectJson;
         return this;
@@ -17,7 +17,7 @@ public class ParseJSON
         return projectJson;
     }
 
-    public ParseJSON setSourceFiles(Iterable<ParseJSONSourceFile> sourceFiles)
+    public BuildJSON setSourceFiles(Iterable<BuildJSONSourceFile> sourceFiles)
     {
         this.sourceFiles = sourceFiles;
         if (sourceFiles == null)
@@ -26,8 +26,8 @@ public class ParseJSON
         }
         else
         {
-            final MutableMap<Path,ParseJSONSourceFile> pathMap = Map.create();
-            for (final ParseJSONSourceFile source : sourceFiles)
+            final MutableMap<Path,BuildJSONSourceFile> pathMap = Map.create();
+            for (final BuildJSONSourceFile source : sourceFiles)
             {
                 final Path sourcePath = source.getRelativePath();
                 if (sourcePath != null)
@@ -40,26 +40,26 @@ public class ParseJSON
         return this;
     }
 
-    public Iterable<ParseJSONSourceFile> getSourceFiles()
+    public Iterable<BuildJSONSourceFile> getSourceFiles()
     {
         return sourceFiles;
     }
 
-    public Result<ParseJSONSourceFile> getSourceFile(Path path)
+    public Result<BuildJSONSourceFile> getSourceFile(Path path)
     {
         PreCondition.assertNotNull(path, "path");
 
         return pathMap == null
-            ? Result.error(new NotFoundException("No source file found in the ParseJSON object with the path " + Strings.escapeAndQuote(path.toString()) + "."))
+            ? Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(path.toString()) + "."))
             : pathMap.get(path)
                 .catchErrorResult(NotFoundException.class, () ->
-                    Result.error(new NotFoundException("No source file found in the ParseJSON object with the path " + Strings.escapeAndQuote(path.toString()) + ".")));
+                    Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(path.toString()) + ".")));
     }
 
     /**
-     * Write this ParseJSON object to the provided file.
-     * @param file The file to write this ParseJSON object to.
-     * @return The result of writing this ParseJSON object.
+     * Write this BuildJSON object to the provided file.
+     * @param file The file to write this BuildJSON object to.
+     * @return The result of writing this BuildJSON object.
      */
     public Result<Void> write(File file)
     {
@@ -77,7 +77,7 @@ public class ParseJSON
                         parseJsonBuilder.objectProperty("project.json", projectJson::write);
                     }
 
-                    for (final ParseJSONSourceFile parseJSONSourceFile : getSourceFiles())
+                    for (final BuildJSONSourceFile parseJSONSourceFile : getSourceFiles())
                     {
                         parseJSONSourceFile.writeJson(parseJsonBuilder);
                     }
@@ -86,15 +86,15 @@ public class ParseJSON
         });
     }
 
-    public static Result<ParseJSON> parse(File parseJSONFile)
+    public static Result<BuildJSON> parse(File parseJSONFile)
     {
         PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
 
         return parseJSONFile.getContentByteReadStream()
-            .thenResult(ParseJSON::parse);
+            .thenResult(BuildJSON::parse);
     }
 
-    public static Result<ParseJSON> parse(ByteReadStream readStream)
+    public static Result<BuildJSON> parse(ByteReadStream readStream)
     {
         PreCondition.assertNotNull(readStream, "readStream");
         PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
@@ -102,24 +102,24 @@ public class ParseJSON
         return parse(readStream.asCharacterReadStream());
     }
 
-    public static Result<ParseJSON> parse(Iterator<Character> characters)
+    public static Result<BuildJSON> parse(Iterator<Character> characters)
     {
         PreCondition.assertNotNull(characters, "character");
 
         return JSON.parse(characters).getRootObject().then((JSONObject rootObject) -> parse(rootObject));
     }
 
-    public static ParseJSON parse(JSONObject rootObject)
+    public static BuildJSON parse(JSONObject rootObject)
     {
         PreCondition.assertNotNull(rootObject, "rootObject");
 
-        final ParseJSON result = new ParseJSON();
+        final BuildJSON result = new BuildJSON();
         rootObject.getObjectPropertyValue("project.json")
             .then((JSONObject jsonObject) -> ProjectJSON.parse(jsonObject))
             .then(result::setProjectJson);
         result.setSourceFiles(rootObject.getProperties()
             .where(property -> !property.getName().equals("project.json"))
-            .map(ParseJSONSourceFile::parse));
+            .map(BuildJSONSourceFile::parse));
 
         PostCondition.assertNotNull(result, "result");
 

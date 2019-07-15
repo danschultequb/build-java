@@ -250,9 +250,9 @@ public class QubBuild
                             final List<File> deletedJavaSourceFiles = List.create();
                             final List<File> modifiedJavaSourceFiles = List.create();
                             final List<File> nonModifiedJavaSourceFiles = List.create();
-                            final List<ParseJSONSourceFile> parseJsonSourceFiles = List.create();
+                            final List<BuildJSONSourceFile> parseJsonSourceFiles = List.create();
                             boolean compileEverything = false;
-                            final ParseJSON updatedParseJson = new ParseJSON();
+                            final BuildJSON updatedParseJson = new BuildJSON();
                             if (!buildJsonParameter.getValue().await())
                             {
                                 compileEverything = true;
@@ -267,41 +267,41 @@ public class QubBuild
                                 {
                                     compileEverything = true;
                                     newJavaSourceFiles.addAll(javaSourceFiles);
-                                    parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, folderToBuild));
+                                    parseJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
                                 }
                                 else
                                 {
                                     verbose.writeLine("Parsing " + parseJsonFile.relativeTo(folderToBuild).toString() + "...").await();
 
-                                    final ParseJSON parseJson = ParseJSON.parse(parseJsonFile)
+                                    final BuildJSON buildJson = BuildJSON.parse(parseJsonFile)
                                         .catchError(FileNotFoundException.class)
                                         .await();
-                                    if (parseJson == null)
+                                    if (buildJson == null)
                                     {
                                         compileEverything = true;
                                         newJavaSourceFiles.addAll(javaSourceFiles);
-                                        parseJsonSourceFiles.addAll(ParseJSONSourceFile.create(javaSourceFiles, folderToBuild));
+                                        parseJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
                                     }
                                     else
                                     {
-                                        compileEverything = shouldCompileEverything(parseJson.getProjectJson(), projectJson);
+                                        compileEverything = shouldCompileEverything(buildJson.getProjectJson(), projectJson);
 
                                         for (final File javaSourceFile : javaSourceFiles)
                                         {
                                             final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
 
-                                            final ParseJSONSourceFile parseJsonSource = parseJson.getSourceFile(javaSourceFileRelativePath)
+                                            final BuildJSONSourceFile parseJsonSource = buildJson.getSourceFile(javaSourceFileRelativePath)
                                                 .catchError(NotFoundException.class)
                                                 .await();
                                             if (parseJsonSource == null)
                                             {
                                                 newJavaSourceFiles.add(javaSourceFile);
-                                                parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                                parseJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                                             }
                                             else if (!javaSourceFile.getLastModified().await().equals(parseJsonSource.getLastModified()))
                                             {
                                                 modifiedJavaSourceFiles.add(javaSourceFile);
-                                                parseJsonSourceFiles.add(ParseJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                                parseJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                                             }
                                             else
                                             {
@@ -310,7 +310,7 @@ public class QubBuild
                                             }
                                         }
 
-                                        for (final ParseJSONSourceFile parseJsonSource : parseJson.getSourceFiles())
+                                        for (final BuildJSONSourceFile parseJsonSource : buildJson.getSourceFiles())
                                         {
                                             final Path parseJsonSourceFilePath = parseJsonSource.getRelativePath();
                                             final File parseJsonSourceFile = folderToBuild.getFile(parseJsonSourceFilePath).await();
@@ -359,7 +359,7 @@ public class QubBuild
                                 for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
                                 {
                                     final Path relativePath = nonModifiedJavaSourceFile.relativeTo(folderToBuild);
-                                    final ParseJSONSourceFile parseJSONSourceFile = updatedParseJson.getSourceFile(relativePath).await();
+                                    final BuildJSONSourceFile parseJSONSourceFile = updatedParseJson.getSourceFile(relativePath).await();
                                     final Iterable<Path> dependencies = parseJSONSourceFile.getDependencies();
                                     if (!Iterable.isNullOrEmpty(dependencies))
                                     {
@@ -383,7 +383,7 @@ public class QubBuild
                                     for (final File fileToNotCompile : List.create(filesToNotCompile))
                                     {
                                         final Path relativePath = fileToNotCompile.relativeTo(folderToBuild);
-                                        final ParseJSONSourceFile parseJSONSourceFile = updatedParseJson.getSourceFile(relativePath).await();
+                                        final BuildJSONSourceFile parseJSONSourceFile = updatedParseJson.getSourceFile(relativePath).await();
                                         final Iterable<Path> dependencies = parseJSONSourceFile.getDependencies();
                                         if (!Iterable.isNullOrEmpty(dependencies))
                                         {
