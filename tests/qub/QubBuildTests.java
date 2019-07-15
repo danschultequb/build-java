@@ -51,7 +51,7 @@ public class QubBuildTests
                             "  --folder: The folder to build. The current folder will be used if this isn't defined.",
                             "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
                             "  --parsejson: Whether or not to read and write a parse.json file. Defaults to true.",
-                            "  --verbose: Whether or not to show verbose logs.",
+                            "  --verbose(v): Whether or not to show verbose logs.",
                             "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
                             "  --help(?): Show the help message for this application."),
                         Strings.getLines(output.getText().await()));
@@ -72,7 +72,7 @@ public class QubBuildTests
                             "  --folder: The folder to build. The current folder will be used if this isn't defined.",
                             "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
                             "  --parsejson: Whether or not to read and write a parse.json file. Defaults to true.",
-                            "  --verbose: Whether or not to show verbose logs.",
+                            "  --verbose(v): Whether or not to show verbose logs.",
                             "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
                             "  --help(?): Show the help message for this application."),
                         Strings.getLines(output.getText().await()));
