@@ -46,11 +46,11 @@ public class QubBuildTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--parsejson] [--verbose] [--profiler] [--help]",
+                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
                             "  Used to compile and package source code projects.",
                             "  --folder: The folder to build. The current folder will be used if this isn't defined.",
                             "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
-                            "  --parsejson: Whether or not to read and write a parse.json file. Defaults to true.",
+                            "  --buildjson: Whether or not to read and write a build.json file. Defaults to true.",
                             "  --verbose(v): Whether or not to show verbose logs.",
                             "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
                             "  --help(?): Show the help message for this application."),
@@ -67,11 +67,11 @@ public class QubBuildTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--parsejson] [--verbose] [--profiler] [--help]",
+                            "Usage: qub-build [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
                             "  Used to compile and package source code projects.",
                             "  --folder: The folder to build. The current folder will be used if this isn't defined.",
                             "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
-                            "  --parsejson: Whether or not to read and write a parse.json file. Defaults to true.",
+                            "  --buildjson: Whether or not to read and write a build.json file. Defaults to true.",
                             "  --verbose(v): Whether or not to show verbose logs.",
                             "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
                             "  --help(?): Show the help message for this application."),
@@ -82,7 +82,7 @@ public class QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "/fake/folder/", "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "/fake/folder/", "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -98,7 +98,7 @@ public class QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "-folder=/fake/folder/", "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-folder=/fake/folder/", "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -114,7 +114,7 @@ public class QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "-verbose", "/fake/folder/", "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-verbose", "/fake/folder/", "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -131,7 +131,7 @@ public class QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -148,7 +148,7 @@ public class QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -165,7 +165,7 @@ public class QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "[]");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -182,7 +182,7 @@ public class QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "{}");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -199,7 +199,7 @@ public class QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -217,7 +217,7 @@ public class QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -236,7 +236,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -251,7 +251,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -268,7 +268,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(outputs, "parse.json"));
+                        getFileContents(outputs, "build.json"));
                 });
 
                 runner.test("with non-empty \"sources\" folder and custom \"outputs\" folder", (Test test) ->
@@ -278,7 +278,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"outputFolder\": \"bin\" } }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -293,7 +293,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/bin/A.class",
-                            "/bin/parse.json"),
+                            "/bin/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -313,7 +313,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(outputs, "parse.json"));
+                        getFileContents(outputs, "build.json"));
                 });
 
                 runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder", (Test test) ->
@@ -324,7 +324,7 @@ public class QubBuildTests
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder.getFile("sources/A.java"), "A.java source");
                     currentFolder.createFolder("outputs");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -339,7 +339,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -356,7 +356,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(outputs, "parse.json"));
+                        getFileContents(outputs, "build.json"));
                 });
 
                 runner.test("with multiple source files and with existing and empty \"outputs\" folder", (Test test) ->
@@ -368,7 +368,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     currentFolder.createFolder("outputs");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -384,7 +384,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -407,7 +407,7 @@ public class QubBuildTests
                                 bJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(outputs, "parse.json"));
+                        getFileContents(outputs, "build.json"));
                 });
 
                 runner.test("with multiple source folders", (Test test) ->
@@ -417,7 +417,7 @@ public class QubBuildTests
                     setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "tests/B.java", "B.java source");
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -433,7 +433,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
@@ -456,10 +456,10 @@ public class QubBuildTests
                                 bJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(outputs, "parse.json"));
+                        getFileContents(outputs, "build.json"));
                 });
 
-                runner.test("with source file with same age as existing class file but no parse.json file", (Test test) ->
+                runner.test("with source file with same age as existing class file but no build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -470,7 +470,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -485,12 +485,12 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
-                    final File parseFile = outputs.getFile("parse.json").await();
+                    final File parseFile = outputs.getFile("build.json").await();
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                     test.assertEqual(
                         JSON.object(parse ->
@@ -507,7 +507,7 @@ public class QubBuildTests
                         getFileContents(parseFile));
                 });
 
-                runner.test("with source file with same age as existing class file and with parse.json file", (Test test) ->
+                runner.test("with source file with same age as existing class file and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -515,7 +515,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File sourceFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -527,7 +527,7 @@ public class QubBuildTests
                     final DateTime beforeClockAdvance = clock.getCurrentDateTime();
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -542,11 +542,11 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(beforeClockAdvance, getFileLastModified(classFile), "Wrong A.class file lastModified");
                     test.assertEqual("A.java source", getFileContents(classFile));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -559,10 +559,10 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile));
+                        getFileContents(buildJsonFile));
                 });
 
-                runner.test("with source file newer than existing class file and with parse.json file", (Test test) ->
+                runner.test("with source file newer than existing class file and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -571,7 +571,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -580,7 +580,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -595,7 +595,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -611,7 +611,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -632,7 +632,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -641,7 +641,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -658,7 +658,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -674,7 +674,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -695,7 +695,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -704,7 +704,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -721,7 +721,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -737,7 +737,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -763,7 +763,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -772,7 +772,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -791,7 +791,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -807,7 +807,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -848,7 +848,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -857,7 +857,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -879,7 +879,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -895,7 +895,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -936,7 +936,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -945,7 +945,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=SHOW"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=SHOW"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -967,7 +967,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -983,7 +983,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -1024,7 +1024,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1033,7 +1033,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -1055,7 +1055,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -1071,7 +1071,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -1112,7 +1112,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1121,7 +1121,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings="))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings="))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -1143,7 +1143,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -1159,7 +1159,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -1200,7 +1200,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1209,7 +1209,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=spam"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=spam"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -1231,7 +1231,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -1247,7 +1247,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -1288,7 +1288,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1297,7 +1297,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=hide"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=hide"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -1316,7 +1316,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -1332,7 +1332,7 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
@@ -1373,7 +1373,7 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1382,7 +1382,7 @@ public class QubBuildTests
                         });
                     }).toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson", "-warnings=errOR"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=errOR"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -1403,7 +1403,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
@@ -1419,11 +1419,11 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 60000);
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong parse.json file contents");
+                        getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
-                runner.test("with multiple source files newer than their existing class files and with parse.json file", (Test test) ->
+                runner.test("with multiple source files newer than their existing class files and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -1431,7 +1431,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1450,7 +1450,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1466,7 +1466,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1475,7 +1475,7 @@ public class QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
                     test.assertEqual("B.java source, depends on A", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -1494,7 +1494,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("with one modified source file and another unmodified and undependant source file", (Test test) ->
@@ -1506,7 +1506,7 @@ public class QubBuildTests
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1524,7 +1524,7 @@ public class QubBuildTests
 
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1540,7 +1540,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -1549,7 +1549,7 @@ public class QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
                     test.assertEqual("B.java source", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -1567,7 +1567,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("with one modified source file and another unmodified and dependant source file", (Test test) ->
@@ -1579,7 +1579,7 @@ public class QubBuildTests
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1597,7 +1597,7 @@ public class QubBuildTests
 
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1613,7 +1613,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1622,7 +1622,7 @@ public class QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
                     test.assertEqual("B.java source", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -1641,7 +1641,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("with one unmodified source file and another modified and dependant source file", (Test test) ->
@@ -1653,7 +1653,7 @@ public class QubBuildTests
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1671,7 +1671,7 @@ public class QubBuildTests
 
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1687,7 +1687,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1696,7 +1696,7 @@ public class QubBuildTests
                     test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -1715,7 +1715,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("with one deleted source file and another unmodified and dependant source file", (Test test) ->
@@ -1727,7 +1727,7 @@ public class QubBuildTests
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1743,7 +1743,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1758,7 +1758,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -1767,7 +1767,7 @@ public class QubBuildTests
                     test.assertEqual(false, bClassFile.exists().await(),
                         "Class file of deleted source file should have been deleted.");
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -1785,7 +1785,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("with one new source file and another unmodified and undependant source file", (Test test) ->
@@ -1796,7 +1796,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1809,7 +1809,7 @@ public class QubBuildTests
 
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1825,7 +1825,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
@@ -1835,7 +1835,7 @@ public class QubBuildTests
                     test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -1853,7 +1853,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("N depends on nothing, A depends on B, B depends on C, C.java is modified: A, B, and C should be compiled", (Test test) ->
@@ -1870,7 +1870,7 @@ public class QubBuildTests
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
                     final File cClassFile = setFileContents(currentFolder, "outputs/C.class", "C.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/N.java", nJava ->
                         {
@@ -1896,7 +1896,7 @@ public class QubBuildTests
 
                     final File cJavaFile = setFileContents(currentFolder, "sources/C.java", "C.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1914,7 +1914,7 @@ public class QubBuildTests
                             "/outputs/B.class",
                             "/outputs/C.class",
                             "/outputs/N.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
@@ -1929,7 +1929,7 @@ public class QubBuildTests
                     test.assertEqual(60000, getFileLastModified(cClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("C.java source", getFileContents(cClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -1957,7 +1957,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("N depends on nothing, A depends on B, B depends on C, C.java is deleted: A, B, and C should be compiled", (Test test) ->
@@ -1974,7 +1974,7 @@ public class QubBuildTests
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
                     final File cClassFile = setFileContents(currentFolder, "outputs/C.class", "C.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/N.java", nJava ->
                         {
@@ -2006,7 +2006,7 @@ public class QubBuildTests
                                 1, 25,
                                 Issue.Type.Error,
                                 "Missing definition for C.")));
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console, compiler);
                         test.assertEqual(1, console.getExitCode());
@@ -2026,7 +2026,7 @@ public class QubBuildTests
                             "/outputs/A.class",
                             "/outputs/B.class",
                             "/outputs/N.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
@@ -2040,7 +2040,7 @@ public class QubBuildTests
 
                     test.assertFalse(cClassFile.exists().await());
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2064,7 +2064,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("N depends on nothing, A depends on B, B depends on C, C.class is deleted: C should be compiled", (Test test) ->
@@ -2081,7 +2081,7 @@ public class QubBuildTests
                     final File nClassFile = setFileContents(currentFolder, "outputs/N.class", "N.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/N.java", nJava ->
                         {
@@ -2106,7 +2106,7 @@ public class QubBuildTests
                     clock.advance(Duration.minutes(1));
 
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -2124,7 +2124,7 @@ public class QubBuildTests
                             "/outputs/B.class",
                             "/outputs/C.class",
                             "/outputs/N.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
@@ -2140,7 +2140,7 @@ public class QubBuildTests
                     test.assertEqual(60000, getFileLastModified(cClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("C.java source", getFileContents(cClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2168,7 +2168,7 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("with no QUB_HOME environment variable specified", (Test test) ->
@@ -2179,7 +2179,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"dependencies\": [ { \"publisher\": \"qub\", \"project\": \"qub-java\", \"version\": \"foo\" } ] } }");
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create());
                         main(console);
@@ -2202,14 +2202,14 @@ public class QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.stringProperty("publisher", "a");
                             projectJson.objectProperty("java");
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2222,7 +2222,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -2237,13 +2237,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2257,8 +2257,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("nothing gets compiled when project.json project changes", (Test test) ->
@@ -2268,14 +2268,14 @@ public class QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.stringProperty("project", "a");
                             projectJson.objectProperty("java");
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2288,7 +2288,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -2303,13 +2303,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2323,8 +2323,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("nothing gets compiled when project.json version changes", (Test test) ->
@@ -2334,14 +2334,14 @@ public class QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.stringProperty("version", "a");
                             projectJson.objectProperty("java");
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2354,7 +2354,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -2369,13 +2369,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2389,8 +2389,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("everything gets compiled when project.json java version changes from 11 to 1.8", (Test test) ->
@@ -2403,16 +2403,16 @@ public class QubBuildTests
                     javaFolder.createFolder("jre1.8.0_192");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.objectProperty("java", java ->
                             {
                                 java.stringProperty("version", "11");
                             });
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2427,7 +2427,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
@@ -2444,13 +2444,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2466,8 +2466,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("everything gets compiled when project.json java version changes from 11 to 8", (Test test) ->
@@ -2480,16 +2480,16 @@ public class QubBuildTests
                     javaFolder.createFolder("jre1.8.0_192");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.objectProperty("java", java ->
                             {
                                 java.stringProperty("version", "11");
                             });
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2504,7 +2504,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
@@ -2521,13 +2521,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2543,8 +2543,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("nothing gets compiled when project.json java version changes from 1.8 to 8", (Test test) ->
@@ -2557,16 +2557,16 @@ public class QubBuildTests
                     javaFolder.createFolder("jre1.8.0_192");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.objectProperty("java", java ->
                             {
                                 java.stringProperty("version", "1.8");
                             });
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2581,7 +2581,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
@@ -2598,13 +2598,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2620,8 +2620,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("nothing gets compiled when project.json java version changes from 8 to 1.8", (Test test) ->
@@ -2634,16 +2634,16 @@ public class QubBuildTests
                     javaFolder.createFolder("jre1.8.0_192");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.objectProperty("java", java ->
                             {
                                 java.stringProperty("version", "8");
                             });
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2658,7 +2658,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("JAVA_HOME", jdk11Folder.toString()));
@@ -2675,13 +2675,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2697,8 +2697,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("nothing gets compiled when project.json java dependency is added", (Test test) ->
@@ -2708,13 +2708,13 @@ public class QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.objectProperty("java");
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2737,7 +2737,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
                     {
                         final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
                         console.setEnvironmentVariables(Map.<String,String>create()
@@ -2756,13 +2756,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2786,8 +2786,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("everything gets compiled when project.json java dependency is removed", (Test test) ->
@@ -2797,9 +2797,9 @@ public class QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.objectProperty("java", java ->
                             {
@@ -2814,7 +2814,7 @@ public class QubBuildTests
                                 });
                             });
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2826,7 +2826,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("QUB_HOME", "/qub/"));
@@ -2843,13 +2843,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2862,8 +2862,8 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
                 runner.test("everything gets compiled when project.json java dependency version is changed", (Test test) ->
@@ -2873,9 +2873,9 @@ public class QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File parseJsonFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parseJson ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
                     {
-                        parseJson.objectProperty("project.json", projectJson ->
+                        buildJson.objectProperty("project.json", projectJson ->
                         {
                             projectJson.objectProperty("java", java ->
                             {
@@ -2890,7 +2890,7 @@ public class QubBuildTests
                                 });
                             });
                         });
-                        parseJson.objectProperty("sources/A.java", aJava ->
+                        buildJson.objectProperty("sources/A.java", aJava ->
                         {
                             aJava.numberProperty("lastModified", 0);
                         });
@@ -2913,7 +2913,7 @@ public class QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, clock, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
                     {
                         final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
                         console.setEnvironmentVariables(Map.<String,String>create()
@@ -2932,13 +2932,13 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseJsonFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -2962,11 +2962,11 @@ public class QubBuildTests
                                 aJava.numberProperty("lastModified", 0);
                             });
                         }).toString(),
-                        getFileContents(parseJsonFile),
-                        "Wrong parse.json file contents");
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
 
-                runner.test("with multiple source files newer than their existing class files and with parse.json file", (Test test) ->
+                runner.test("with multiple source files newer than their existing class files and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -2974,7 +2974,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/parse.json", JSON.object(parse ->
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -2993,7 +2993,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3009,7 +3009,7 @@ public class QubBuildTests
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
@@ -3018,7 +3018,7 @@ public class QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
                     test.assertEqual("B.java source, depends on A", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -3037,10 +3037,10 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
-                        "Wrong parse.json file contents");
+                        "Wrong build.json file contents");
                 });
 
-                runner.test("with partial-name dependency match and -parsejson", (Test test) ->
+                runner.test("with partial-name dependency match and -buildjson", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -3050,7 +3050,7 @@ public class QubBuildTests
                     final File abJavaFile = setFileContents(currentFolder, "sources/AB.java", "AB.java source");
                     final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source, depends on AB");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3067,7 +3067,7 @@ public class QubBuildTests
                             "/outputs/A.class",
                             "/outputs/AB.class",
                             "/outputs/B.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
@@ -3079,7 +3079,7 @@ public class QubBuildTests
                     test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source, depends on AB", getFileContents(outputs, "B.class"));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "parse.json"), "Wrong parse.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "build.json"), "Wrong build.json file lastModified");
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -3101,11 +3101,11 @@ public class QubBuildTests
                                 bJava.stringArrayProperty("dependencies", Iterable.create("sources/AB.java"));
                             });
                         }).toString(),
-                        getFileContents(outputs, "parse.json"),
-                        "Wrong parse.json file contents");
+                        getFileContents(outputs, "build.json"),
+                        "Wrong build.json file contents");
                 });
 
-                runner.test("with multiple source files and -parsejson=false", (Test test) ->
+                runner.test("with multiple source files and -buildjson=false", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -3114,7 +3114,7 @@ public class QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3138,10 +3138,10 @@ public class QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "B.class"));
                     test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
 
-                    test.assertFalse(outputs.fileExists("parse.json").await());
+                    test.assertFalse(outputs.fileExists("build.json").await());
                 });
 
-                runner.test("with existing outputs folder and -parsejson=false", (Test test) ->
+                runner.test("with existing outputs folder and -buildjson=false", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
@@ -3153,7 +3153,7 @@ public class QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     outputs.createFile("blah.txt").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
                     {
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3176,7 +3176,7 @@ public class QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "B.class"));
                     test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
 
-                    test.assertFalse(outputs.fileExists("parse.json").await());
+                    test.assertFalse(outputs.fileExists("build.json").await());
                 });
 
                 runner.test("with project.json dependency with publisher that doesn't exist", (Test test) ->
@@ -3202,7 +3202,7 @@ public class QubBuildTests
                     }).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("QUB_HOME", "/qub_home/"));
@@ -3245,7 +3245,7 @@ public class QubBuildTests
                     final Folder qubFolder = currentFolder.getFileSystem().createFolder("/qub_home/").await();
                     qubFolder.createFolder("qub").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-parsejson=false"))
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
                     {
                         console.setEnvironmentVariables(Map.<String,String>create()
                             .set("QUB_HOME", qubFolder.toString()));
@@ -3284,7 +3284,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         currentFolder.getFolder("outputs").await()
                             .getFilesAndFoldersRecursively().await()
                             .map(FileSystemEntry::toString));
@@ -3343,11 +3343,11 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Updating outputs/parse.json...",
+                            "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
-                            "VERBOSE: Writing parse.json file...",
-                            "VERBOSE: Done writing parse.json file...",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "VERBOSE: Starting compilation...",
@@ -3358,7 +3358,7 @@ public class QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
-                            "/outputs/parse.json"),
+                            "/outputs/build.json"),
                         currentFolder.getFolder("outputs").await()
                             .getFilesAndFoldersRecursively().await()
                             .map(FileSystemEntry::toString));

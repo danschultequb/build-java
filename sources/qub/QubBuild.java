@@ -76,8 +76,8 @@ public class QubBuild
         final CommandLineParameter<Warnings> warningsParameter = parameters.addEnum("warnings", Warnings.Show)
             .setValueName("<show|error|hide>")
             .setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
-        final CommandLineParameterBoolean useParseJsonParameter = parameters.addBoolean("parsejson", true)
-            .setDescription("Whether or not to read and write a parse.json file. Defaults to true.");
+        final CommandLineParameterBoolean buildJsonParameter = parameters.addBoolean("buildjson", true)
+            .setDescription("Whether or not to read and write a build.json file. Defaults to true.");
         final CommandLineParameterVerbose verbose = parameters.addVerbose(console);
         final CommandLineParameterProfiler profiler = parameters.addProfiler(console, QubBuild.class);
         final CommandLineParameter<Boolean> help = parameters.addHelp();
@@ -245,7 +245,7 @@ public class QubBuild
                                 outputFolderName = projectJsonJava.getOutputFolder();
                             }
                             final Folder outputsFolder = folderToBuild.getFolder(outputFolderName).await();
-                            final File parseJsonFile = outputsFolder.getFile("parse.json").await();
+                            final File parseJsonFile = outputsFolder.getFile("build.json").await();
                             final List<File> newJavaSourceFiles = List.create();
                             final List<File> deletedJavaSourceFiles = List.create();
                             final List<File> modifiedJavaSourceFiles = List.create();
@@ -253,7 +253,7 @@ public class QubBuild
                             final List<ParseJSONSourceFile> parseJsonSourceFiles = List.create();
                             boolean compileEverything = false;
                             final ParseJSON updatedParseJson = new ParseJSON();
-                            if (!useParseJsonParameter.getValue().await())
+                            if (!buildJsonParameter.getValue().await())
                             {
                                 compileEverything = true;
                                 outputsFolder.delete()
@@ -339,9 +339,9 @@ public class QubBuild
                                 updatedParseJson.setProjectJson(projectJson);
                                 verbose.writeLine("Setting source files...").await();
                                 updatedParseJson.setSourceFiles(parseJsonSourceFiles);
-                                verbose.writeLine("Writing parse.json file...").await();
+                                verbose.writeLine("Writing build.json file...").await();
                                 updatedParseJson.write(parseJsonFile).await();
-                                verbose.writeLine("Done writing parse.json file...").await();
+                                verbose.writeLine("Done writing build.json file...").await();
                             }
 
                             verbose.writeLine("Detecting java source files to compile...").await();
