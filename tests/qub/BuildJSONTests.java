@@ -44,10 +44,10 @@ public class BuildJSONTests
 
             runner.testGroup("getSourceFile()", () ->
             {
-                runner.test("with null path", (Test test) ->
+                runner.test("with null relativePath", (Test test) ->
                 {
                     final BuildJSON buildJson = new BuildJSON();
-                    test.assertThrows(() -> buildJson.getSourceFile(null), new PreConditionFailure("path cannot be null."));
+                    test.assertThrows(() -> buildJson.getSourceFile(null), new PreConditionFailure("relativePath cannot be null."));
                 });
 
                 runner.test("with null sourceFiles", (Test test) ->

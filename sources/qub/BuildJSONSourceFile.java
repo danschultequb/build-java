@@ -8,6 +8,7 @@ public class BuildJSONSourceFile
     private Path relativePath;
     private DateTime lastModified;
     private Iterable<Path> dependencies;
+    private List<JavaCompilerIssue> issues = List.create();
 
     /**
      * Get the path to the source file from the project root folder.
@@ -66,6 +67,38 @@ public class BuildJSONSourceFile
         return this;
     }
 
+    /**
+     * Clear the known issues about the source file.
+     * @return This object for method chaining.
+     */
+    public BuildJSONSourceFile clearIssues()
+    {
+        this.issues.clear();
+        return this;
+    }
+
+    /**
+     * Add the provided issue to the source file.
+     * @param issue The issue to add to the source file.
+     * @return This object for method chaining.
+     */
+    public BuildJSONSourceFile addIssue(JavaCompilerIssue issue)
+    {
+        PreCondition.assertNotNull(issue, "issue");
+
+        this.issues.add(issue);
+        return this;
+    }
+
+    /**
+     * Get the issues that have been added to the source file.
+     * @return The issues that have been added to the source file.
+     */
+    public Iterable<JavaCompilerIssue> getIssues()
+    {
+        return this.issues;
+    }
+
     @Override
     public boolean equals(Object rhs)
     {
@@ -77,7 +110,8 @@ public class BuildJSONSourceFile
         return rhs != null &&
             Comparer.equal(relativePath, rhs.relativePath) &&
             Comparer.equal(lastModified, rhs.lastModified) &&
-            Comparer.equal(dependencies, rhs.dependencies);
+            Comparer.equal(dependencies, rhs.dependencies) &&
+            Comparer.equal(issues, rhs.issues);
     }
 
     @Override
@@ -96,6 +130,23 @@ public class BuildJSONSourceFile
             if (!Iterable.isNullOrEmpty(dependencies))
             {
                 sourceFile.stringArrayProperty("dependencies", dependencies.map(Path::toString));
+            }
+            if (!Iterable.isNullOrEmpty(issues))
+            {
+                sourceFile.arrayProperty("issues", issuesJson ->
+                {
+                    for (final JavaCompilerIssue issue : issues)
+                    {
+                        issuesJson.objectElement(issueJson ->
+                        {
+                            issueJson.stringProperty("sourceFilePath", issue.sourceFilePath);
+                            issueJson.numberProperty("lineNumber", issue.lineNumber);
+                            issueJson.numberProperty("columnNumber", issue.columnNumber);
+                            issueJson.stringProperty("type", issue.type.toString());
+                            issueJson.stringProperty("message", issue.message);
+                        });
+                    }
+                });
             }
         }).toString();
     }
@@ -169,15 +220,32 @@ public class BuildJSONSourceFile
     {
         PreCondition.assertNotNull(builder, "builder");
 
-        builder.objectProperty(getRelativePath().toString(), (JSONObjectBuilder parseJsonSourceFileBuilder) ->
+        builder.objectProperty(getRelativePath().toString(), (JSONObjectBuilder buildJsonSourceFileBuilder) ->
         {
             if (lastModified != null)
             {
-                parseJsonSourceFileBuilder.numberProperty("lastModified", lastModified.getMillisecondsSinceEpoch());
+                buildJsonSourceFileBuilder.numberProperty("lastModified", lastModified.getMillisecondsSinceEpoch());
             }
             if (!Iterable.isNullOrEmpty(dependencies))
             {
-                parseJsonSourceFileBuilder.stringArrayProperty("dependencies", dependencies.map(Path::toString));
+                buildJsonSourceFileBuilder.stringArrayProperty("dependencies", dependencies.map(Path::toString));
+            }
+            if (!Iterable.isNullOrEmpty(issues))
+            {
+                buildJsonSourceFileBuilder.arrayProperty("issues", issuesJson ->
+                {
+                    for (final JavaCompilerIssue issue : issues)
+                    {
+                        issuesJson.objectElement(issueJson ->
+                        {
+                            issueJson.stringProperty("sourceFilePath", issue.sourceFilePath);
+                            issueJson.numberProperty("lineNumber", issue.lineNumber);
+                            issueJson.numberProperty("columnNumber", issue.columnNumber);
+                            issueJson.stringProperty("type", issue.type.toString());
+                            issueJson.stringProperty("message", issue.message);
+                        });
+                    }
+                });
             }
         });
     }
@@ -209,6 +277,27 @@ public class BuildJSONSourceFile
                             .instanceOf(JSONQuotedString.class)
                             .map(JSONQuotedString::toUnquotedString)
                             .map(Path::parse));
+                    });
+                sourceFileObject.getArrayPropertyValue("issues")
+                    .then((JSONArray issuesArray) ->
+                    {
+                        for (final JSONObject element : issuesArray.getElements().instanceOf(JSONObject.class))
+                        {
+                            try
+                            {
+                                final String sourceFilePath = element.getUnquotedStringPropertyValue("sourceFilePath").await();
+                                final int lineNumber = element.getNumberPropertyValue("lineNumber").await().intValue();
+                                final int columnNumber = element.getNumberPropertyValue("columnNumber").await().intValue();
+                                final String typeString = element.getUnquotedStringPropertyValue("type").await();
+                                final Issue.Type type = Strings.isNullOrEmpty(typeString) ? null : Issue.Type.valueOf(typeString);
+                                final String message = element.getUnquotedStringPropertyValue("message").await();
+                                final JavaCompilerIssue issue = new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, type, message);
+                                result.addIssue(issue);
+                            }
+                            catch (Throwable ignored)
+                            {
+                            }
+                        }
                     });
             });
 

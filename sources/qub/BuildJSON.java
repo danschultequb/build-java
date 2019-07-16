@@ -45,15 +45,22 @@ public class BuildJSON
         return sourceFiles;
     }
 
-    public Result<BuildJSONSourceFile> getSourceFile(Path path)
+    /**
+     * Get the BuildJSONSourceFile that matches the provided relative path. The path should be
+     * relative to the project folder.
+     * @param relativePath The path to the source file. This should be relative to the project
+     *                     folder.
+     * @return The BuildJSONSourceFile that is associated with the provided relative path.
+     */
+    public Result<BuildJSONSourceFile> getSourceFile(Path relativePath)
     {
-        PreCondition.assertNotNull(path, "path");
+        PreCondition.assertNotNull(relativePath, "relativePath");
 
         return pathMap == null
-            ? Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(path.toString()) + "."))
-            : pathMap.get(path)
+            ? Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + "."))
+            : pathMap.get(relativePath)
                 .catchErrorResult(NotFoundException.class, () ->
-                    Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(path.toString()) + ".")));
+                    Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + ".")));
     }
 
     /**
@@ -69,17 +76,17 @@ public class BuildJSON
         {
             try (final CharacterWriteStream writeStream = new BufferedByteWriteStream(file.getContentByteWriteStream().await()).asCharacterWriteStream())
             {
-                JSON.object(writeStream, (JSONObjectBuilder parseJsonBuilder) ->
+                JSON.object(writeStream, (JSONObjectBuilder buildJsonBuilder) ->
                 {
                     final ProjectJSON projectJson = getProjectJson();
                     if (projectJson != null)
                     {
-                        parseJsonBuilder.objectProperty("project.json", projectJson::write);
+                        buildJsonBuilder.objectProperty("project.json", projectJson::write);
                     }
 
-                    for (final BuildJSONSourceFile parseJSONSourceFile : getSourceFiles())
+                    for (final BuildJSONSourceFile buildJSONSourceFile : getSourceFiles())
                     {
-                        parseJSONSourceFile.writeJson(parseJsonBuilder);
+                        buildJSONSourceFile.writeJson(buildJsonBuilder);
                     }
                 });
             }

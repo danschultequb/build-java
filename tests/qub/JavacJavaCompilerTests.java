@@ -251,7 +251,7 @@ public class JavacJavaCompilerTests
                         test.assertEqual(
                             Iterable.create(
                                 JavaCompiler.error(
-                                    "sources\\C.java",
+                                    "sources/C.java",
                                     1, 8,
                                     "class MyTestClass is public, should be declared in a file named MyTestClass.java")),
                             result.issues);
@@ -287,7 +287,7 @@ public class JavacJavaCompilerTests
                             Strings.getLines(result.error));
                         test.assertEqual(Iterable.create(
                             JavaCompiler.error(
-                                "sources\\C.java",
+                                "sources/C.java",
                                 1, 1,
                                 "class, interface, or enum expected")),
                             result.issues);
@@ -338,11 +338,11 @@ public class JavacJavaCompilerTests
                         test.assertEqual(
                             Iterable.create(
                                 JavaCompiler.error(
-                                    "sources\\C.java",
+                                    "sources/C.java",
                                     6, 17,
                                     "';' expected"),
                                 JavaCompiler.error(
-                                    "sources\\C.java",
+                                    "sources/C.java",
                                     7, 4,
                                     "reached end of file while parsing")),
                             result.issues);

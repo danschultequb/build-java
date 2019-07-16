@@ -64,7 +64,8 @@ public class JavacJavaCompiler extends JavaCompiler
                                             final int caretIndex = caretLine.indexOf('^');
                                             final int columnNumber = caretIndex + 1;
 
-                                            issues.add(new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, issueType, message));
+                                            final String normalizedSourceFilePath = Path.parse(sourceFilePath).normalize().toString();
+                                            issues.add(new JavaCompilerIssue(normalizedSourceFilePath, lineNumber, columnNumber, issueType, message));
                                         }
                                     }
                                 })

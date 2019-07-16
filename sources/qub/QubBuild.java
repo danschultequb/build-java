@@ -250,7 +250,8 @@ public class QubBuild
                             final List<File> deletedJavaSourceFiles = List.create();
                             final List<File> modifiedJavaSourceFiles = List.create();
                             final List<File> nonModifiedJavaSourceFiles = List.create();
-                            final List<BuildJSONSourceFile> parseJsonSourceFiles = List.create();
+                            final List<File> issuedJavaSourceFiles = List.create();
+                            final List<BuildJSONSourceFile> buildJsonSourceFiles = List.create();
                             boolean compileEverything = false;
                             final BuildJSON updatedBuildJson = new BuildJSON();
                             if (!buildJsonParameter.getValue().await())
@@ -267,7 +268,7 @@ public class QubBuild
                                 {
                                     compileEverything = true;
                                     newJavaSourceFiles.addAll(javaSourceFiles);
-                                    parseJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
+                                    buildJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
                                 }
                                 else
                                 {
@@ -280,7 +281,7 @@ public class QubBuild
                                     {
                                         compileEverything = true;
                                         newJavaSourceFiles.addAll(javaSourceFiles);
-                                        parseJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
+                                        buildJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
                                     }
                                     else
                                     {
@@ -290,46 +291,48 @@ public class QubBuild
                                         {
                                             final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
 
-                                            final BuildJSONSourceFile parseJsonSource = buildJson.getSourceFile(javaSourceFileRelativePath)
+                                            final BuildJSONSourceFile buildJsonSource = buildJson.getSourceFile(javaSourceFileRelativePath)
                                                 .catchError(NotFoundException.class)
                                                 .await();
-                                            if (parseJsonSource == null)
+                                            if (buildJsonSource == null)
                                             {
                                                 newJavaSourceFiles.add(javaSourceFile);
-                                                parseJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                                buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                                             }
-                                            else if (!javaSourceFile.getLastModified().await().equals(parseJsonSource.getLastModified()))
+                                            else if (!javaSourceFile.getLastModified().await().equals(buildJsonSource.getLastModified()))
                                             {
                                                 modifiedJavaSourceFiles.add(javaSourceFile);
-                                                parseJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                                buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                            }
+                                            else if (!Iterable.isNullOrEmpty(buildJsonSource.getIssues()))
+                                            {
+                                                issuedJavaSourceFiles.add(javaSourceFile);
+                                                buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                                             }
                                             else
                                             {
                                                 nonModifiedJavaSourceFiles.add(javaSourceFile);
-                                                parseJsonSourceFiles.add(parseJsonSource);
+                                                buildJsonSourceFiles.add(buildJsonSource);
                                             }
                                         }
 
-                                        for (final BuildJSONSourceFile parseJsonSource : buildJson.getSourceFiles())
+                                        for (final BuildJSONSourceFile buildJsonSource : buildJson.getSourceFiles())
                                         {
-                                            final Path parseJsonSourceFilePath = parseJsonSource.getRelativePath();
-                                            final File parseJsonSourceFile = folderToBuild.getFile(parseJsonSourceFilePath).await();
-                                            if (!javaSourceFiles.contains(parseJsonSourceFile))
+                                            final Path buildJsonSourceFilePath = buildJsonSource.getRelativePath();
+                                            final File buildJsonSourceFile = folderToBuild.getFile(buildJsonSourceFilePath).await();
+                                            if (!javaSourceFiles.contains(buildJsonSourceFile))
                                             {
-                                                deletedJavaSourceFiles.add(parseJsonSourceFile);
+                                                deletedJavaSourceFiles.add(buildJsonSourceFile);
                                             }
                                         }
 
-                                        if (!Iterable.isNullOrEmpty(deletedJavaSourceFiles))
+                                        writeFileList(verbose, deletedJavaSourceFiles, "Deleted source files").await();
+                                        for (final File deletedSourceFile : deletedJavaSourceFiles)
                                         {
-                                            verbose.writeLine("Deleting class files for deleted source files...").await();
-                                            for (final File deletedSourceFile : deletedJavaSourceFiles)
-                                            {
-                                                getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
-                                                    .delete()
-                                                    .catchError(FileNotFoundException.class)
-                                                    .await();
-                                            }
+                                            getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
+                                                .delete()
+                                                .catchError(FileNotFoundException.class)
+                                                .await();
                                         }
                                     }
                                 }
@@ -338,7 +341,7 @@ public class QubBuild
                                 verbose.writeLine("Setting project.json...").await();
                                 updatedBuildJson.setProjectJson(projectJson);
                                 verbose.writeLine("Setting source files...").await();
-                                updatedBuildJson.setSourceFiles(parseJsonSourceFiles);
+                                updatedBuildJson.setSourceFiles(buildJsonSourceFiles);
                             }
 
                             verbose.writeLine("Detecting java source files to compile...").await();
@@ -350,9 +353,16 @@ public class QubBuild
                             }
                             else
                             {
+                                writeFileList(verbose, newJavaSourceFiles, "Added source files").await();
                                 javaSourceFilesToCompile.addAll(newJavaSourceFiles);
+
+                                writeFileList(verbose, modifiedJavaSourceFiles, "Modified source files").await();
                                 javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
 
+                                writeFileList(verbose, issuedJavaSourceFiles, "Source files that previously contained issues").await();
+                                javaSourceFilesToCompile.addAll(issuedJavaSourceFiles);
+
+                                final List<File> javaSourceFilesWithDeletedDependencies = List.create();
                                 for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
                                 {
                                     final Path relativePath = nonModifiedJavaSourceFile.relativeTo(folderToBuild);
@@ -365,13 +375,16 @@ public class QubBuild
                                         {
                                             if (deletedJavaSourceFiles.contains(dependencyFile))
                                             {
+                                                javaSourceFilesWithDeletedDependencies.add(nonModifiedJavaSourceFile);
                                                 javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
                                                 break;
                                             }
                                         }
                                     }
                                 }
+                                writeFileList(verbose, javaSourceFilesWithDeletedDependencies, "Source files with deleted dependencies").await();
 
+                                final List<File> javaSourceFilesWithModifiedDependencies = List.create();
                                 final List<File> filesToNotCompile = List.create(nonModifiedJavaSourceFiles);
                                 boolean filesToNotCompileChanged = true;
                                 while(filesToNotCompileChanged && filesToNotCompile.any())
@@ -390,6 +403,7 @@ public class QubBuild
                                                 if (javaSourceFilesToCompile.contains(dependencyFile))
                                                 {
                                                     filesToNotCompileChanged = true;
+                                                    javaSourceFilesWithModifiedDependencies.add(fileToNotCompile);
                                                     javaSourceFilesToCompile.add(fileToNotCompile);
                                                     filesToNotCompile.remove(fileToNotCompile);
                                                     break;
@@ -398,15 +412,19 @@ public class QubBuild
                                         }
                                     }
                                 }
+                                writeFileList(verbose, javaSourceFilesWithDeletedDependencies, "Source files with modified dependencies").await();
 
+                                final List<File> javaSourceFilesWithMissingClassFiles = List.create();
                                 for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
                                 {
                                     final File classFile = getClassFile(nonModifiedJavaSourceFile, folderToBuild, outputsFolder);
                                     if (!classFile.exists().await() && !javaSourceFilesToCompile.contains(nonModifiedJavaSourceFile))
                                     {
+                                        javaSourceFilesWithMissingClassFiles.add(nonModifiedJavaSourceFile);
                                         javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
                                     }
                                 }
+                                writeFileList(verbose, javaSourceFilesWithMissingClassFiles, "Source files with missing class files").await();
                             }
 
                             if (Iterable.isNullOrEmpty(javaSourceFilesToCompile))
@@ -436,10 +454,12 @@ public class QubBuild
                                         for (final JavaCompilerIssue warning : warningIssues)
                                         {
                                             console.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
+                                            final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
+                                            sourceFile.addIssue(warning);
                                         }
                                     }
 
-                                    final Iterable<JavaCompilerIssue> errors = warnings == Warnings.Error ? sortedIssues : sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error);
+                                    final Iterable<JavaCompilerIssue> errors = (warnings == Warnings.Error ? sortedIssues : sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error));
                                     final int errorCount = errors.getCount();
                                     if (errorCount > 0)
                                     {
@@ -447,6 +467,8 @@ public class QubBuild
                                         for (final JavaCompilerIssue error : errors)
                                         {
                                             console.writeLine(error.sourceFilePath + " (Line " + error.lineNumber + "): " + error.message).await();
+                                            final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(error.sourceFilePath)).await();
+                                            sourceFile.addIssue(error);
                                         }
                                     }
                                 }
@@ -471,6 +493,21 @@ public class QubBuild
                 }
             }
         }
+    }
+
+    public static Result<Void> writeFileList(CommandLineParameterVerbose verbose, Iterable<File> files, String description)
+    {
+        return Result.create(() ->
+        {
+            if (!Iterable.isNullOrEmpty(files))
+            {
+                verbose.writeLine(description + ":").await();
+                for (final File file : files)
+                {
+                    verbose.writeLine(file.getPath().toString()).await();
+                }
+            }
+        });
     }
 
     public static boolean shouldCompileEverything(ProjectJSON oldProjectJson, ProjectJSON newProjectJson)

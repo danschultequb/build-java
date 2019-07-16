@@ -622,7 +622,7 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "This doesn't look right to me.")));
@@ -651,7 +651,7 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "1 Error:",
-                            "/sources/A.java (Line 1): This doesn't look right to me."),
+                            "sources/A.java (Line 1): This doesn't look right to me."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -672,6 +672,17 @@ public class QubBuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "This doesn't look right to me.");
+                                    });
+                                });
                             });
                         }).toString(),
                         getFileContents(parseFile), "Wrong build.json file contents");
@@ -685,7 +696,7 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 1, 5,
                                 Issue.Type.Warning,
                                 "Are you sure?")));
@@ -714,7 +725,7 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "1 Warning:",
-                            "/sources/A.java (Line 1): Are you sure?"),
+                            "sources/A.java (Line 1): Are you sure?"),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -735,6 +746,17 @@ public class QubBuildTests
                             parse.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
                             });
                         }).toString(),
                         getFileContents(parseFile), "Wrong build.json file contents");
@@ -748,12 +770,12 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?")));
@@ -763,7 +785,8 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -782,33 +805,60 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "1 Warning:",
-                            "/tests/ATests.java (Line 10): Can't be this.",
+                            "tests/ATests.java (Line 10): Can't be this.",
                             "1 Error:",
-                            "/sources/A.java (Line 1): Are you sure?"),
+                            "sources/A.java (Line 1): Are you sure?"),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                                aTestsJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        getFileContents(buildFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
 
                 runner.test("with multiple source files with errors and warnings", (Test test) ->
@@ -818,27 +868,27 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 12, 2,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 20,7,
                                 Issue.Type.Error,
                                 "Can't be this.")));
@@ -848,7 +898,10 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    setFileContents(currentFolder, "tests/C.java", "C.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -867,36 +920,103 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "2 Warnings:",
-                            "/tests/ATests.java (Line 10): Can't be this.",
-                            "/tests/C.java (Line 10): Can't be this.",
+                            "tests/ATests.java (Line 10): Can't be this.",
+                            "tests/C.java (Line 10): Can't be this.",
                             "3 Errors:",
-                            "/sources/A.java (Line 12): Are you sure?",
-                            "/sources/B.java (Line 1): Are you sure?",
-                            "/tests/C.java (Line 20): Can't be this."),
+                            "sources/A.java (Line 12): Are you sure?",
+                            "sources/B.java (Line 1): Are you sure?",
+                            "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
+                            "/outputs/B.class",
+                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 60000);
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                                aTestsJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/C.java", cJava ->
+                            {
+                                cJava.numberProperty("lastModified", 60000);
+                                cJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 20);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        getFileContents(buildFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
 
                 runner.test("with multiple source files with errors and warnings and -warnings=SHOW", (Test test) ->
@@ -906,27 +1026,27 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 12, 2,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 20,7,
                                 Issue.Type.Error,
                                 "Can't be this.")));
@@ -936,7 +1056,10 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    setFileContents(currentFolder, "tests/C.java", "C.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -955,36 +1078,103 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "2 Warnings:",
-                            "/tests/ATests.java (Line 10): Can't be this.",
-                            "/tests/C.java (Line 10): Can't be this.",
+                            "tests/ATests.java (Line 10): Can't be this.",
+                            "tests/C.java (Line 10): Can't be this.",
                             "3 Errors:",
-                            "/sources/A.java (Line 12): Are you sure?",
-                            "/sources/B.java (Line 1): Are you sure?",
-                            "/tests/C.java (Line 20): Can't be this."),
+                            "sources/A.java (Line 12): Are you sure?",
+                            "sources/B.java (Line 1): Are you sure?",
+                            "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
+                            "/outputs/B.class",
+                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 60000);
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                                aTestsJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/C.java", cJava ->
+                            {
+                                cJava.numberProperty("lastModified", 60000);
+                                cJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 20);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        getFileContents(buildFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
 
                 runner.test("with multiple source files with errors and warnings and -warnings", (Test test) ->
@@ -994,27 +1184,27 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 12, 2,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 20,7,
                                 Issue.Type.Error,
                                 "Can't be this.")));
@@ -1024,6 +1214,9 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    setFileContents(currentFolder, "tests/C.java", "C.java source");
                     final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
@@ -1043,32 +1236,99 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "2 Warnings:",
-                            "/tests/ATests.java (Line 10): Can't be this.",
-                            "/tests/C.java (Line 10): Can't be this.",
+                            "tests/ATests.java (Line 10): Can't be this.",
+                            "tests/C.java (Line 10): Can't be this.",
                             "3 Errors:",
-                            "/sources/A.java (Line 12): Are you sure?",
-                            "/sources/B.java (Line 1): Are you sure?",
-                            "/tests/C.java (Line 20): Can't be this."),
+                            "sources/A.java (Line 12): Are you sure?",
+                            "sources/B.java (Line 1): Are you sure?",
+                            "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
+                            "/outputs/B.class",
+                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 60000);
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                                aTestsJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/C.java", cJava ->
+                            {
+                                cJava.numberProperty("lastModified", 60000);
+                                cJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 20);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
                         getFileContents(parseFile), "Wrong build.json file contents");
@@ -1082,27 +1342,27 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 12, 2,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 20,7,
                                 Issue.Type.Error,
                                 "Can't be this.")));
@@ -1112,7 +1372,10 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    setFileContents(currentFolder, "tests/C.java", "C.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1131,36 +1394,103 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "2 Warnings:",
-                            "/tests/ATests.java (Line 10): Can't be this.",
-                            "/tests/C.java (Line 10): Can't be this.",
+                            "tests/ATests.java (Line 10): Can't be this.",
+                            "tests/C.java (Line 10): Can't be this.",
                             "3 Errors:",
-                            "/sources/A.java (Line 12): Are you sure?",
-                            "/sources/B.java (Line 1): Are you sure?",
-                            "/tests/C.java (Line 20): Can't be this."),
+                            "sources/A.java (Line 12): Are you sure?",
+                            "sources/B.java (Line 1): Are you sure?",
+                            "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
+                            "/outputs/B.class",
+                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 60000);
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                                aTestsJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/C.java", cJava ->
+                            {
+                                cJava.numberProperty("lastModified", 60000);
+                                cJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 20);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        getFileContents(buildFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
 
                 runner.test("with multiple source files with errors and warnings and -warnings=spam", (Test test) ->
@@ -1170,27 +1500,27 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 12, 2,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 20,7,
                                 Issue.Type.Error,
                                 "Can't be this.")));
@@ -1200,7 +1530,10 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    setFileContents(currentFolder, "tests/C.java", "C.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1219,36 +1552,103 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "2 Warnings:",
-                            "/tests/ATests.java (Line 10): Can't be this.",
-                            "/tests/C.java (Line 10): Can't be this.",
+                            "tests/ATests.java (Line 10): Can't be this.",
+                            "tests/C.java (Line 10): Can't be this.",
                             "3 Errors:",
-                            "/sources/A.java (Line 12): Are you sure?",
-                            "/sources/B.java (Line 1): Are you sure?",
-                            "/tests/C.java (Line 20): Can't be this."),
+                            "sources/A.java (Line 12): Are you sure?",
+                            "sources/B.java (Line 1): Are you sure?",
+                            "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
+                            "/outputs/B.class",
+                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 60000);
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                                aTestsJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/C.java", cJava ->
+                            {
+                                cJava.numberProperty("lastModified", 60000);
+                                cJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 20);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        getFileContents(buildFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
 
                 runner.test("with multiple source files with errors and warnings and -warnings=hide", (Test test) ->
@@ -1258,27 +1658,27 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 12, 2,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 20,7,
                                 Issue.Type.Error,
                                 "Can't be this.")));
@@ -1288,7 +1688,10 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    setFileContents(currentFolder, "tests/C.java", "C.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1307,33 +1710,81 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "3 Errors:",
-                            "/sources/A.java (Line 12): Are you sure?",
-                            "/sources/B.java (Line 1): Are you sure?",
-                            "/tests/C.java (Line 20): Can't be this."),
+                            "sources/A.java (Line 12): Are you sure?",
+                            "sources/B.java (Line 1): Are you sure?",
+                            "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
+                            "/outputs/B.class",
+                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 60000);
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                            });
+                            build.objectProperty("tests/C.java", cJava ->
+                            {
+                                cJava.numberProperty("lastModified", 60000);
+                                cJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 20);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        getFileContents(buildFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
 
                 runner.test("with multiple source files with errors and warnings and -warnings=errOR", (Test test) ->
@@ -1343,27 +1794,27 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 5,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/sources/A.java",
+                                "sources/A.java",
                                 12, 2,
                                 Issue.Type.Error,
                                 "Are you sure?"),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/ATests.java",
+                                "tests/ATests.java",
                                 10,7,
                                 Issue.Type.Warning,
                                 "Can't be this."),
                             new JavaCompilerIssue(
-                                "/tests/C.java",
+                                "tests/C.java",
                                 20,7,
                                 Issue.Type.Error,
                                 "Can't be this.")));
@@ -1373,7 +1824,10 @@ public class QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    setFileContents(currentFolder, "tests/C.java", "C.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -1392,35 +1846,102 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "5 Errors:",
-                            "/sources/A.java (Line 12): Are you sure?",
-                            "/sources/B.java (Line 1): Are you sure?",
-                            "/tests/ATests.java (Line 10): Can't be this.",
-                            "/tests/C.java (Line 10): Can't be this.",
-                            "/tests/C.java (Line 20): Can't be this."),
+                            "sources/A.java (Line 12): Are you sure?",
+                            "sources/B.java (Line 1): Are you sure?",
+                            "tests/ATests.java (Line 10): Can't be this.",
+                            "tests/C.java (Line 10): Can't be this.",
+                            "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
+                            "/outputs/ATests.class",
+                            "/outputs/B.class",
+                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
+                        JSON.object(build ->
                         {
-                            parse.objectProperty("project.json", projectJson ->
+                            build.objectProperty("project.json", projectJson ->
                             {
                                 projectJson.objectProperty("java");
                             });
-                            parse.objectProperty("sources/A.java", aJava ->
+                            build.objectProperty("sources/A.java", aJava ->
                             {
                                 aJava.numberProperty("lastModified", 60000);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 60000);
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 5);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/ATests.java", aTestsJava ->
+                            {
+                                aTestsJava.numberProperty("lastModified", 60000);
+                                aTestsJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
+                            });
+                            build.objectProperty("tests/C.java", cJava ->
+                            {
+                                cJava.numberProperty("lastModified", 60000);
+                                cJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 10);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Warning");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "tests/C.java");
+                                        issue.numberProperty("lineNumber", 20);
+                                        issue.numberProperty("columnNumber", 7);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Can't be this.");
+                                    });
+                                });
                             });
                         }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
 
                 runner.test("with multiple source files newer than their existing class files and with build.json file", (Test test) ->
@@ -2002,7 +2523,7 @@ public class QubBuildTests
                         .setExitCode(1)
                         .setIssues(Iterable.create(
                             new JavaCompilerIssue(
-                                "/sources/B.java",
+                                "sources/B.java",
                                 1, 25,
                                 Issue.Type.Error,
                                 "Missing definition for C.")));
@@ -2016,8 +2537,7 @@ public class QubBuildTests
                         Iterable.create(
                             "Compiling...",
                             "1 Error:",
-                            "/sources/B.java (Line 1): Missing definition for C."),
-
+                            "sources/B.java (Line 1): Missing definition for C."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2057,6 +2577,17 @@ public class QubBuildTests
                             {
                                 bJava.numberProperty("lastModified", 0);
                                 bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
+                                bJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/B.java");
+                                        issue.numberProperty("lineNumber", 1);
+                                        issue.numberProperty("columnNumber", 25);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Missing definition for C.");
+                                    });
+                                });
                             });
                             parse.objectProperty("sources/N.java", nJava ->
                             {
@@ -3037,6 +3568,413 @@ public class QubBuildTests
                             });
                         }).toString(),
                         getFileContents(parseFile),
+                        "Wrong build.json file contents");
+                });
+
+                runner.test("with deleted source file and --verbose", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                        parse.objectProperty("sources/B.java", bJava ->
+                        {
+                            bJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    {
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: Deleted source files:",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "VERBOSE: No source files need compilation.",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertFalse(bClassFile.exists().await());
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(build ->
+                        {
+                            build.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            build.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                        }).toString(),
+                        getFileContents(buildFile),
+                        "Wrong build.json file contents");
+                });
+
+                runner.test("with new source file and --verbose", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("dependencies");
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+
+                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    {
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "VERBOSE: Added source files:",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: Starting compilation...",
+                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+                            "VERBOSE: Compilation finished.",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/B.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    final File bClassFile = currentFolder.getFile("outputs/B.class").await();
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
+                    test.assertEqual("B.java source", getFileContents(bClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(build ->
+                        {
+                            build.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            build.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                            });
+                            build.objectProperty("sources/B.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(buildFile),
+                        "Wrong build.json file contents");
+                });
+
+                runner.test("with modified source file and --verbose", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+
+                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    {
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "VERBOSE: Modified source files:",
+                            "VERBOSE: /sources/A.java",
+                            "VERBOSE: Starting compilation...",
+                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                            "VERBOSE: Compilation finished.",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(build ->
+                        {
+                            build.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            build.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 60000);
+                            });
+                        }).toString(),
+                        getFileContents(buildFile),
+                        "Wrong build.json file contents");
+                });
+
+                runner.test("with unmodified source file with issues and --verbose", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+                        .setExitCode(1)
+                        .setIssues(Iterable.create(
+                            new JavaCompilerIssue(
+                                "sources/A.java",
+                                12, 2,
+                                Issue.Type.Error,
+                                "Are you sure?")));
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                            aJava.arrayProperty("issues", issues ->
+                            {
+                                issues.objectElement(issue ->
+                                {
+                                    issue.stringProperty("sourceFilePath", "sources/A.java");
+                                    issue.numberProperty("lineNumber", 12);
+                                    issue.numberProperty("columnNumber", 2);
+                                    issue.stringProperty("type", "Error");
+                                    issue.stringProperty("message", "Are you sure?");
+                                });
+                            });
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    {
+                        main(console, compiler);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "VERBOSE: Source files that previously contained issues:",
+                            "VERBOSE: /sources/A.java",
+                            "VERBOSE: Starting compilation...",
+                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                            "VERBOSE: Compilation finished.",
+                            "1 Error:",
+                            "sources/A.java (Line 12): Are you sure?",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(build ->
+                        {
+                            build.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            build.objectProperty("sources/A.java", aJava ->
+                            {
+                                aJava.numberProperty("lastModified", 0);
+                                aJava.arrayProperty("issues", issues ->
+                                {
+                                    issues.objectElement(issue ->
+                                    {
+                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+                                        issue.numberProperty("lineNumber", 12);
+                                        issue.numberProperty("columnNumber", 2);
+                                        issue.stringProperty("type", "Error");
+                                        issue.stringProperty("message", "Are you sure?");
+                                    });
+                                });
+                            });
+                        }).toString(),
+                        getFileContents(buildFile),
+                        "Wrong build.json file contents");
+                });
+
+                runner.test("with unmodified source file with deleted dependency and --verbose", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on A");
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    {
+                        parse.objectProperty("sources/A.java", aJava ->
+                        {
+                            aJava.numberProperty("lastModified", 0);
+                        });
+                        parse.objectProperty("sources/B.java", bJava ->
+                        {
+                            bJava.numberProperty("lastModified", 0);
+                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+                        });
+                    }).toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    {
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: Deleted source files:",
+                            "VERBOSE: /sources/A.java",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "VERBOSE: Source files with deleted dependencies:",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: Source files with modified dependencies:",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: Starting compilation...",
+                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+                            "VERBOSE: Compilation finished.",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/B.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+
+                    test.assertFalse(aClassFile.exists().await());
+
+                    test.assertEqual(60000, bClassFile.getLastModified().await().getMillisecondsSinceEpoch());
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+                    test.assertEqual(
+                        JSON.object(build ->
+                        {
+                            build.objectProperty("project.json", projectJson ->
+                            {
+                                projectJson.objectProperty("java");
+                            });
+                            build.objectProperty("sources/B.java", bJava ->
+                            {
+                                bJava.numberProperty("lastModified", 0);
+                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+                            });
+                        }).toString(),
+                        getFileContents(buildFile),
                         "Wrong build.json file contents");
                 });
 
