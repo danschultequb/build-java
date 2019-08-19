@@ -5,6 +5,10 @@ package qub;
  */
 public class Dependency
 {
+    private final static String publisherPropertyName = "publisher";
+    private final static String projectPropertyName = "project";
+    private final static String versionPropertyName = "version";
+
     private String publisher;
     private String project;
     private String version;
@@ -86,20 +90,42 @@ public class Dependency
     @Override
     public String toString()
     {
-        return JSON.object(object ->
+        return JSON.object(this::write).toString();
+    }
+
+    public void write(JSONObjectBuilder builder)
+    {
+        PreCondition.assertNotNull(builder, "builder");
+
+        if (!Strings.isNullOrEmpty(publisher))
         {
-            if (publisher != null)
-            {
-                object.stringProperty("publisher", Objects.toString(publisher));
-            }
-            if (project != null)
-            {
-                object.stringProperty("project", Objects.toString(project));
-            }
-            if (version != null)
-            {
-                object.stringProperty("version", Objects.toString(version));
-            }
-        }).toString();
+            builder.stringProperty(publisherPropertyName, publisher);
+        }
+        if (!Strings.isNullOrEmpty(project))
+        {
+            builder.stringProperty(projectPropertyName, project);
+        }
+        if (!Strings.isNullOrEmpty(version))
+        {
+            builder.stringProperty(versionPropertyName, version);
+        }
+    }
+
+    public static Dependency parse(JSONObject dependencyObject)
+    {
+        final Dependency dependency = new Dependency();
+        dependencyObject.getUnquotedStringPropertyValue(publisherPropertyName)
+            .then(dependency::setPublisher)
+            .catchError()
+            .await();
+        dependencyObject.getUnquotedStringPropertyValue(projectPropertyName)
+            .then(dependency::setProject)
+            .catchError()
+            .await();
+        dependencyObject.getUnquotedStringPropertyValue(versionPropertyName)
+            .then(dependency::setVersion)
+            .catchError()
+            .await();
+        return dependency;
     }
 }

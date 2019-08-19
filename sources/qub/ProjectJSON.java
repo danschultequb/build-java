@@ -2,6 +2,11 @@ package qub;
 
 public class ProjectJSON
 {
+    private static final String publisherPropertyName = "publisher";
+    private static final String projectPropertyName = "project";
+    private static final String versionPropertyName = "version";
+    private static final String javaPropertyName = "java";
+
     private String publisher;
     private String project;
     private String version;
@@ -83,25 +88,31 @@ public class ProjectJSON
         return java;
     }
 
+    @Override
+    public String toString()
+    {
+        return JSON.object(this::write).toString();
+    }
+
     public void write(JSONObjectBuilder builder)
     {
         PreCondition.assertNotNull(builder, "builder");
 
         if (!Strings.isNullOrEmpty(publisher))
         {
-            builder.stringProperty("publisher", publisher);
+            builder.stringProperty(publisherPropertyName, publisher);
         }
         if (!Strings.isNullOrEmpty(project))
         {
-            builder.stringProperty("project", project);
+            builder.stringProperty(projectPropertyName, project);
         }
         if (!Strings.isNullOrEmpty(version))
         {
-            builder.stringProperty("version", version);
+            builder.stringProperty(versionPropertyName, version);
         }
         if (java != null)
         {
-            builder.objectProperty("java", java::write);
+            builder.objectProperty(javaPropertyName, java::write);
         }
     }
 
@@ -156,13 +167,22 @@ public class ProjectJSON
 
         ProjectJSON projectJson = new ProjectJSON();
 
-        rootObject.getUnquotedStringPropertyValue("publisher").then(projectJson::setPublisher);
-        rootObject.getUnquotedStringPropertyValue("project").then(projectJson::setProject);
-        rootObject.getUnquotedStringPropertyValue("version").then(projectJson::setVersion);
-
-        rootObject.getObjectPropertyValue("java")
-            .then((JSONObject javaObject) -> ProjectJSONJava.parse(javaObject))
-            .then(projectJson::setJava);
+        rootObject.getUnquotedStringPropertyValue(publisherPropertyName)
+            .then(projectJson::setPublisher)
+            .catchError()
+            .await();
+        rootObject.getUnquotedStringPropertyValue(projectPropertyName)
+            .then(projectJson::setProject)
+            .catchError()
+            .await();
+        rootObject.getUnquotedStringPropertyValue(versionPropertyName)
+            .then(projectJson::setVersion)
+            .catchError()
+            .await();
+        rootObject.getObjectPropertyValue(javaPropertyName)
+            .then((JSONObject javaObject) -> projectJson.setJava(ProjectJSONJava.parse(javaObject)))
+            .catchError()
+            .await();
 
         return projectJson;
     }

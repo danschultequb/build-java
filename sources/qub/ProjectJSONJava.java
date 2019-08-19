@@ -2,8 +2,19 @@ package qub;
 
 public class ProjectJSONJava
 {
+    public final static String mainClassPropertyName = "mainClass";
+    public final static String shortcutNamePropertyName = "shortcutName";
+    public final static String captureVMArgumentsPropertyName = "captureVMArguments";
+    public final static String versionPropertyName = "version";
+    public final static String outputFolderPropertyName = "outputFolder";
+    public final static String sourceFilesPropertyName = "sourceFiles";
+    public final static String maximumErrorsPropertyName = "maximumErrors";
+    public final static String maximumWarningsPropertyName = "maximumWarnings";
+    public final static String dependenciesPropertyName = "dependencies";
+
     private String mainClass;
     private String shortcutName;
+    private Boolean captureVMArguments;
     private String version;
     private String outputFolder;
     private Integer maximumErrors;
@@ -46,6 +57,27 @@ public class ProjectJSONJava
     public ProjectJSONJava setShortcutName(String shortcutName)
     {
         this.shortcutName = shortcutName;
+        return this;
+    }
+
+    /**
+     * Get whether or not the Java VM arguments should be exposed to the application.
+     * @return Whether or not the Java VM arguments should be exposed to the application.
+     */
+    public Boolean getCaptureVMArguments()
+    {
+        return captureVMArguments;
+    }
+
+    /**
+     * Set whether or not the Java VM arguments should be exposed to the application.
+     * @param captureVMArguments Whether or not the Java VM arguments should be exposed to the
+     *                           application.
+     * @return This object for method chaining.
+     */
+    public ProjectJSONJava setCaptureVMArguments(Boolean captureVMArguments)
+    {
+        this.captureVMArguments = captureVMArguments;
         return this;
     }
 
@@ -169,53 +201,43 @@ public class ProjectJSONJava
 
         if (!Strings.isNullOrEmpty(mainClass))
         {
-            builder.stringProperty("mainClass", mainClass);
+            builder.stringProperty(mainClassPropertyName, mainClass);
         }
         if (!Strings.isNullOrEmpty(shortcutName))
         {
-            builder.stringProperty("shortcutName", shortcutName);
+            builder.stringProperty(shortcutNamePropertyName, shortcutName);
+        }
+        if (captureVMArguments != null)
+        {
+            builder.booleanProperty(captureVMArgumentsPropertyName, captureVMArguments);
         }
         if (!Strings.isNullOrEmpty(version))
         {
-            builder.stringProperty("version", version);
+            builder.stringProperty(versionPropertyName, version);
         }
         if (!Strings.isNullOrEmpty(outputFolder))
         {
-            builder.stringProperty("outputFolder", outputFolder);
+            builder.stringProperty(outputFolderPropertyName, outputFolder);
         }
         if (!Iterable.isNullOrEmpty(sourceFilePatterns))
         {
-            builder.stringArrayProperty("sourceFiles", sourceFilePatterns.map(PathPattern::toString));
+            builder.stringArrayProperty(sourceFilesPropertyName, sourceFilePatterns.map(PathPattern::toString));
         }
         if (maximumErrors != null)
         {
-            builder.numberProperty("maximumErrors", maximumErrors);
+            builder.numberProperty(maximumErrorsPropertyName, maximumErrors);
         }
         if (maximumWarnings != null)
         {
-            builder.numberProperty("maximumWarnings", maximumWarnings);
+            builder.numberProperty(maximumWarningsPropertyName, maximumWarnings);
         }
         if (!Iterable.isNullOrEmpty(dependencies))
         {
-            builder.arrayProperty("dependencies", dependenciesBuilder ->
+            builder.arrayProperty(dependenciesPropertyName, dependenciesBuilder ->
             {
                 for (final Dependency dependency : dependencies)
                 {
-                    dependenciesBuilder.objectElement(dependencyBuilder ->
-                    {
-                        if (!Strings.isNullOrEmpty(dependency.getPublisher()))
-                        {
-                            dependencyBuilder.stringProperty("publisher", dependency.getPublisher());
-                        }
-                        if (!Strings.isNullOrEmpty(dependency.getProject()))
-                        {
-                            dependencyBuilder.stringProperty("project", dependency.getProject());
-                        }
-                        if (!Strings.isNullOrEmpty(dependency.getVersion()))
-                        {
-                            dependencyBuilder.stringProperty("version", dependency.getVersion());
-                        }
-                    });
+                    dependenciesBuilder.objectElement(dependency::write);
                 }
             });
         }
@@ -226,13 +248,24 @@ public class ProjectJSONJava
         PreCondition.assertNotNull(javaObject, "javaObject");
 
         final ProjectJSONJava result = new ProjectJSONJava();
-        javaObject.getUnquotedStringPropertyValue("mainClass").then(result::setMainClass);
-        javaObject.getUnquotedStringPropertyValue("shortcutName").then(result::setShortcutName);
-        javaObject.getUnquotedStringPropertyValue("version")
+        javaObject.getUnquotedStringPropertyValue(mainClassPropertyName)
+            .then(result::setMainClass)
+            .catchError()
+            .await();
+        javaObject.getUnquotedStringPropertyValue(shortcutNamePropertyName)
+            .then(result::setShortcutName)
+            .catchError()
+            .await();
+        javaObject.getUnquotedStringPropertyValue(versionPropertyName)
             .catchErrorResult(WrongTypeException.class, () -> javaObject.getNumberPropertyValue("version").then(Object::toString))
-            .then(result::setVersion);
-        javaObject.getUnquotedStringPropertyValue("outputFolder").then(result::setOutputFolder);
-        javaObject.getUnquotedStringPropertyValue("sourceFiles")
+            .then(result::setVersion)
+            .catchError()
+            .await();
+        javaObject.getUnquotedStringPropertyValue(outputFolderPropertyName)
+            .then(result::setOutputFolder)
+            .catchError()
+            .await();
+        javaObject.getUnquotedStringPropertyValue(sourceFilesPropertyName)
             .then((String sourceFilesPattern) ->
             {
                 if (!Strings.isNullOrEmpty(sourceFilesPattern))
@@ -242,7 +275,7 @@ public class ProjectJSONJava
             })
             .catchError(WrongTypeException.class, () ->
             {
-                javaObject.getArrayPropertyValue("sourceFiles")
+                javaObject.getArrayPropertyValue(sourceFilesPropertyName)
                     .then((JSONArray sourceFilesArray) ->
                     {
                         result.setSourceFilePatterns(sourceFilesArray.getElements()
@@ -251,24 +284,26 @@ public class ProjectJSONJava
                             .where(value -> !Strings.isNullOrEmpty(value))
                             .map(PathPattern::parse));
                     });
-            });
-        javaObject.getNumberPropertyValue("maximumErrors")
-            .then((Double maximumErrors) -> result.setMaximumErrors(maximumErrors.intValue()));
-        javaObject.getNumberPropertyValue("maximumWarnings")
-            .then((Double maximumWarnings) -> result.setMaximumWarnings(maximumWarnings.intValue()));
-        javaObject.getArrayPropertyValue("dependencies").then((JSONArray dependenciesArray) ->
-        {
-            result.setDependencies(dependenciesArray.getElements()
-                .instanceOf(JSONObject.class)
-                .map((JSONObject dependencyObject) ->
-                {
-                    final Dependency dependency = new Dependency();
-                    dependencyObject.getUnquotedStringPropertyValue("publisher").then(dependency::setPublisher);
-                    dependencyObject.getUnquotedStringPropertyValue("project").then(dependency::setProject);
-                    dependencyObject.getUnquotedStringPropertyValue("version").then(dependency::setVersion);
-                    return dependency;
-                }));
-        });
+            })
+            .catchError()
+            .await();
+        javaObject.getNumberPropertyValue(maximumErrorsPropertyName)
+            .then((Double maximumErrors) -> result.setMaximumErrors(maximumErrors.intValue()))
+            .catchError()
+            .await();
+        javaObject.getNumberPropertyValue(maximumWarningsPropertyName)
+            .then((Double maximumWarnings) -> result.setMaximumWarnings(maximumWarnings.intValue()))
+            .catchError()
+            .await();
+        javaObject.getArrayPropertyValue(dependenciesPropertyName)
+            .then((JSONArray dependenciesArray) ->
+            {
+                result.setDependencies(dependenciesArray.getElements()
+                    .instanceOf(JSONObject.class)
+                    .map(Dependency::parse));
+            })
+            .catchError()
+            .await();
 
         PostCondition.assertNotNull(result, "result");
 
