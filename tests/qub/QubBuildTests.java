@@ -1,8 +1,8 @@
 package qub;
 
-public class QubBuildTests
+public interface QubBuildTests
 {
-    public static void test(TestRunner runner)
+    static void test(TestRunner runner)
     {
         runner.testGroup(QubBuild.class, () ->
         {
@@ -26,6 +26,26 @@ public class QubBuildTests
                     final QubBuild qubBuild = new QubBuild();
                     qubBuild.setShowTotalDuration(true);
                     test.assertTrue(qubBuild.getShowTotalDuration());
+                });
+            });
+
+            runner.testGroup("getJavaCompiler()", () ->
+            {
+                runner.test("when it hasn't been set", (Test test) ->
+                {
+                    final QubBuild qubBuild = new QubBuild();
+                    final JavaCompiler javaCompiler = qubBuild.getJavaCompiler(FakeJavaCompiler::new);
+                    test.assertNotNull(javaCompiler);
+                    test.assertSame(FakeJavaCompiler.class, javaCompiler.getClass());
+                    test.assertSame(javaCompiler, qubBuild.getJavaCompiler(FakeJavaCompiler::new));
+                });
+
+                runner.test("when it has been set", (Test test) ->
+                {
+                    final QubBuild qubBuild = new QubBuild();
+                    final FakeJavaCompiler javaCompiler = new FakeJavaCompiler();
+                    qubBuild.setJavaCompiler(javaCompiler);
+                    test.assertSame(javaCompiler, qubBuild.getJavaCompiler(JavacJavaCompiler::new));
                 });
             });
 
@@ -4387,24 +4407,24 @@ public class QubBuildTests
         });
     }
 
-    private static ManualClock getManualClock(Test test)
+    static ManualClock getManualClock(Test test)
     {
         PreCondition.assertNotNull(test, "test");
 
         return new ManualClock(DateTime.utc(0), test.getMainAsyncRunner());
     }
 
-    private static InMemoryCharacterStream getInMemoryCharacterStream(Test test)
+    static InMemoryCharacterStream getInMemoryCharacterStream(Test test)
     {
         return new InMemoryCharacterStream();
     }
 
-    private static Folder getInMemoryCurrentFolder(Test test)
+    static Folder getInMemoryCurrentFolder(Test test)
     {
         return getInMemoryCurrentFolder(test, getManualClock(test));
     }
 
-    private static Folder getInMemoryCurrentFolder(Test test, Clock clock)
+    static Folder getInMemoryCurrentFolder(Test test, Clock clock)
     {
         PreCondition.assertNotNull(test, "test");
         PreCondition.assertNotNull(clock, "clock");
@@ -4414,19 +4434,19 @@ public class QubBuildTests
         return fileSystem.getFolder("/").await();
     }
 
-    private static File setFileContents(Folder folder, String relativeFilePath, String contents)
+    static File setFileContents(Folder folder, String relativeFilePath, String contents)
     {
         final File file = folder.getFile(relativeFilePath).await();
         setFileContents(file, contents);
         return file;
     }
 
-    private static void setFileContents(Result<File> fileResult, String contents)
+    static void setFileContents(Result<File> fileResult, String contents)
     {
         fileResult.then((File file) -> setFileContents(file, contents)).await();
     }
 
-    private static void setFileContents(File file, String contents)
+    static void setFileContents(File file, String contents)
     {
         final byte[] byteContents = Strings.isNullOrEmpty(contents)
             ? new byte[0]
@@ -4434,27 +4454,27 @@ public class QubBuildTests
         file.setContents(byteContents).await();
     }
 
-    private static String getFileContents(Folder folder, String relativeFilePath)
+    static String getFileContents(Folder folder, String relativeFilePath)
     {
         return getFileContents(folder.getFile(relativeFilePath));
     }
 
-    private static DateTime getFileLastModified(Folder folder, String relativeFilePath)
+    static DateTime getFileLastModified(Folder folder, String relativeFilePath)
     {
         return getFileLastModified(folder.getFile(relativeFilePath).await());
     }
 
-    private static DateTime getFileLastModified(File file)
+    static DateTime getFileLastModified(File file)
     {
         return file.getLastModified().await();
     }
 
-    private static String getFileContents(Result<File> file)
+    static String getFileContents(Result<File> file)
     {
         return getFileContents(file.await());
     }
 
-    private static String getFileContents(File file)
+    static String getFileContents(File file)
     {
         return file.getContentByteReadStream()
             .then((ByteReadStream contents) -> contents.asCharacterReadStream())
@@ -4462,7 +4482,7 @@ public class QubBuildTests
             .await();
     }
 
-    private static Console createConsole(CharacterWriteStream output, Folder currentFolder, Clock clock, String... commandLineArguments)
+    static Console createConsole(CharacterWriteStream output, Folder currentFolder, Clock clock, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(currentFolder, "currentFolder");
@@ -4475,7 +4495,7 @@ public class QubBuildTests
         return result;
     }
 
-    private static Console createConsole(CharacterWriteStream output, Folder currentFolder, String... commandLineArguments)
+    static Console createConsole(CharacterWriteStream output, Folder currentFolder, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(currentFolder, "currentFolder");
@@ -4488,7 +4508,7 @@ public class QubBuildTests
         return result;
     }
 
-    private static Console createConsole(CharacterWriteStream output, String... commandLineArguments)
+    static Console createConsole(CharacterWriteStream output, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
@@ -4499,7 +4519,7 @@ public class QubBuildTests
         return result;
     }
 
-    private static Console createConsole(String... commandLineArguments)
+    static Console createConsole(String... commandLineArguments)
     {
         final Console result = new Console(CommandLineArguments.create(commandLineArguments));
         result.setLineSeparator("\n");
@@ -4507,21 +4527,21 @@ public class QubBuildTests
         return result;
     }
 
-    private static void main(Console console)
+    static void main(Console console)
     {
         PreCondition.assertNotNull(console, "console");
 
         main(console, true);
     }
 
-    private static void main(Console console, boolean showTotalDuration)
+    static void main(Console console, boolean showTotalDuration)
     {
         PreCondition.assertNotNull(console, "console");
 
         main(console, new FakeJavaCompiler(), showTotalDuration);
     }
 
-    private static void main(Console console, JavaCompiler compiler)
+    static void main(Console console, JavaCompiler compiler)
     {
         PreCondition.assertNotNull(console, "console");
         PreCondition.assertNotNull(compiler, "compiler");
@@ -4529,7 +4549,7 @@ public class QubBuildTests
         main(console, compiler, true);
     }
 
-    private static void main(Console console, JavaCompiler compiler, boolean showTotalDuration)
+    static void main(Console console, JavaCompiler compiler, boolean showTotalDuration)
     {
         PreCondition.assertNotNull(console, "console");
         PreCondition.assertNotNull(compiler, "compiler");

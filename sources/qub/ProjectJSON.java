@@ -125,8 +125,18 @@ public class ProjectJSON
     {
         PreCondition.assertNotNull(projectJSONFile, "projectJSONFile");
 
-        return projectJSONFile.getContentByteReadStream()
-            .thenResult(ProjectJSON::parse);
+        return Result.create(() ->
+        {
+            ProjectJSON result;
+            try (ByteReadStream readStream = projectJSONFile.getContentByteReadStream().await())
+            {
+                result = ProjectJSON.parse(readStream).await();
+            }
+
+            PostCondition.assertNotNull(result, "result");
+
+            return result;
+        });
     }
 
     /**
@@ -137,7 +147,7 @@ public class ProjectJSON
     public static Result<ProjectJSON> parse(ByteReadStream readStream)
     {
         PreCondition.assertNotNull(readStream, "readStream");
-        PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
+        PreCondition.assertNotDisposed(readStream, "readStream.isDisposed()");
 
         return parse(readStream.asCharacterReadStream());
     }

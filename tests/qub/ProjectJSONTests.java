@@ -2,11 +2,11 @@ package qub;
 
 public interface ProjectJSONTests
 {
-    public static void test(TestRunner runner)
+    static void test(TestRunner runner)
     {
         runner.testGroup(ProjectJSON.class, () ->
         {
-            runner.test("constructor", (Test test) ->
+            runner.test("constructor()", (Test test) ->
             {
                 final ProjectJSON projectJSON = new ProjectJSON();
                 test.assertNull(projectJSON.getPublisher());
@@ -648,9 +648,84 @@ public interface ProjectJSONTests
                     test.assertNull(java.getVersion());
                     test.assertNull(java.getMainClass());
                     test.assertNull(java.getShortcutName());
+                    test.assertNull(java.getCaptureVMArguments());
                     test.assertNull(java.getMaximumErrors());
                     test.assertEqual(100, java.getMaximumWarnings());
                     test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with captureVMArguments true", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").await();
+                    file.setContentsAsString("{ \"java\": { \"captureVMArguments\": true } }").await();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).await();
+                    test.assertNotNull(projectJSON);
+                    test.assertNull(projectJSON.getPublisher());
+                    test.assertNull(projectJSON.getProject());
+                    test.assertNull(projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertEqual(true, java.getCaptureVMArguments());
+                    test.assertNull(java.getMaximumErrors());
+                    test.assertNull(java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+
+                runner.test("with captureVMArguments false", (Test test) ->
+                {
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/");
+                    final File file = fileSystem.createFile("/project.json").await();
+                    file.setContentsAsString("{ \"java\": { \"captureVMArguments\": false } }").await();
+
+                    final ProjectJSON projectJSON = ProjectJSON.parse(file).await();
+                    test.assertNotNull(projectJSON);
+                    test.assertNull(projectJSON.getPublisher());
+                    test.assertNull(projectJSON.getProject());
+                    test.assertNull(projectJSON.getVersion());
+
+                    final ProjectJSONJava java = projectJSON.getJava();
+                    test.assertNotNull(java);
+                    test.assertNull(java.getVersion());
+                    test.assertNull(java.getMainClass());
+                    test.assertNull(java.getShortcutName());
+                    test.assertEqual(false, java.getCaptureVMArguments());
+                    test.assertNull(java.getMaximumErrors());
+                    test.assertNull(java.getMaximumWarnings());
+                    test.assertNull(java.getDependencies());
+                });
+            });
+
+            runner.testGroup("toString()", () ->
+            {
+                runner.test("with no properties", (Test test) ->
+                {
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    test.assertEqual("{}", projectJSON.toString());
+                });
+
+                runner.test("with publisher, project, and version", (Test test) ->
+                {
+                    final ProjectJSON projectJSON = new ProjectJSON()
+                        .setPublisher("a")
+                        .setProject("b")
+                        .setVersion("c");
+                    test.assertEqual("{\"publisher\":\"a\",\"project\":\"b\",\"version\":\"c\"}", projectJSON.toString());
+                });
+
+                runner.test("with captureVMArguments", (Test test) ->
+                {
+                    final ProjectJSON projectJSON = new ProjectJSON()
+                        .setJava(new ProjectJSONJava()
+                            .setCaptureVMArguments(true));
+                    test.assertEqual("{\"java\":{\"captureVMArguments\":true}}", projectJSON.toString());
                 });
             });
         });

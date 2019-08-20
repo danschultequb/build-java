@@ -256,6 +256,10 @@ public class ProjectJSONJava
             .then(result::setShortcutName)
             .catchError()
             .await();
+        javaObject.getBooleanPropertyValue(captureVMArgumentsPropertyName)
+            .then(result::setCaptureVMArguments)
+            .catchError()
+            .await();
         javaObject.getUnquotedStringPropertyValue(versionPropertyName)
             .catchErrorResult(WrongTypeException.class, () -> javaObject.getNumberPropertyValue("version").then(Object::toString))
             .then(result::setVersion)

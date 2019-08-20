@@ -38,7 +38,7 @@ public class QubBuild
      *                set yet.
      * @return The JavaCompiler to use to compile Java source files.
      */
-    private JavaCompiler getJavaCompiler(Function0<JavaCompiler> creator)
+    public JavaCompiler getJavaCompiler(Function0<JavaCompiler> creator)
     {
         PreCondition.assertNotNull(creator, "creator");
 
@@ -107,7 +107,7 @@ public class QubBuild
 
                 verbose.writeLine("Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...").await();
                 final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile)
-                    .catchError((Throwable error) -> error(console, error.getMessage()).await())
+                    .catchError((Throwable error) -> error(console, Exceptions.unwrap(error).getMessage()).await())
                     .await();
                 if (projectJson != null)
                 {
