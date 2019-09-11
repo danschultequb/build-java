@@ -4171,7 +4171,7 @@ public interface QubBuildTests
                     test.assertEqual(
                         Iterable.create(
                             "Compiling...",
-                            "ERROR: No publisher folder named \"fake-qub\" found in the Qub folder (/qub_home)."),
+                            "ERROR: No publisher folder named \"fake-qub\" found in the Qub folder (/qub_home/)."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertFalse(currentFolder.folderExists("outputs").await());
