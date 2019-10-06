@@ -11,7 +11,7 @@ public abstract class JavaCompiler
     private Folder qubFolder;
     private Integer maximumErrors;
     private Integer maximumWarnings;
-    private CommandLineParameterVerbose verbose;
+    private VerboseCharacterWriteStream verbose;
 
     public String getVersion()
     {
@@ -103,12 +103,12 @@ public abstract class JavaCompiler
         return maximumWarnings;
     }
 
-    public CommandLineParameterVerbose getVerbose()
+    public VerboseCharacterWriteStream getVerbose()
     {
         return verbose;
     }
 
-    public JavaCompiler setVerbose(CommandLineParameterVerbose verbose)
+    public JavaCompiler setVerbose(VerboseCharacterWriteStream verbose)
     {
         this.verbose = verbose;
         return this;
@@ -128,18 +128,20 @@ public abstract class JavaCompiler
     /**
      * Check that this system has the proper JRE installed to compile to the provided Java version.
      * @param javaVersion The Java version to check for.
-     * @param process The process to use.
      * @return Whether or not the proper JRE is installed to compile to the provided Java version.
      */
-    public Result<Void> checkJavaVersion(String javaVersion, Process process)
+    public Result<Void> checkJavaVersion(String javaVersion, EnvironmentVariables environmentVariables, FileSystem fileSystem)
     {
-        PreCondition.assertNotNull(process, "process");
+        PreCondition.assertNotNull(environmentVariables, "environmentVariables");
+        PreCondition.assertNotNull(fileSystem, "fileSystem");
 
         Result<Void> result = Result.success();
 
         if (!Strings.isNullOrEmpty(javaVersion))
         {
-            final String javaHome = process.getEnvironmentVariable("JAVA_HOME");
+            final String javaHome = environmentVariables.get("JAVA_HOME")
+                .catchError(NotFoundException.class)
+                .await();
             if (Strings.isNullOrEmpty(javaHome))
             {
                 result = Result.error(new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified."));
@@ -148,7 +150,7 @@ public abstract class JavaCompiler
             {
                 setVersion("8");
 
-                final Folder javaFolder = process.getFileSystem().getFolder(javaHome).await().getParentFolder().await();
+                final Folder javaFolder = fileSystem.getFolder(javaHome).await().getParentFolder().await();
                 final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().await();
                 final Iterable<Folder> jre18Folders = jreAndJdkFolders.where((Folder jreOrJdkFolder) -> jreOrJdkFolder.getName().startsWith("jre1.8.0_"));
                 if (!jre18Folders.any())
@@ -251,10 +253,10 @@ public abstract class JavaCompiler
      * @param sourceFiles The source files to compile.
      * @param rootFolder The folder that contains all of the source files to compile.
      * @param outputFolder The output folder where the compiled results will be placed.
-     * @param process The process to use.
+     * @param warnings How warnings should be treated.
      * @return The result of the compilation.
      */
-    public abstract Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Process process);
+    public abstract Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Warnings warnings);
 
     public static JavaCompilerIssue error(String sourceFilePath, int lineNumber, int columnNumber, String errorMessage)
     {

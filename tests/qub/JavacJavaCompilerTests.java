@@ -1,26 +1,25 @@
 package qub;
 
-public class JavacJavaCompilerTests
+public interface JavacJavaCompilerTests
 {
-    public static void test(TestRunner runner)
+    static void test(TestRunner runner)
     {
         runner.testGroup(JavacJavaCompiler.class, () ->
         {
-            JavaCompilerTests.test(runner, JavacJavaCompiler::new);
+            JavaCompilerTests.test(runner, (Test test) -> new JavacJavaCompiler(test.getProcess().getProcessFactory()));
 
             runner.testGroup("compile()", () ->
             {
                 runner.test("with null sourceFiles", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Iterable<File> sourceFiles = null;
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final Process process = new Process();
-                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process),
+                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show),
                             new PreConditionFailure("sourceFiles cannot be null."));
                     }
                     finally
@@ -31,15 +30,14 @@ public class JavacJavaCompilerTests
 
                 runner.test("with empty sourceFiles", runner.skip(), (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Iterable<File> sourceFiles = Iterable.create();
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final Process process = new Process();
-                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process),
+                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show),
                             new PreConditionFailure("sourceFiles cannot be empty."));
                     }
                     finally
@@ -50,34 +48,15 @@ public class JavacJavaCompilerTests
 
                 runner.test("with null rootFolder", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
                         final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final Process process = new Process();
-                        test.assertThrows(() -> compiler.compile(sourceFiles, null, outputFolder, process), new PreConditionFailure("rootFolder cannot be null."));
-                    }
-                    finally
-                    {
-                        test.assertNull(rootFolder.delete().await());
-                    }
-                });
-
-                runner.test("with null process", (Test test) ->
-                {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
-                    final Folder currentFolder = test.getProcess().getCurrentFolder().await();
-                    final Folder rootFolder = currentFolder.createFolder("temp").await();
-                    try
-                    {
-                        final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
-                        final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final Process process = null;
-                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).await(),
-                            new PreConditionFailure("process cannot be null."));
+                        test.assertThrows(() -> compiler.compile(sourceFiles, null, outputFolder, Warnings.Show),
+                            new PreConditionFailure("rootFolder cannot be null."));
                     }
                     finally
                     {
@@ -87,16 +66,16 @@ public class JavacJavaCompilerTests
 
                 runner.test("with no PATH environment variable", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final Process process = new Process();
+                    process.setEnvironmentVariables(new EnvironmentVariables());
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(process.getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
                         final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final Process process = new Process();
-                        process.setEnvironmentVariables(Map.create());
-                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).await(),
+                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await(),
                             new FileNotFoundException("javac"));
                     }
                     finally
@@ -107,16 +86,16 @@ public class JavacJavaCompilerTests
 
                 runner.test("with empty PATH environment variable", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final Process process = new Process();
+                    process.setEnvironmentVariables(new EnvironmentVariables().set("PATH", ""));
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(process.getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
                         final Iterable<File> sourceFiles = Iterable.create(rootFolder.getFile("sources/A.java").await());
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final Process process = new Process();
-                        process.setEnvironmentVariables(Map.<String,String>create().set("PATH", ""));
-                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, process).await(),
+                        test.assertThrows(() -> compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await(),
                             new FileNotFoundException("javac"));
                     }
                     finally
@@ -127,7 +106,7 @@ public class JavacJavaCompilerTests
 
                 runner.test("with Java file that doesn't exist", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
@@ -135,7 +114,7 @@ public class JavacJavaCompilerTests
                         final File aJava = rootFolder.getFile("sources/A.java").await();
                         final Iterable<File> sourceFiles = Iterable.create(aJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await();
                         test.assertNotNull(result);
                         test.assertEqual(2, result.exitCode);
                         test.assertEqual("", result.output);
@@ -156,7 +135,7 @@ public class JavacJavaCompilerTests
 
                 runner.test("with empty Java file", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
@@ -165,7 +144,7 @@ public class JavacJavaCompilerTests
                         bJava.create();
                         final Iterable<File> sourceFiles = Iterable.create(bJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await();
                         test.assertNotNull(result);
                         test.assertEqual(0, result.exitCode);
                         test.assertEqual("", result.output);
@@ -181,7 +160,7 @@ public class JavacJavaCompilerTests
 
                 runner.test("with no errors", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
@@ -201,7 +180,7 @@ public class JavacJavaCompilerTests
                                     "}")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await();
                         test.assertNotNull(result);
                         test.assertEqual(0, result.exitCode);
                         test.assertEqual("", result.output);
@@ -217,7 +196,7 @@ public class JavacJavaCompilerTests
 
                 runner.test("with \"error: class MyTestClass is public, should be declared in a file named MyTestClass.java\"", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
@@ -237,7 +216,7 @@ public class JavacJavaCompilerTests
                                     "}")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await();
                         test.assertNotNull(result);
                         test.assertEqual(1, result.exitCode);
                         test.assertEqual("", result.output);
@@ -265,7 +244,7 @@ public class JavacJavaCompilerTests
 
                 runner.test("with \"error: class, interface, or enum expected\"", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
@@ -274,7 +253,7 @@ public class JavacJavaCompilerTests
                         cJava.setContentsAsString("Im not a valid Java file");
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await();
                         test.assertNotNull(result);
                         test.assertEqual(1, result.exitCode);
                         test.assertEqual("", result.output);
@@ -301,7 +280,7 @@ public class JavacJavaCompilerTests
 
                 runner.test("with \"error: ';' expected\" and \"error: reached end of file while parsing\"", (Test test) ->
                 {
-                    final JavacJavaCompiler compiler = new JavacJavaCompiler();
+                    final JavacJavaCompiler compiler = new JavacJavaCompiler(test.getProcess().getProcessFactory());
                     final Folder currentFolder = test.getProcess().getCurrentFolder().await();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
@@ -321,7 +300,7 @@ public class JavacJavaCompilerTests
                                     "")));
                         final Iterable<File> sourceFiles = Iterable.create(cJava);
                         final Folder outputFolder = rootFolder.getFolder("outputs").await();
-                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, new Process()).await();
+                        final JavaCompilationResult result = compiler.compile(sourceFiles, rootFolder, outputFolder, Warnings.Show).await();
                         test.assertNotNull(result);
                         test.assertEqual(1, result.exitCode);
                         test.assertEqual("", result.output);

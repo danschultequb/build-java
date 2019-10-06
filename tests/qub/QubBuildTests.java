@@ -6,63 +6,318 @@ public interface QubBuildTests
     {
         runner.testGroup(QubBuild.class, () ->
         {
-            runner.testGroup("getShowTotalDuration()", () ->
-            {
-                runner.test("when not set", (Test test) ->
-                {
-                    final QubBuild qubBuild = new QubBuild();
-                    test.assertTrue(qubBuild.getShowTotalDuration());
-                });
-
-                runner.test("when set to false", (Test test) ->
-                {
-                    final QubBuild qubBuild = new QubBuild();
-                    qubBuild.setShowTotalDuration(false);
-                    test.assertFalse(qubBuild.getShowTotalDuration());
-                });
-
-                runner.test("when set to true", (Test test) ->
-                {
-                    final QubBuild qubBuild = new QubBuild();
-                    qubBuild.setShowTotalDuration(true);
-                    test.assertTrue(qubBuild.getShowTotalDuration());
-                });
-            });
-
-            runner.testGroup("getJavaCompiler()", () ->
-            {
-                runner.test("when it hasn't been set", (Test test) ->
-                {
-                    final QubBuild qubBuild = new QubBuild();
-                    final JavaCompiler javaCompiler = qubBuild.getJavaCompiler(FakeJavaCompiler::new);
-                    test.assertNotNull(javaCompiler);
-                    test.assertSame(FakeJavaCompiler.class, javaCompiler.getClass());
-                    test.assertSame(javaCompiler, qubBuild.getJavaCompiler(FakeJavaCompiler::new));
-                });
-
-                runner.test("when it has been set", (Test test) ->
-                {
-                    final QubBuild qubBuild = new QubBuild();
-                    final FakeJavaCompiler javaCompiler = new FakeJavaCompiler();
-                    qubBuild.setJavaCompiler(javaCompiler);
-                    test.assertSame(javaCompiler, qubBuild.getJavaCompiler(JavacJavaCompiler::new));
-                });
-            });
-
-            runner.testGroup("main(Console)", () ->
+            runner.testGroup("main(String[])", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
-                    test.assertThrows(() -> main((Console)null), new PreConditionFailure("console cannot be null."));
+                    test.assertThrows(() -> QubBuild.main((String[])null),
+                        new PreConditionFailure("args cannot be null."));
+                });
+            });
+
+            runner.testGroup("getParameters(Process)", () ->
+            {
+                runner.test("with null", (Test test) ->
+                {
+                    test.assertThrows(() -> QubBuild.getParameters(null),
+                        new PreConditionFailure("process cannot be null."));
                 });
 
-                runner.test("with --help command line argument", (Test test) ->
+                runner.test("with no arguments", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    try (final Console console = createConsole())
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with positional folder to build argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("/folder/to/build/"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with named folder to build argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--folder=/folder/to/build/"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --warnings argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--warnings"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --warnings= argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--warnings="))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --warnings=Show argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--warnings=Show"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --warnings=error argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--warnings=error"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Error, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --warnings=HIDE argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--warnings=HIDE"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Hide, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --warnings=spam argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--warnings=spam"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --buildjson argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--buildjson"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --buildjson= argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--buildjson="))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --buildjson=false argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--buildjson=false"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertFalse(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --buildjson=true argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--buildjson=true"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --verbose argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--verbose"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertTrue(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --verbose= argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--verbose="))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertTrue(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --verbose=false argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--verbose=false"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertFalse(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --verbose=true argument", (Test test) ->
+                {
+                    try (final Console console = createConsole("--verbose=true"))
+                    {
+                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        test.assertNotNull(parameters);
+                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
+                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertTrue(parameters.getUseBuildJson());
+                        test.assertTrue(parameters.getVerbose().isVerbose());
+                        test.assertEqual(Warnings.Show, parameters.getWarnings());
+                    }
+                });
+
+                runner.test("with --help argument", (Test test) ->
+                {
+                    final InMemoryCharacterStream output = new InMemoryCharacterStream();
                     try (final Console console = createConsole(output, "--help"))
                     {
-                        main(console);
-                        test.assertEqual(-1, console.getExitCode());
+                        test.assertNull(QubBuild.getParameters(console));
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -82,8 +337,7 @@ public interface QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     try (final Console console = createConsole(output, "-?"))
                     {
-                        main(console);
-                        test.assertEqual(-1, console.getExitCode());
+                        test.assertNull(QubBuild.getParameters(console));
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -97,6 +351,15 @@ public interface QubBuildTests
                             "  --help(?): Show the help message for this application."),
                         Strings.getLines(output.getText().await()));
                 });
+            });
+
+            runner.testGroup("main(Console)", () ->
+            {
+                runner.test("with null console", (Test test) ->
+                {
+                    test.assertThrows(() -> QubBuild.main((Console)null),
+                        new PreConditionFailure("console cannot be null."));
+                });
 
                 runner.test("with no project.json in the unnamed specified folder command line argument", (Test test) ->
                 {
@@ -104,12 +367,11 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final Console console = createConsole(output, currentFolder, "/fake/folder/", "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: The file at \"/fake/folder/project.json\" doesn't exist."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -120,12 +382,11 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final Console console = createConsole(output, currentFolder, "-folder=/fake/folder/", "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: The file at \"/fake/folder/project.json\" doesn't exist."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -136,12 +397,11 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final Console console = createConsole(output, currentFolder, "-verbose", "/fake/folder/", "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "VERBOSE: Parsing project.json...",
                             "ERROR: The file at \"/fake/folder/project.json\" doesn't exist."),
                         Strings.getLines(output.getText().await()).skipLast());
@@ -153,12 +413,11 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: The file at \"/project.json\" doesn't exist."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -170,12 +429,11 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "");
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: No root was found in the JSON document."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -187,12 +445,11 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "[]");
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: Expected the root of the JSON document to be an object."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -204,12 +461,11 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{}");
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: No language specified in project.json. Nothing to compile."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -221,12 +477,11 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: No java source files found in /."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -239,12 +494,11 @@ public interface QubBuildTests
                     currentFolder.createFolder("sources");
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
                             "ERROR: No java source files found in /."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
@@ -256,25 +510,33 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
@@ -298,25 +560,33 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"outputFolder\": \"bin\" } }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final Folder outputs = currentFolder.getFolder("bin").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/bin", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/bin", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("bin").await();
                     test.assertEqual(
                         Iterable.create(
                             "/bin/A.class",
                             "/bin/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
@@ -343,26 +613,33 @@ public interface QubBuildTests
                     setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder.getFile("sources/A.java"), "A.java source");
-                    currentFolder.createFolder("outputs");
+                    final Folder outputs = currentFolder.createFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
@@ -387,19 +664,27 @@ public interface QubBuildTests
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
-                    currentFolder.createFolder("outputs");
+                    final Folder outputs = currentFolder.createFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/B.java")
+                                .setFunction(() ->
+                                {
+                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
+                                    outputs.setFileContentsAsString("B.class", "B.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 2 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -407,9 +692,9 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
-                    test.assertEqual("B.java source", getFileContents(outputs, "B.class"));
+                    test.assertEqual("B.java bytecode", getFileContents(outputs, "B.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
@@ -437,18 +722,27 @@ public interface QubBuildTests
                     setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "tests/B.java", "B.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "tests/B.java")
+                                .setFunction(() ->
+                                {
+                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
+                                    outputs.setFileContentsAsString("B.class", "B.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 2 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -456,9 +750,9 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+                    test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
-                    test.assertEqual("B.java source", getFileContents(outputs, "B.class"));
+                    test.assertEqual("B.java bytecode", getFileContents(outputs, "B.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
                         JSON.object(parse ->
@@ -490,18 +784,26 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -509,7 +811,7 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual("A.java bytecode", getFileContents(classFile));
                     final File parseFile = outputs.getFile("build.json").await();
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                     test.assertEqual(
@@ -549,13 +851,13 @@ public interface QubBuildTests
 
                     try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "No files need to be compiled."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -600,25 +902,33 @@ public interface QubBuildTests
                         });
                     }).toString());
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual("A.java bytecode", getFileContents(classFile));
                     test.assertEqual(
                         JSON.object(parse ->
                         {
@@ -638,14 +948,6 @@ public interface QubBuildTests
                 runner.test("with one source file with one error", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "This doesn't look right to me.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
@@ -663,13 +965,26 @@ public interface QubBuildTests
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\A.java:1: error: This doesn't look right to me.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("                   ^").await();
+                                    errorStream.writeLine("1 error").await();
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 1 file...",
                             "1 Error:",
                             "sources/A.java (Line 1): This doesn't look right to me."),
                         Strings.getLines(output.getText().await()).skipLast());
@@ -680,31 +995,24 @@ public interface QubBuildTests
                             "/outputs/A.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual(clock.getCurrentDateTime().minus(Duration.minutes(1)), getFileLastModified(classFile));
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "This doesn't look right to me.");
-                                    });
-                                });
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(clock.getCurrentDateTime())
+                                    .addIssue(
+                                        new JavaCompilerIssue(
+                                            "sources/A.java",
+                                            1,
+                                            20,
+                                            Issue.Type.Error,
+                                            "This doesn't look right to me."))))
+                            .toString(),
                         getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
@@ -712,21 +1020,13 @@ public interface QubBuildTests
                 runner.test("with one source file with one warning", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                1, 5,
-                                Issue.Type.Warning,
-                                "Are you sure?")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
                     {
                         parse.objectProperty("sources/A.java", aJava ->
                         {
@@ -737,13 +1037,29 @@ public interface QubBuildTests
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\A.java:1: warning: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("                   ^").await();
+                                    errorStream.writeLine("1 error").await();
+
+                                    classFile.setContentsAsString("A.java bytecode").await();
+
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 1 file...",
                             "1 Warning:",
                             "sources/A.java (Line 1): Are you sure?"),
                         Strings.getLines(output.getText().await()).skipLast());
@@ -755,75 +1071,67 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual("A.java bytecode", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(clock.getCurrentDateTime())
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))))
+                            .toString(),
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
 
                 runner.test("with two source files with one error and one warning", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File aTestsSourceFile = setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
+                    final File aTestsClassFile = currentFolder.getFile("outputs/ATests.class").await();
+                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                            .setLastModified(DateTime.utc(0))
+                            .setDependencies(Iterable.create())))
+                        .toString());
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "tests/ATests.java", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\A.java:1: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("    ^").await();
+
+                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+                                    aTestsClassFile.setContentsAsString("ATests.java bytecode");
+
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 2 files...",
                             "1 Warning:",
                             "tests/ATests.java (Line 10): Can't be this.",
                             "1 Error:",
@@ -837,8 +1145,10 @@ public interface QubBuildTests
                             "/outputs/ATests.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(clock.getCurrentDateTime().minus(Duration.minutes(1)), getFileLastModified(aClassFile));
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aTestsClassFile));
+                    test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
                         JSON.object(build ->
                         {
@@ -884,61 +1194,65 @@ public interface QubBuildTests
                 runner.test("with multiple source files with errors and warnings", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                20,7,
-                                Issue.Type.Error,
-                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
                     setFileContents(currentFolder, "tests/C.java", "C.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.local(0))
+                                .setDependencies(Iterable.create())))
+                            .toString());
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File aTestsClass = outputs.getFile("ATests.class").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine(" ^").await();
+
+                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("    ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+                                    aTestsClass.setContentsAsString("ATests.java bytecode").await();
+
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 4 files...",
                             "2 Warnings:",
                             "tests/ATests.java (Line 10): Can't be this.",
                             "tests/C.java (Line 10): Can't be this.",
@@ -948,155 +1262,108 @@ public interface QubBuildTests
                             "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/ATests.class",
-                            "/outputs/B.class",
-                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(clock.getCurrentDateTime().minus(Duration.minutes(1)), getFileLastModified(aClassFile));
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aTestsClass));
+                    test.assertEqual("ATests.java bytecode", getFileContents(aTestsClass));
                     test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 60000);
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                                aTestsJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                                cJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 20);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(buildFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 12, 2, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/B.java", 1, 5, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/ATests.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("tests/ATests.java", 10, 7, Issue.Type.Warning, "Can't be this.")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/C.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .setIssues(Iterable.create(
+                                        new JavaCompilerIssue("tests/C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
+                                        new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this.")))
+                            ))
+                            .toString(),
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
 
-                runner.test("with multiple source files with errors and warnings and -warnings=SHOW", (Test test) ->
+                runner.test("with multiple source files with errors and warnings and -warnings=show", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                20,7,
-                                Issue.Type.Error,
-                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
                     setFileContents(currentFolder, "tests/C.java", "C.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.local(0))
+                                .setDependencies(Iterable.create())))
+                            .toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=SHOW"))
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File aTestsClassFile = outputs.getFile("ATests.class").await();
+
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=show"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine(" ^").await();
+
+                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("    ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+                                    aTestsClassFile.setContentsAsString("ATests.java bytecode").await();
+
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 4 files...",
                             "2 Warnings:",
                             "tests/ATests.java (Line 10): Can't be this.",
                             "tests/C.java (Line 10): Can't be this.",
@@ -1106,860 +1373,257 @@ public interface QubBuildTests
                             "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/ATests.class",
-                            "/outputs/B.class",
-                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(clock.getCurrentDateTime().minus(Duration.minutes(1)), getFileLastModified(aClassFile));
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aTestsClassFile));
+                    test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 60000);
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                                aTestsJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                                cJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 20);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(buildFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
-                });
-
-                runner.test("with multiple source files with errors and warnings and -warnings", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                20,7,
-                                Issue.Type.Error,
-                                "Can't be this.")));
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    clock.advance(Duration.minutes(1));
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source");
-                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
-                    setFileContents(currentFolder, "tests/C.java", "C.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings"))
-                    {
-                        main(console, compiler);
-                        test.assertEqual(1, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "2 Warnings:",
-                            "tests/ATests.java (Line 10): Can't be this.",
-                            "tests/C.java (Line 10): Can't be this.",
-                            "3 Errors:",
-                            "sources/A.java (Line 12): Are you sure?",
-                            "sources/B.java (Line 1): Are you sure?",
-                            "tests/C.java (Line 20): Can't be this."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/ATests.class",
-                            "/outputs/B.class",
-                            "/outputs/C.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 60000);
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                                aTestsJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                                cJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 20);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(parseFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
-                });
-
-                runner.test("with multiple source files with errors and warnings and -warnings=", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                20,7,
-                                Issue.Type.Error,
-                                "Can't be this.")));
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    clock.advance(Duration.minutes(1));
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source");
-                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
-                    setFileContents(currentFolder, "tests/C.java", "C.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings="))
-                    {
-                        main(console, compiler);
-                        test.assertEqual(1, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "2 Warnings:",
-                            "tests/ATests.java (Line 10): Can't be this.",
-                            "tests/C.java (Line 10): Can't be this.",
-                            "3 Errors:",
-                            "sources/A.java (Line 12): Are you sure?",
-                            "sources/B.java (Line 1): Are you sure?",
-                            "tests/C.java (Line 20): Can't be this."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/ATests.class",
-                            "/outputs/B.class",
-                            "/outputs/C.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 60000);
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                                aTestsJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                                cJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 20);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(buildFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
-                });
-
-                runner.test("with multiple source files with errors and warnings and -warnings=spam", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                20,7,
-                                Issue.Type.Error,
-                                "Can't be this.")));
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    clock.advance(Duration.minutes(1));
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source");
-                    setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
-                    setFileContents(currentFolder, "tests/C.java", "C.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=spam"))
-                    {
-                        main(console, compiler);
-                        test.assertEqual(1, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "2 Warnings:",
-                            "tests/ATests.java (Line 10): Can't be this.",
-                            "tests/C.java (Line 10): Can't be this.",
-                            "3 Errors:",
-                            "sources/A.java (Line 12): Are you sure?",
-                            "sources/B.java (Line 1): Are you sure?",
-                            "tests/C.java (Line 20): Can't be this."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/ATests.class",
-                            "/outputs/B.class",
-                            "/outputs/C.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 60000);
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                                aTestsJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                                cJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 20);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(buildFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 12, 2, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/B.java", 1, 5, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/ATests.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("tests/ATests.java", 10, 7, Issue.Type.Warning, "Can't be this.")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/C.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .setIssues(Iterable.create(
+                                        new JavaCompilerIssue("tests/C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
+                                        new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this.")))
+                            ))
+                            .toString(),
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
 
                 runner.test("with multiple source files with errors and warnings and -warnings=hide", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                20,7,
-                                Issue.Type.Error,
-                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
                     setFileContents(currentFolder, "tests/C.java", "C.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.local(0))
+                                .setDependencies(Iterable.create())))
+                            .toString());
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File aTestsClassFile = outputs.getFile("ATests.class").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=hide"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine(" ^").await();
+
+                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("    ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+                                    aTestsClassFile.setContentsAsString("ATests.java bytecode").await();
+
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 4 files...",
                             "3 Errors:",
                             "sources/A.java (Line 12): Are you sure?",
                             "sources/B.java (Line 1): Are you sure?",
                             "tests/C.java (Line 20): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/ATests.class",
-                            "/outputs/B.class",
-                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(clock.getCurrentDateTime().minus(Duration.minutes(1)), getFileLastModified(aClassFile));
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aTestsClassFile));
+                    test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 60000);
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                            });
-                            build.objectProperty("tests/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                                cJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 20);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(buildFile), "Wrong build.json file contents");
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 12, 2, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/B.java", 1, 5, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/ATests.java")
+                                    .setLastModified(DateTime.utc(60000)),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/C.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .setIssues(Iterable.create(
+                                        new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this.")))
+                            ))
+                            .toString(),
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
 
-                runner.test("with multiple source files with errors and warnings and -warnings=errOR", (Test test) ->
+                runner.test("with multiple source files with errors and warnings and -warnings=error", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 5,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?"),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/ATests.java",
-                                10,7,
-                                Issue.Type.Warning,
-                                "Can't be this."),
-                            new JavaCompilerIssue(
-                                "tests/C.java",
-                                20,7,
-                                Issue.Type.Error,
-                                "Can't be this.")));
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     setFileContents(currentFolder, "tests/ATests.java", "ATests.java source");
                     setFileContents(currentFolder, "tests/C.java", "C.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.local(0))
+                                .setDependencies(Iterable.create())))
+                            .toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=errOR"))
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File aTestsClassFile = outputs.getFile("ATests.class").await();
+
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=error"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine(" ^").await();
+
+                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("    ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+
+                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
+                                    errorStream.writeLine("Something is wrong here").await();
+                                    errorStream.writeLine("      ^").await();
+                                    aTestsClassFile.setContentsAsString("ATests.java bytecode").await();
+
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 4 files...",
                             "5 Errors:",
                             "sources/A.java (Line 12): Are you sure?",
                             "sources/B.java (Line 1): Are you sure?",
                             "tests/ATests.java (Line 10): Can't be this.",
-                            "tests/C.java (Line 10): Can't be this.",
-                            "tests/C.java (Line 20): Can't be this."),
+                            "tests/C.java (Line 20): Can't be this.",
+                            "tests/C.java (Line 10): Can't be this."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/ATests.class",
-                            "/outputs/B.class",
-                            "/outputs/C.class",
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
-                    test.assertEqual("A.java source", getFileContents(classFile));
+                    test.assertEqual(clock.getCurrentDateTime().minus(Duration.minutes(1)), getFileLastModified(aClassFile));
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aTestsClassFile));
+                    test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 60000);
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                                aTestsJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                                cJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/C.java");
-                                        issue.numberProperty("lineNumber", 20);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 12, 2, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/B.java", 1, 5, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/ATests.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("tests/ATests.java", 10, 7, Issue.Type.Error, "Can't be this.")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/C.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .setIssues(Iterable.create(
+                                        new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this."),
+                                        new JavaCompilerIssue("tests/C.java", 10, 7, Issue.Type.Error, "Can't be this.")))
+                            ))
+                            .toString(),
                         getFileContents(buildJsonFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
@@ -1972,19 +1636,17 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(clock.getCurrentDateTime())
+                                .setDependencies(Iterable.create()),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(clock.getCurrentDateTime())
+                                .setDependencies(Iterable.create(Path.parse("sources/A.java")))))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
@@ -1993,13 +1655,22 @@ public interface QubBuildTests
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/B.java")
+                                .setFunction(() ->
+                                {
+                                    aClassFile.setContentsAsString("A.java bytecode").await();
+                                    bClassFile.setContentsAsString("B.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 2 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2011,30 +1682,26 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
-                    test.assertEqual("B.java source, depends on A", getFileContents(bClassFile));
+                    test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                            parse.objectProperty("sources/B.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(clock.getCurrentDateTime()),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(clock.getCurrentDateTime())
+                                    .setDependencies(Iterable.create(Path.parse("sources/A.java")))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2046,34 +1713,40 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(clock.getCurrentDateTime())
+                                .setDependencies(Iterable.create()),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(clock.getCurrentDateTime())
+                                .setDependencies(Iterable.create())))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
-                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java")
+                                .setFunction(() ->
+                                {
+                                    bClassFile.setContentsAsString("B.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2088,26 +1761,21 @@ public interface QubBuildTests
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
-                    test.assertEqual("B.java source", getFileContents(bClassFile));
+                    test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                            parse.objectProperty("sources/B.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0)),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(60000))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2119,34 +1787,41 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(clock.getCurrentDateTime())
+                                .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(clock.getCurrentDateTime())
+                                .setDependencies(Iterable.create())))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
-                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    aClassFile.setContentsAsString("A.java bytecode").await();
+                                    bClassFile.setContentsAsString("B.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 2 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2158,30 +1833,25 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
-                    test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
-                    test.assertEqual("B.java source", getFileContents(bClassFile));
+                    test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                            });
-                            parse.objectProperty("sources/B.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(60000))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2193,34 +1863,40 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create()),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create())))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    aClassFile.setContentsAsString("A.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2232,30 +1908,25 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
-                    test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                            });
-                            parse.objectProperty("sources/B.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(clock.getCurrentDateTime())
+                                    .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2267,32 +1938,38 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"shortcutName\": \"foo\" } }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create())))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    aClassFile.setContentsAsString("A.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2303,29 +1980,24 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
-                    test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(false, bClassFile.exists().await(),
                         "Class file of deleted source file should have been deleted.");
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.stringProperty("shortcutName", "foo");
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()
+                                    .setShortcutName("foo")))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/B.java")))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2336,32 +2008,40 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create())))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
-                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File bClassFile = outputs.getFile("B.class").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java")
+                                .setFunction(() ->
+                                {
+                                    bClassFile.setContentsAsString("B.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -2372,28 +2052,22 @@ public interface QubBuildTests
                     test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    final File bClassFile = outputs.getFile("B.class").await();
                     test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("B.java source", getFileContents(bClassFile));
+                    test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                            parse.objectProperty("sources/B.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0)),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(60000))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2403,49 +2077,55 @@ public interface QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File nJavaFile = setFileContents(currentFolder, "sources/N.java", "N.java source");
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
-                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
+                    setFileContents(currentFolder, "sources/N.java", "N.java source");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
 
                     final File nClassFile = setFileContents(currentFolder, "outputs/N.class", "N.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
                     final File cClassFile = setFileContents(currentFolder, "outputs/C.class", "C.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/N.java", nJava ->
-                        {
-                            nJava.numberProperty("lastModified", 0);
-                        });
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
-                        });
-                        parse.objectProperty("sources/C.java", cJava ->
-                        {
-                            cJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/N.java")
+                                .setLastModified(DateTime.utc(0)),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create(Path.parse("sources/C.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/C.java")
+                                .setLastModified(DateTime.utc(0))))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
-                    final File cJavaFile = setFileContents(currentFolder, "sources/C.java", "C.java source");
+                    setFileContents(currentFolder, "sources/C.java", "C.java source");
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/C.java", "sources/B.java", "sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    aClassFile.setContentsAsString("A.java bytecode").await();
+                                    bClassFile.setContentsAsString("B.java bytecode").await();
+                                    cClassFile.setContentsAsString("C.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 3 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2462,42 +2142,35 @@ public interface QubBuildTests
                     test.assertEqual("N.java source", getFileContents(nClassFile));
 
                     test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("B.java source, depends on C", getFileContents(bClassFile));
+                    test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
                     test.assertEqual(60000, getFileLastModified(cClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("C.java source", getFileContents(cClassFile));
+                    test.assertEqual("C.java bytecode", getFileContents(cClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                            });
-                            parse.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 0);
-                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
-                            });
-                            parse.objectProperty("sources/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 60000);
-                            });
-                            parse.objectProperty("sources/N.java", nJava ->
-                            {
-                                nJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/C.java"))),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/C.java")
+                                    .setLastModified(DateTime.utc(60000)),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/N.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2506,7 +2179,7 @@ public interface QubBuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
                     setFileContents(currentFolder, "sources/N.java", "N.java source");
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
@@ -2515,47 +2188,48 @@ public interface QubBuildTests
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
                     final File cClassFile = setFileContents(currentFolder, "outputs/C.class", "C.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/N.java", nJava ->
-                        {
-                            nJava.numberProperty("lastModified", 0);
-                        });
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
-                        });
-                        parse.objectProperty("sources/C.java", cJava ->
-                        {
-                            cJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/N.java")
+                                .setLastModified(DateTime.utc(0)),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create(Path.parse("sources/C.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/C.java")
+                                .setLastModified(DateTime.utc(0))))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/B.java",
-                                1, 25,
-                                Issue.Type.Error,
-                                "Missing definition for C.")));
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console, compiler);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "sources/A.java")
+                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
+                                {
+                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                                    errorStream.writeLine("sources\\B.java:1: error: Missing definition for C.").await();
+                                    errorStream.writeLine("Code that references C class").await();
+                                    errorStream.writeLine("                        ^").await();
+
+                                    return 1;
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
+                            "Compiling 2 files...",
                             "1 Error:",
                             "sources/B.java (Line 1): Missing definition for C."),
                         Strings.getLines(output.getText().await()).skipLast());
@@ -2572,49 +2246,33 @@ public interface QubBuildTests
                     test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("N.java source", getFileContents(nClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source, depends on C", getFileContents(bClassFile));
 
                     test.assertFalse(cClassFile.exists().await());
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                            });
-                            parse.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 0);
-                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
-                                bJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/B.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 25);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Missing definition for C.");
-                                    });
-                                });
-                            });
-                            parse.objectProperty("sources/N.java", nJava ->
-                            {
-                                nJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/C.java")))
+                                    .addIssue(new JavaCompilerIssue("sources/B.java", 1, 25, Issue.Type.Error, "Missing definition for C.")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/N.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2623,52 +2281,57 @@ public interface QubBuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File nJavaFile = setFileContents(currentFolder, "sources/N.java", "N.java source");
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
-                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
-                    final File cJavaFile = setFileContents(currentFolder, "sources/C.java", "C.java source");
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "sources/N.java", "N.java source");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
+                    setFileContents(currentFolder, "sources/C.java", "C.java source");
 
                     final File nClassFile = setFileContents(currentFolder, "outputs/N.class", "N.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on C");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/N.java", nJava ->
-                        {
-                            nJava.numberProperty("lastModified", 0);
-                        });
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
-                        });
-                        parse.objectProperty("sources/C.java", cJava ->
-                        {
-                            cJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/N.java")
+                                .setLastModified(DateTime.utc(0)),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(DateTime.utc(0))
+                                .setDependencies(Iterable.create(Path.parse("sources/C.java"))),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/C.java")
+                                .setLastModified(DateTime.utc(0))))
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File cClassFile = outputs.getFile("C.class").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeProcessRun("javac")
+                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/C.java")
+                                .setFunction(() ->
+                                {
+                                    cClassFile.setContentsAsString("C.java bytecode").await();
+                                })));
+
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -2687,38 +2350,30 @@ public interface QubBuildTests
                     test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source, depends on C", getFileContents(bClassFile));
 
-                    final File cClassFile = setFileContents(currentFolder, "outputs/C.class", "C.java source");
                     test.assertEqual(60000, getFileLastModified(cClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("C.java source", getFileContents(cClassFile));
+                    test.assertEqual("C.java bytecode", getFileContents(cClassFile));
 
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/B.java"));
-                            });
-                            parse.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 0);
-                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/C.java"));
-                            });
-                            parse.objectProperty("sources/C.java", cJava ->
-                            {
-                                cJava.numberProperty("lastModified", 0);
-                            });
-                            parse.objectProperty("sources/N.java", nJava ->
-                            {
-                                nJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/B.java"))),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create(Path.parse("sources/C.java"))),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/C.java")
+                                    .setLastModified(DateTime.utc(0)),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/N.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
 
@@ -2727,20 +2382,19 @@ public interface QubBuildTests
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": { \"dependencies\": [ { \"publisher\": \"qub\", \"project\": \"qub-java\", \"version\": \"foo\" } ] } }");
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        console.setEnvironmentVariables(Map.<String,String>create());
-                        main(console);
+                        console.setEnvironmentVariables(new EnvironmentVariables());
+                        QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "ERROR: Cannot resolve project dependencies without a QUB_HOME environment variable."),
+                            "ERROR: A QUB_HOME folder path environment variable must be specified."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertFalse(currentFolder.getFolder("outputs").await().exists().await());
@@ -2753,35 +2407,31 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.stringProperty("publisher", "a");
-                            projectJson.objectProperty("java");
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.stringProperty("publisher", "b");
-                        projectJson.objectProperty("java");
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setProjectJson(new ProjectJSON()
+                            .setPublisher("a")
+                            .setJava(new ProjectJSONJava()))
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))))
+                        .toString());
+                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                        .setPublisher("b")
+                        .setJava(new ProjectJSONJava())
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "No files need to be compiled."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2796,18 +2446,15 @@ public interface QubBuildTests
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.stringProperty("publisher", "b");
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setPublisher("b")
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2819,35 +2466,31 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.stringProperty("project", "a");
-                            projectJson.objectProperty("java");
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.stringProperty("project", "b");
-                        projectJson.objectProperty("java");
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setProjectJson(new ProjectJSON()
+                            .setProject("a")
+                            .setJava(new ProjectJSONJava()))
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))))
+                        .toString());
+                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                        .setProject("b")
+                        .setJava(new ProjectJSONJava())
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "No files need to be compiled."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2862,18 +2505,15 @@ public interface QubBuildTests
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.stringProperty("project", "b");
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setProject("b")
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2885,35 +2525,31 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.stringProperty("version", "a");
-                            projectJson.objectProperty("java");
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.stringProperty("version", "b");
-                        projectJson.objectProperty("java");
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setProjectJson(new ProjectJSON()
+                            .setVersion("a")
+                            .setJava(new ProjectJSONJava()))
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))))
+                        .toString());
+                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                        .setVersion("b")
+                        .setJava(new ProjectJSONJava())
+                        .toString());
 
                     clock.advance(Duration.minutes(1));
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        main(console);
+                        QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling..."),
+                            "No files need to be compiled."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -2928,18 +2564,15 @@ public interface QubBuildTests
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.stringProperty("version", "b");
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setVersion("b")
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2954,1455 +2587,1406 @@ public interface QubBuildTests
                     javaFolder.createFolder("jre1.8.0_192");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.objectProperty("java", java ->
-                            {
-                                java.stringProperty("version", "11");
-                            });
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.stringProperty("version", "1.8");
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("JAVA_HOME", jdk11Folder.toString()));
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.stringProperty("version", "1.8");
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildJsonFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("everything gets compiled when project.json java version changes from 11 to 8", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
-                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
-                    javaFolder.createFolder("jre1.8.0_192");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.objectProperty("java", java ->
-                            {
-                                java.stringProperty("version", "11");
-                            });
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.stringProperty("version", "8");
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("JAVA_HOME", jdk11Folder.toString()));
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.stringProperty("version", "8");
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildJsonFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("nothing gets compiled when project.json java version changes from 1.8 to 8", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
-                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
-                    javaFolder.createFolder("jre1.8.0_192");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.objectProperty("java", java ->
-                            {
-                                java.stringProperty("version", "1.8");
-                            });
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.stringProperty("version", "8");
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("JAVA_HOME", jdk11Folder.toString()));
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.stringProperty("version", "8");
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildJsonFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("nothing gets compiled when project.json java version changes from 8 to 1.8", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
-                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
-                    javaFolder.createFolder("jre1.8.0_192");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.objectProperty("java", java ->
-                            {
-                                java.stringProperty("version", "8");
-                            });
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.stringProperty("version", "1.8");
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("JAVA_HOME", jdk11Folder.toString()));
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.stringProperty("version", "1.8");
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildJsonFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("nothing gets compiled when project.json java dependency is added", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.objectProperty("java");
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.arrayProperty("dependencies", dependencies ->
-                            {
-                                dependencies.objectElement(dependency ->
-                                {
-                                    dependency.stringProperty("publisher", "a");
-                                    dependency.stringProperty("project", "b");
-                                    dependency.stringProperty("version", "c");
-                                });
-                            });
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
-                    {
-                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", qubFolder.toString()));
-                        qubFolder.createFile("a/b/c/b.jar").await();
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.arrayProperty("dependencies", dependencies ->
-                                    {
-                                        dependencies.objectElement(dependency ->
-                                        {
-                                            dependency.stringProperty("publisher", "a");
-                                            dependency.stringProperty("project", "b");
-                                            dependency.stringProperty("version", "c");
-                                        });
-                                    });
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildJsonFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("everything gets compiled when project.json java dependency is removed", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.objectProperty("java", java ->
-                            {
-                                java.arrayProperty("dependencies", dependencies ->
-                                {
-                                    dependencies.objectElement(dependency ->
-                                    {
-                                        dependency.stringProperty("publisher", "a");
-                                        dependency.stringProperty("project", "b");
-                                        dependency.stringProperty("version", "c");
-                                    });
-                                });
-                            });
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.objectProperty("java");
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", "/qub/"));
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildJsonFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("everything gets compiled when project.json java dependency version is changed", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
-                    {
-                        buildJson.objectProperty("project.json", projectJson ->
-                        {
-                            projectJson.objectProperty("java", java ->
-                            {
-                                java.arrayProperty("dependencies", dependencies ->
-                                {
-                                    dependencies.objectElement(dependency ->
-                                    {
-                                        dependency.stringProperty("publisher", "a");
-                                        dependency.stringProperty("project", "b");
-                                        dependency.stringProperty("version", "c");
-                                    });
-                                });
-                            });
-                        });
-                        buildJson.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.arrayProperty("dependencies", dependencies ->
-                            {
-                                dependencies.objectElement(dependency ->
-                                {
-                                    dependency.stringProperty("publisher", "a");
-                                    dependency.stringProperty("project", "b");
-                                    dependency.stringProperty("version", "d");
-                                });
-                            });
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
-                    {
-                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", qubFolder.toString()));
-                        qubFolder.createFile("a/b/d/b.jar").await();
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.arrayProperty("dependencies", dependencies ->
-                                    {
-                                        dependencies.objectElement(dependency ->
-                                        {
-                                            dependency.stringProperty("publisher", "a");
-                                            dependency.stringProperty("project", "b");
-                                            dependency.stringProperty("version", "d");
-                                        });
-                                    });
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildJsonFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with multiple source files newer than their existing class files and with build.json file", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/B.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
-                    test.assertEqual("B.java source, depends on A", getFileContents(bClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                            parse.objectProperty("sources/B.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
-                            });
-                        }).toString(),
-                        getFileContents(parseFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with deleted source file and --verbose", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: Deleted source files:",
-                            "VERBOSE: /sources/B.java",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: No source files need compilation.",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertFalse(bClassFile.exists().await());
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(buildFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with new source file and --verbose", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    setFileContents(currentFolder, "sources/B.java", "B.java source");
-
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: Added source files:",
-                            "VERBOSE: /sources/B.java",
-                            "VERBOSE: Starting compilation...",
-                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
-                            "VERBOSE: Compilation finished.",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/B.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    final File bClassFile = currentFolder.getFile("outputs/B.class").await();
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
-                    test.assertEqual("B.java source", getFileContents(bClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                            build.objectProperty("sources/B.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                        }).toString(),
-                        getFileContents(buildFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with modified source file and --verbose", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: Modified source files:",
-                            "VERBOSE: /sources/A.java",
-                            "VERBOSE: Starting compilation...",
-                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
-                            "VERBOSE: Compilation finished.",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                        }).toString(),
-                        getFileContents(buildFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with unmodified source file with issues and --verbose", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
-                        .setExitCode(1)
-                        .setIssues(Iterable.create(
-                            new JavaCompilerIssue(
-                                "sources/A.java",
-                                12, 2,
-                                Issue.Type.Error,
-                                "Are you sure?")));
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("issues", issues ->
-                            {
-                                issues.objectElement(issue ->
-                                {
-                                    issue.stringProperty("sourceFilePath", "sources/A.java");
-                                    issue.numberProperty("lineNumber", 12);
-                                    issue.numberProperty("columnNumber", 2);
-                                    issue.stringProperty("type", "Error");
-                                    issue.stringProperty("message", "Are you sure?");
-                                });
-                            });
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
-                    {
-                        main(console, compiler);
-                        test.assertEqual(1, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: Source files that previously contained issues:",
-                            "VERBOSE: /sources/A.java",
-                            "VERBOSE: Starting compilation...",
-                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
-                            "VERBOSE: Compilation finished.",
-                            "1 Error:",
-                            "sources/A.java (Line 12): Are you sure?",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(aClassFile));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 12);
-                                        issue.numberProperty("columnNumber", 2);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                        }).toString(),
-                        getFileContents(buildFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with unmodified source file with deleted dependency and --verbose", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
-                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
-                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on A");
-                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                        });
-                        parse.objectProperty("sources/B.java", bJava ->
-                        {
-                            bJava.numberProperty("lastModified", 0);
-                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
-                        });
-                    }).toString());
-
-                    clock.advance(Duration.minutes(1));
-
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: Deleted source files:",
-                            "VERBOSE: /sources/A.java",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: Source files with deleted dependencies:",
-                            "VERBOSE: /sources/B.java",
-                            "VERBOSE: Source files with modified dependencies:",
-                            "VERBOSE: /sources/B.java",
-                            "VERBOSE: Starting compilation...",
-                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
-                            "VERBOSE: Compilation finished.",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/B.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertFalse(aClassFile.exists().await());
-
-                    test.assertEqual(60000, bClassFile.getLastModified().await().getMillisecondsSinceEpoch());
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 0);
-                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
-                            });
-                        }).toString(),
-                        getFileContents(buildFile),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with partial-name dependency match and -buildjson", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File abJavaFile = setFileContents(currentFolder, "sources/AB.java", "AB.java source");
-                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source, depends on AB");
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/AB.class",
-                            "/outputs/B.class",
-                            "/outputs/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
-
-                    test.assertEqual(0, getFileLastModified(outputs, "AB.class").getMillisecondsSinceEpoch());
-                    test.assertEqual("AB.java source", getFileContents(outputs, "AB.class"));
-
-                    test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
-                    test.assertEqual("B.java source, depends on AB", getFileContents(outputs, "B.class"));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "build.json"), "Wrong build.json file lastModified");
-                    test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                            parse.objectProperty("sources/AB.java", abJava ->
-                            {
-                                abJava.numberProperty("lastModified", 0);
-                            });
-                            parse.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 0);
-                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/AB.java"));
-                            });
-                        }).toString(),
-                        getFileContents(outputs, "build.json"),
-                        "Wrong build.json file contents");
-                });
-
-                runner.test("with multiple source files and -buildjson=false", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/B.class"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "B.class"));
-                    test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
-
-                    test.assertFalse(outputs.fileExists("build.json").await());
-                });
-
-                runner.test("with existing outputs folder and -buildjson=false", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
-                    outputs.createFile("blah.txt").await();
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
-                    {
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/B.class"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
-                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
-
-                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "B.class"));
-                    test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
-
-                    test.assertFalse(outputs.fileExists("build.json").await());
-                });
-
-                runner.test("with project.json dependency with publisher that doesn't exist", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.stringProperty("project", "fake-project");
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.arrayProperty("dependencies", dependencies ->
-                            {
-                                dependencies.objectElement(dependency ->
-                                {
-                                    dependency.stringProperty("publisher", "fake-qub");
-                                    dependency.stringProperty("project", "qub-java");
-                                    dependency.stringProperty("version", "1");
-                                });
-                            });
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", "/qub_home/"));
-                        main(console);
-                        test.assertEqual(1, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "ERROR: No publisher folder named \"fake-qub\" found in the Qub folder (/qub_home/)."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    test.assertFalse(currentFolder.folderExists("outputs").await());
-                });
-
-                runner.test("with project.json dependency with project that doesn't exist", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
-                    {
-                        projectJson.stringProperty("project", "fake-project");
-                        projectJson.objectProperty("java", java ->
-                        {
-                            java.arrayProperty("dependencies", dependencies ->
-                            {
-                                dependencies.objectElement(dependency ->
-                                {
-                                    dependency.stringProperty("publisher", "qub");
-                                    dependency.stringProperty("project", "fake-qub-java");
-                                    dependency.stringProperty("version", "1");
-                                });
-                            });
-                        });
-                    }).toString());
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-
-                    final Folder qubFolder = currentFolder.getFileSystem().createFolder("/qub_home/").await();
-                    qubFolder.createFolder("qub").await();
-
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", qubFolder.toString()));
-                        main(console);
-                        test.assertEqual(1, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub)."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    test.assertFalse(currentFolder.folderExists("outputs").await());
-                });
-
-                runner.test("with show total duration set to false", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", JSON.object(projectJson -> projectJson.objectProperty("java")).toString());
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
-
-                    try (final Console console = createConsole(output, currentFolder))
-                    {
-                        main(console, false);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling..."),
-                        Strings.getLines(output.getText().await()));
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "/outputs/A.class",
-                            "/outputs/build.json"),
-                        currentFolder.getFolder("outputs").await()
-                            .getFilesAndFoldersRecursively().await()
-                            .map(FileSystemEntry::toString));
-                });
-
-                runner.test("with transitive dependency", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final ProjectJSON aProjectJSON = new ProjectJSON()
-                        .setProject("a")
-                        .setPublisher("me")
-                        .setVersion("1")
-                        .setJava(new ProjectJSONJava());
-                    final ProjectJSON bProjectJSON = new ProjectJSON()
-                        .setProject("b")
-                        .setPublisher("me")
-                        .setVersion("2")
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setProjectJson(new ProjectJSON()
+                            .setJava(new ProjectJSONJava()
+                                .setVersion("11")))
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.utc(0))))
+                        .toString());
+                    setFileContents(currentFolder, "project.json", new ProjectJSON()
                         .setJava(new ProjectJSONJava()
-                            .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setProject("a")
-                                    .setPublisher("me")
-                                    .setVersion("1"))));
-                    final ProjectJSON cProjectJson = new ProjectJSON()
-                        .setProject("c")
-                        .setPublisher("me")
-                        .setVersion("3")
-                        .setJava(new ProjectJSONJava()
-                            .setDependencies(Iterable.create(
-                                new Dependency()
-                                .setProject("b")
-                                .setPublisher("me")
-                                .setVersion("2"))));
-                    currentFolder.getFile("project.json").await()
-                        .setContentsAsString(JSON.object(cProjectJson::write).toString());
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                            .setVersion("1.8"))
+                        .toString());
 
-                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", "/qub/"));
-                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
-                        publisherFolder.create().await();
-                        publisherFolder.setFileContentsAsString("b/2/project.json", JSON.object(bProjectJSON::write).toString()).await();
-                        publisherFolder.createFile("b/2/b.jar").await();
-                        publisherFolder.setFileContentsAsString("a/1/project.json", JSON.object(aProjectJSON::write).toString()).await();
-                        publisherFolder.createFile("a/1/a.jar").await();
-
-                        main(console, false);
-                        test.assertEqual(0, console.getExitCode());
+                        console
+                            .setEnvironmentVariables(new EnvironmentVariables()
+                                .set("JAVA_HOME", jdk11Folder.toString())
+                                .set("QUB_HOME", "/qub/"))
+                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                                .add(new FakeProcessRun("javac")
+                                    .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-source", "8", "-target", "8", "-bootclasspath", "/java/jre1.8.0_192/lib/rt.jar", "-classpath", "/outputs", "sources/A.java")
+                                    .setFunction(() ->
+                                    {
+                                        aClassFile.setContentsAsString("A.java bytecode").await();
+                                    })));
+                        QubBuild.main(console);
+                         test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: Compiling all source files.",
-                            "VERBOSE: Starting compilation...",
-                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar sources/A.java...",
-                            "VERBOSE: Compilation finished.",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()));
+                            "Compiling 1 file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
                             "/outputs/build.json"),
-                        currentFolder.getFolder("outputs").await()
-                            .getFilesAndFoldersRecursively().await()
-                            .map(FileSystemEntry::toString));
-                });
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                runner.test("with multiple versions of same project dependency", (Test test) ->
-                {
-                    final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final ProjectJSON a1ProjectJSON = new ProjectJSON()
-                        .setProject("a")
-                        .setPublisher("me")
-                        .setVersion("1")
-                        .setJava(new ProjectJSONJava());
-                    final ProjectJSON a2ProjectJSON = new ProjectJSON()
-                        .setProject("a")
-                        .setPublisher("me")
-                        .setVersion("2")
-                        .setJava(new ProjectJSONJava());
-                    final ProjectJSON bProjectJSON = new ProjectJSON()
-                        .setProject("b")
-                        .setPublisher("me")
-                        .setVersion("2")
-                        .setJava(new ProjectJSONJava()
-                            .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setProject("a")
-                                    .setPublisher("me")
-                                    .setVersion("2"))));
-                    final ProjectJSON cProjectJson = new ProjectJSON()
-                        .setProject("c")
-                        .setPublisher("me")
-                        .setVersion("3")
-                        .setJava(new ProjectJSONJava()
-                            .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setProject("a")
-                                    .setPublisher("me")
-                                    .setVersion("1"),
-                                new Dependency()
-                                    .setProject("b")
-                                    .setPublisher("me")
-                                    .setVersion("2"))));
-                    currentFolder.getFile("project.json").await()
-                        .setContentsAsString(JSON.object(cProjectJson::write).toString());
-                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
-                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
-                    {
-                        console.setEnvironmentVariables(Map.<String,String>create()
-                            .set("QUB_HOME", "/qub/"));
-                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
-                        publisherFolder.create().await();
-                        publisherFolder.setFileContentsAsString("b/2/project.json", JSON.object(bProjectJSON::write).toString()).await();
-                        publisherFolder.createFile("b/2/b.jar").await();
-                        publisherFolder.setFileContentsAsString("a/1/project.json", JSON.object(a1ProjectJSON::write).toString()).await();
-                        publisherFolder.createFile("a/1/a.jar").await();
-                        publisherFolder.setFileContentsAsString("a/2/project.json", JSON.object(a2ProjectJSON::write).toString()).await();
-                        publisherFolder.createFile("a/2/a.jar").await();
-
-                        main(console, false);
-                        test.assertEqual(1, console.getExitCode());
-                    }
-
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "VERBOSE: Parsing project.json...",
-                            "ERROR: Found more than one required version for package me/a:",
-                            "1. me/a@1",
-                            "2. me/a@2",
-                            "     from me/b@2",
-                            ""),
-                        Strings.getLines(output.getText().await()));
-
-                    test.assertFalse(currentFolder.folderExists("outputs").await());
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()
+                                    .setVersion("1.8")))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
                 });
-            });
 
-            runner.testGroup("main(String[])", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    test.assertThrows(() -> QubBuild.main((String[])null), new PreConditionFailure("args cannot be null."));
-                });
+//                runner.test("everything gets compiled when project.json java version changes from 11 to 8", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
+//                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
+//                    javaFolder.createFolder("jre1.8.0_192");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
+//                    {
+//                        buildJson.objectProperty("project.json", projectJson ->
+//                        {
+//                            projectJson.objectProperty("java", java ->
+//                            {
+//                                java.stringProperty("version", "11");
+//                            });
+//                        });
+//                        buildJson.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.objectProperty("java", java ->
+//                        {
+//                            java.stringProperty("version", "8");
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("JAVA_HOME", jdk11Folder.toString()));
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "Compiling 1 file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java", java ->
+//                                {
+//                                    java.stringProperty("version", "8");
+//                                });
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildJsonFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("nothing gets compiled when project.json java version changes from 1.8 to 8", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
+//                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
+//                    javaFolder.createFolder("jre1.8.0_192");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
+//                    {
+//                        buildJson.objectProperty("project.json", projectJson ->
+//                        {
+//                            projectJson.objectProperty("java", java ->
+//                            {
+//                                java.stringProperty("version", "1.8");
+//                            });
+//                        });
+//                        buildJson.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.objectProperty("java", java ->
+//                        {
+//                            java.stringProperty("version", "8");
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("JAVA_HOME", jdk11Folder.toString()));
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "No files need to be compiled."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java", java ->
+//                                {
+//                                    java.stringProperty("version", "8");
+//                                });
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildJsonFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("nothing gets compiled when project.json java version changes from 8 to 1.8", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
+//                    final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
+//                    javaFolder.createFolder("jre1.8.0_192");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
+//                    {
+//                        buildJson.objectProperty("project.json", projectJson ->
+//                        {
+//                            projectJson.objectProperty("java", java ->
+//                            {
+//                                java.stringProperty("version", "8");
+//                            });
+//                        });
+//                        buildJson.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.objectProperty("java", java ->
+//                        {
+//                            java.stringProperty("version", "1.8");
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("JAVA_HOME", jdk11Folder.toString()));
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "No files need to be compiled."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java", java ->
+//                                {
+//                                    java.stringProperty("version", "1.8");
+//                                });
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildJsonFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("nothing gets compiled when project.json java dependency is added", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
+//                    {
+//                        buildJson.objectProperty("project.json", projectJson ->
+//                        {
+//                            projectJson.objectProperty("java");
+//                        });
+//                        buildJson.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.objectProperty("java", java ->
+//                        {
+//                            java.arrayProperty("dependencies", dependencies ->
+//                            {
+//                                dependencies.objectElement(dependency ->
+//                                {
+//                                    dependency.stringProperty("publisher", "a");
+//                                    dependency.stringProperty("project", "b");
+//                                    dependency.stringProperty("version", "c");
+//                                });
+//                            });
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
+//                    {
+//                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("QUB_HOME", qubFolder.toString()));
+//                        qubFolder.createFile("a/b/c/b.jar").await();
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "No files need to be compiled."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java", java ->
+//                                {
+//                                    java.arrayProperty("dependencies", dependencies ->
+//                                    {
+//                                        dependencies.objectElement(dependency ->
+//                                        {
+//                                            dependency.stringProperty("publisher", "a");
+//                                            dependency.stringProperty("project", "b");
+//                                            dependency.stringProperty("version", "c");
+//                                        });
+//                                    });
+//                                });
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildJsonFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("everything gets compiled when project.json java dependency is removed", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
+//                    {
+//                        buildJson.objectProperty("project.json", projectJson ->
+//                        {
+//                            projectJson.objectProperty("java", java ->
+//                            {
+//                                java.arrayProperty("dependencies", dependencies ->
+//                                {
+//                                    dependencies.objectElement(dependency ->
+//                                    {
+//                                        dependency.stringProperty("publisher", "a");
+//                                        dependency.stringProperty("project", "b");
+//                                        dependency.stringProperty("version", "c");
+//                                    });
+//                                });
+//                            });
+//                        });
+//                        buildJson.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.objectProperty("java");
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("QUB_HOME", "/qub/"));
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "Compiling 1 file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildJsonFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("everything gets compiled when project.json java dependency version is changed", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(buildJson ->
+//                    {
+//                        buildJson.objectProperty("project.json", projectJson ->
+//                        {
+//                            projectJson.objectProperty("java", java ->
+//                            {
+//                                java.arrayProperty("dependencies", dependencies ->
+//                                {
+//                                    dependencies.objectElement(dependency ->
+//                                    {
+//                                        dependency.stringProperty("publisher", "a");
+//                                        dependency.stringProperty("project", "b");
+//                                        dependency.stringProperty("version", "c");
+//                                    });
+//                                });
+//                            });
+//                        });
+//                        buildJson.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.objectProperty("java", java ->
+//                        {
+//                            java.arrayProperty("dependencies", dependencies ->
+//                            {
+//                                dependencies.objectElement(dependency ->
+//                                {
+//                                    dependency.stringProperty("publisher", "a");
+//                                    dependency.stringProperty("project", "b");
+//                                    dependency.stringProperty("version", "d");
+//                                });
+//                            });
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
+//                    {
+//                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("QUB_HOME", qubFolder.toString()));
+//                        qubFolder.createFile("a/b/d/b.jar").await();
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "Compiling 1 file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java", java ->
+//                                {
+//                                    java.arrayProperty("dependencies", dependencies ->
+//                                    {
+//                                        dependencies.objectElement(dependency ->
+//                                        {
+//                                            dependency.stringProperty("publisher", "a");
+//                                            dependency.stringProperty("project", "b");
+//                                            dependency.stringProperty("version", "d");
+//                                        });
+//                                    });
+//                                });
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildJsonFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with multiple source files newer than their existing class files and with build.json file", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
+//                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+//                    {
+//                        parse.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                            aJava.arrayProperty("dependencies");
+//                        });
+//                        parse.objectProperty("sources/B.java", bJava ->
+//                        {
+//                            bJava.numberProperty("lastModified", 0);
+//                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "Compiling 2 files..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/B.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
+//                    test.assertEqual("B.java source, depends on A", getFileContents(bClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 60000);
+//                            });
+//                            parse.objectProperty("sources/B.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 60000);
+//                                aJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+//                            });
+//                        }).toString(),
+//                        getFileContents(parseFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with deleted source file and --verbose", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
+//                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+//                    {
+//                        parse.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                        parse.objectProperty("sources/B.java", bJava ->
+//                        {
+//                            bJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "VERBOSE: Parsing project.json...",
+//                            "VERBOSE: Parsing outputs/build.json...",
+//                            "VERBOSE: Deleted source files:",
+//                            "VERBOSE: /sources/B.java",
+//                            "VERBOSE: Updating outputs/build.json...",
+//                            "VERBOSE: Setting project.json...",
+//                            "VERBOSE: Setting source files...",
+//                            "VERBOSE: Detecting java source files to compile...",
+//                            "No files need to be compiled.",
+//                            "VERBOSE: Writing build.json file...",
+//                            "VERBOSE: Done writing build.json file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertFalse(bClassFile.exists().await());
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(build ->
+//                        {
+//                            build.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            build.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with new source file and --verbose", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+//                    {
+//                        parse.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                            aJava.arrayProperty("dependencies");
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    setFileContents(currentFolder, "sources/B.java", "B.java source");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "VERBOSE: Parsing project.json...",
+//                            "VERBOSE: Parsing outputs/build.json...",
+//                            "VERBOSE: Updating outputs/build.json...",
+//                            "VERBOSE: Setting project.json...",
+//                            "VERBOSE: Setting source files...",
+//                            "VERBOSE: Detecting java source files to compile...",
+//                            "VERBOSE: Added source files:",
+//                            "VERBOSE: /sources/B.java",
+//                            "Compiling 1 file...",
+//                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+//                            "VERBOSE: Compilation finished.",
+//                            "VERBOSE: Writing build.json file...",
+//                            "VERBOSE: Done writing build.json file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/B.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    final File bClassFile = currentFolder.getFile("outputs/B.class").await();
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
+//                    test.assertEqual("B.java source", getFileContents(bClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(build ->
+//                        {
+//                            build.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            build.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                            build.objectProperty("sources/B.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 60000);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with modified source file and --verbose", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+//                    {
+//                        parse.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "VERBOSE: Parsing project.json...",
+//                            "VERBOSE: Parsing outputs/build.json...",
+//                            "VERBOSE: Updating outputs/build.json...",
+//                            "VERBOSE: Setting project.json...",
+//                            "VERBOSE: Setting source files...",
+//                            "VERBOSE: Detecting java source files to compile...",
+//                            "VERBOSE: Modified source files:",
+//                            "VERBOSE: /sources/A.java",
+//                            "Compiling 1 file...",
+//                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+//                            "VERBOSE: Compilation finished.",
+//                            "VERBOSE: Writing build.json file...",
+//                            "VERBOSE: Done writing build.json file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(build ->
+//                        {
+//                            build.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            build.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 60000);
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with unmodified source file with issues and --verbose", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final FakeJavaCompiler compiler = new FakeJavaCompiler()
+//                        .setExitCode(1)
+//                        .setIssues(Iterable.create(
+//                            new JavaCompilerIssue(
+//                                "sources/A.java",
+//                                12, 2,
+//                                Issue.Type.Error,
+//                                "Are you sure?")));
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+//                    {
+//                        parse.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                            aJava.arrayProperty("issues", issues ->
+//                            {
+//                                issues.objectElement(issue ->
+//                                {
+//                                    issue.stringProperty("sourceFilePath", "sources/A.java");
+//                                    issue.numberProperty("lineNumber", 12);
+//                                    issue.numberProperty("columnNumber", 2);
+//                                    issue.stringProperty("type", "Error");
+//                                    issue.stringProperty("message", "Are you sure?");
+//                                });
+//                            });
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+//                    {
+//                        QubBuild.main(console, compiler);
+//                        test.assertEqual(1, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "VERBOSE: Parsing project.json...",
+//                            "VERBOSE: Parsing outputs/build.json...",
+//                            "VERBOSE: Updating outputs/build.json...",
+//                            "VERBOSE: Setting project.json...",
+//                            "VERBOSE: Setting source files...",
+//                            "VERBOSE: Detecting java source files to compile...",
+//                            "VERBOSE: Source files that previously contained issues:",
+//                            "VERBOSE: /sources/A.java",
+//                            "Compiling 1 file...",
+//                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+//                            "VERBOSE: Compilation finished.",
+//                            "1 Error:",
+//                            "sources/A.java (Line 12): Are you sure?",
+//                            "VERBOSE: Writing build.json file...",
+//                            "VERBOSE: Done writing build.json file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(aClassFile));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(build ->
+//                        {
+//                            build.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            build.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                                aJava.arrayProperty("issues", issues ->
+//                                {
+//                                    issues.objectElement(issue ->
+//                                    {
+//                                        issue.stringProperty("sourceFilePath", "sources/A.java");
+//                                        issue.numberProperty("lineNumber", 12);
+//                                        issue.numberProperty("columnNumber", 2);
+//                                        issue.stringProperty("type", "Error");
+//                                        issue.stringProperty("message", "Are you sure?");
+//                                    });
+//                                });
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with unmodified source file with deleted dependency and --verbose", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+//                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+//                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on A");
+//                    final File buildFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
+//                    {
+//                        parse.objectProperty("sources/A.java", aJava ->
+//                        {
+//                            aJava.numberProperty("lastModified", 0);
+//                        });
+//                        parse.objectProperty("sources/B.java", bJava ->
+//                        {
+//                            bJava.numberProperty("lastModified", 0);
+//                            bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+//                        });
+//                    }).toString());
+//
+//                    clock.advance(Duration.minutes(1));
+//
+//                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "VERBOSE: Parsing project.json...",
+//                            "VERBOSE: Parsing outputs/build.json...",
+//                            "VERBOSE: Deleted source files:",
+//                            "VERBOSE: /sources/A.java",
+//                            "VERBOSE: Updating outputs/build.json...",
+//                            "VERBOSE: Setting project.json...",
+//                            "VERBOSE: Setting source files...",
+//                            "VERBOSE: Detecting java source files to compile...",
+//                            "VERBOSE: Source files with deleted dependencies:",
+//                            "VERBOSE: /sources/B.java",
+//                            "VERBOSE: Source files with modified dependencies:",
+//                            "VERBOSE: /sources/B.java",
+//                            "Compiling 1 file...",
+//                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+//                            "VERBOSE: Compilation finished.",
+//                            "VERBOSE: Writing build.json file...",
+//                            "VERBOSE: Done writing build.json file..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/B.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertFalse(aClassFile.exists().await());
+//
+//                    test.assertEqual(60000, bClassFile.getLastModified().await().getMillisecondsSinceEpoch());
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(build ->
+//                        {
+//                            build.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            build.objectProperty("sources/B.java", bJava ->
+//                            {
+//                                bJava.numberProperty("lastModified", 0);
+//                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/A.java"));
+//                            });
+//                        }).toString(),
+//                        getFileContents(buildFile),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with partial-name dependency match and -buildjson", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    final File abJavaFile = setFileContents(currentFolder, "sources/AB.java", "AB.java source");
+//                    final File bJavaFile = setFileContents(currentFolder, "sources/B.java", "B.java source, depends on AB");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "Compiling 3 files..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/AB.class",
+//                            "/outputs/B.class",
+//                            "/outputs/build.json"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+//                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+//
+//                    test.assertEqual(0, getFileLastModified(outputs, "AB.class").getMillisecondsSinceEpoch());
+//                    test.assertEqual("AB.java source", getFileContents(outputs, "AB.class"));
+//
+//                    test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
+//                    test.assertEqual("B.java source, depends on AB", getFileContents(outputs, "B.class"));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "build.json"), "Wrong build.json file lastModified");
+//                    test.assertEqual(
+//                        JSON.object(parse ->
+//                        {
+//                            parse.objectProperty("project.json", projectJson ->
+//                            {
+//                                projectJson.objectProperty("java");
+//                            });
+//                            parse.objectProperty("sources/A.java", aJava ->
+//                            {
+//                                aJava.numberProperty("lastModified", 0);
+//                            });
+//                            parse.objectProperty("sources/AB.java", abJava ->
+//                            {
+//                                abJava.numberProperty("lastModified", 0);
+//                            });
+//                            parse.objectProperty("sources/B.java", bJava ->
+//                            {
+//                                bJava.numberProperty("lastModified", 0);
+//                                bJava.stringArrayProperty("dependencies", Iterable.create("sources/AB.java"));
+//                            });
+//                        }).toString(),
+//                        getFileContents(outputs, "build.json"),
+//                        "Wrong build.json file contents");
+//                });
+//
+//                runner.test("with multiple source files and -buildjson=false", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "Compiling 2 files..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/B.class"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
+//                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "B.class"));
+//                    test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
+//
+//                    test.assertFalse(outputs.fileExists("build.json").await());
+//                });
+//
+//                runner.test("with existing outputs folder and -buildjson=false", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//                    setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+//
+//                    final Folder outputs = currentFolder.getFolder("outputs").await();
+//                    outputs.createFile("blah.txt").await();
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+//                    {
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "Compiling 2 files..."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/B.class"),
+//                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "A.class"));
+//                    test.assertEqual("A.java source", getFileContents(outputs, "A.class"));
+//
+//                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "B.class"));
+//                    test.assertEqual("B.java source, depends on A", getFileContents(outputs, "B.class"));
+//
+//                    test.assertFalse(outputs.fileExists("build.json").await());
+//                });
+//
+//                runner.test("with project.json dependency with publisher that doesn't exist", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.stringProperty("project", "fake-project");
+//                        projectJson.objectProperty("java", java ->
+//                        {
+//                            java.arrayProperty("dependencies", dependencies ->
+//                            {
+//                                dependencies.objectElement(dependency ->
+//                                {
+//                                    dependency.stringProperty("publisher", "fake-qub");
+//                                    dependency.stringProperty("project", "qub-java");
+//                                    dependency.stringProperty("version", "1");
+//                                });
+//                            });
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("QUB_HOME", "/qub_home/"));
+//                        QubBuild.main(console);
+//                        test.assertEqual(1, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "ERROR: No publisher folder named \"fake-qub\" found in the Qub folder (/qub_home/)."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    test.assertFalse(currentFolder.folderExists("outputs").await());
+//                });
+//
+//                runner.test("with project.json dependency with project that doesn't exist", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    setFileContents(currentFolder, "project.json", JSON.object(projectJson ->
+//                    {
+//                        projectJson.stringProperty("project", "fake-project");
+//                        projectJson.objectProperty("java", java ->
+//                        {
+//                            java.arrayProperty("dependencies", dependencies ->
+//                            {
+//                                dependencies.objectElement(dependency ->
+//                                {
+//                                    dependency.stringProperty("publisher", "qub");
+//                                    dependency.stringProperty("project", "fake-qub-java");
+//                                    dependency.stringProperty("version", "1");
+//                                });
+//                            });
+//                        });
+//                    }).toString());
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//
+//                    final Folder qubFolder = currentFolder.getFileSystem().createFolder("/qub_home/").await();
+//                    qubFolder.createFolder("qub").await();
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("QUB_HOME", qubFolder.toString()));
+//                        QubBuild.main(console);
+//                        test.assertEqual(1, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub)."),
+//                        Strings.getLines(output.getText().await()).skipLast());
+//
+//                    test.assertFalse(currentFolder.folderExists("outputs").await());
+//                });
+//
+//                runner.test("with transitive dependency", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    final ProjectJSON aProjectJSON = new ProjectJSON()
+//                        .setProject("a")
+//                        .setPublisher("me")
+//                        .setVersion("1")
+//                        .setJava(new ProjectJSONJava());
+//                    final ProjectJSON bProjectJSON = new ProjectJSON()
+//                        .setProject("b")
+//                        .setPublisher("me")
+//                        .setVersion("2")
+//                        .setJava(new ProjectJSONJava()
+//                            .setDependencies(Iterable.create(
+//                                new Dependency()
+//                                    .setProject("a")
+//                                    .setPublisher("me")
+//                                    .setVersion("1"))));
+//                    final ProjectJSON cProjectJson = new ProjectJSON()
+//                        .setProject("c")
+//                        .setPublisher("me")
+//                        .setVersion("3")
+//                        .setJava(new ProjectJSONJava()
+//                            .setDependencies(Iterable.create(
+//                                new Dependency()
+//                                .setProject("b")
+//                                .setPublisher("me")
+//                                .setVersion("2"))));
+//                    currentFolder.getFile("project.json").await()
+//                        .setContentsAsString(JSON.object(cProjectJson::write).toString());
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("QUB_HOME", "/qub/"));
+//                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
+//                        publisherFolder.create().await();
+//                        publisherFolder.setFileContentsAsString("b/2/project.json", JSON.object(bProjectJSON::write).toString()).await();
+//                        publisherFolder.createFile("b/2/b.jar").await();
+//                        publisherFolder.setFileContentsAsString("a/1/project.json", JSON.object(aProjectJSON::write).toString()).await();
+//                        publisherFolder.createFile("a/1/a.jar").await();
+//
+//                        QubBuild.main(console);
+//                        test.assertEqual(0, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "VERBOSE: Parsing project.json...",
+//                            "VERBOSE: Updating outputs/build.json...",
+//                            "VERBOSE: Setting project.json...",
+//                            "VERBOSE: Setting source files...",
+//                            "VERBOSE: Detecting java source files to compile...",
+//                            "VERBOSE: Compiling all source files.",
+//                            "Compiling 1 file...",
+//                            "VERBOSE: Running javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar sources/A.java...",
+//                            "VERBOSE: Compilation finished.",
+//                            "VERBOSE: Writing build.json file...",
+//                            "VERBOSE: Done writing build.json file..."),
+//                        Strings.getLines(output.getText().await()));
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "/outputs/A.class",
+//                            "/outputs/build.json"),
+//                        currentFolder.getFolder("outputs").await()
+//                            .getFilesAndFoldersRecursively().await()
+//                            .map(FileSystemEntry::toString));
+//                });
+//
+//                runner.test("with multiple versions of same project dependency", (Test test) ->
+//                {
+//                    final ManualClock clock = getManualClock(test);
+//                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+//                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+//                    final ProjectJSON a1ProjectJSON = new ProjectJSON()
+//                        .setProject("a")
+//                        .setPublisher("me")
+//                        .setVersion("1")
+//                        .setJava(new ProjectJSONJava());
+//                    final ProjectJSON a2ProjectJSON = new ProjectJSON()
+//                        .setProject("a")
+//                        .setPublisher("me")
+//                        .setVersion("2")
+//                        .setJava(new ProjectJSONJava());
+//                    final ProjectJSON bProjectJSON = new ProjectJSON()
+//                        .setProject("b")
+//                        .setPublisher("me")
+//                        .setVersion("2")
+//                        .setJava(new ProjectJSONJava()
+//                            .setDependencies(Iterable.create(
+//                                new Dependency()
+//                                    .setProject("a")
+//                                    .setPublisher("me")
+//                                    .setVersion("2"))));
+//                    final ProjectJSON cProjectJson = new ProjectJSON()
+//                        .setProject("c")
+//                        .setPublisher("me")
+//                        .setVersion("3")
+//                        .setJava(new ProjectJSONJava()
+//                            .setDependencies(Iterable.create(
+//                                new Dependency()
+//                                    .setProject("a")
+//                                    .setPublisher("me")
+//                                    .setVersion("1"),
+//                                new Dependency()
+//                                    .setProject("b")
+//                                    .setPublisher("me")
+//                                    .setVersion("2"))));
+//                    currentFolder.getFile("project.json").await()
+//                        .setContentsAsString(JSON.object(cProjectJson::write).toString());
+//                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+//
+//                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
+//                    {
+//                        console.setEnvironmentVariables(new EnvironmentVariables()
+//                            .set("QUB_HOME", "/qub/"));
+//                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
+//                        publisherFolder.create().await();
+//                        publisherFolder.setFileContentsAsString("b/2/project.json", JSON.object(bProjectJSON::write).toString()).await();
+//                        publisherFolder.createFile("b/2/b.jar").await();
+//                        publisherFolder.setFileContentsAsString("a/1/project.json", JSON.object(a1ProjectJSON::write).toString()).await();
+//                        publisherFolder.createFile("a/1/a.jar").await();
+//                        publisherFolder.setFileContentsAsString("a/2/project.json", JSON.object(a2ProjectJSON::write).toString()).await();
+//                        publisherFolder.createFile("a/2/a.jar").await();
+//
+//                        QubBuild.main(console);
+//                        test.assertEqual(1, console.getExitCode());
+//                    }
+//
+//                    test.assertEqual(
+//                        Iterable.create(
+//                            "VERBOSE: Parsing project.json...",
+//                            "ERROR: Found more than one required version for package me/a:",
+//                            "1. me/a@1",
+//                            "2. me/a@2",
+//                            "     from me/b@2",
+//                            ""),
+//                        Strings.getLines(output.getText().await()));
+//
+//                    test.assertFalse(currentFolder.folderExists("outputs").await());
+//                });
             });
         });
     }
@@ -4525,38 +4109,5 @@ public interface QubBuildTests
         result.setLineSeparator("\n");
 
         return result;
-    }
-
-    static void main(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        main(console, true);
-    }
-
-    static void main(Console console, boolean showTotalDuration)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        main(console, new FakeJavaCompiler(), showTotalDuration);
-    }
-
-    static void main(Console console, JavaCompiler compiler)
-    {
-        PreCondition.assertNotNull(console, "console");
-        PreCondition.assertNotNull(compiler, "compiler");
-
-        main(console, compiler, true);
-    }
-
-    static void main(Console console, JavaCompiler compiler, boolean showTotalDuration)
-    {
-        PreCondition.assertNotNull(console, "console");
-        PreCondition.assertNotNull(compiler, "compiler");
-
-        final QubBuild qubBuild = new QubBuild();
-        qubBuild.setJavaCompiler(compiler);
-        qubBuild.setShowTotalDuration(showTotalDuration);
-        qubBuild.main(console);
     }
 }

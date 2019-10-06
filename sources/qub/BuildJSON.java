@@ -63,6 +63,29 @@ public class BuildJSON
                     Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + ".")));
     }
 
+    public JSONObject toJson()
+    {
+        return JSON.object((JSONObjectBuilder buildJsonBuilder) ->
+        {
+            final ProjectJSON projectJson = getProjectJson();
+            if (projectJson != null)
+            {
+                buildJsonBuilder.objectProperty("project.json", projectJson::write);
+            }
+
+            for (final BuildJSONSourceFile buildJSONSourceFile : getSourceFiles())
+            {
+                buildJSONSourceFile.writeJson(buildJsonBuilder);
+            }
+        });
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.toJson().toString();
+    }
+
     /**
      * Write this BuildJSON object to the provided file.
      * @param file The file to write this BuildJSON object to.
@@ -76,19 +99,7 @@ public class BuildJSON
         {
             try (final CharacterWriteStream writeStream = new BufferedByteWriteStream(file.getContentByteWriteStream().await()).asCharacterWriteStream())
             {
-                JSON.object(writeStream, (JSONObjectBuilder buildJsonBuilder) ->
-                {
-                    final ProjectJSON projectJson = getProjectJson();
-                    if (projectJson != null)
-                    {
-                        buildJsonBuilder.objectProperty("project.json", projectJson::write);
-                    }
-
-                    for (final BuildJSONSourceFile buildJSONSourceFile : getSourceFiles())
-                    {
-                        buildJSONSourceFile.writeJson(buildJsonBuilder);
-                    }
-                });
+                writeStream.write(this.toString()).await();
             }
         });
     }

@@ -5,17 +5,26 @@ package qub;
  */
 public class JavacJavaCompiler extends JavaCompiler
 {
+    private final ProcessFactory processFactory;
+
+    public JavacJavaCompiler(ProcessFactory processFactory)
+    {
+        PreCondition.assertNotNull(processFactory, "processFactory");
+
+        this.processFactory = processFactory;
+    }
+
     @Override
-    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Process process)
+    public Result<JavaCompilationResult> compile(Iterable<File> sourceFiles, Folder rootFolder, Folder outputFolder, Warnings warnings)
     {
         PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
         PreCondition.assertNotNull(rootFolder, "rootFolder");
         PreCondition.assertNotNull(outputFolder, "outputFolder");
-        PreCondition.assertNotNull(process, "process");
+        PreCondition.assertNotNull(warnings, "warnings");
 
         return Result.create(() ->
         {
-            final ProcessBuilder javac = process.getProcessBuilder("javac").await();
+            final ProcessBuilder javac = this.processFactory.getProcessBuilder("javac").await();
             javac.setWorkingFolder(rootFolder);
 
             final InMemoryByteStream stdout = new InMemoryByteStream();
@@ -47,31 +56,34 @@ public class JavacJavaCompiler extends JavaCompiler
                         if (secondColon >= 0)
                         {
                             final String lineNumberString = errorLine.substring(firstColon + 1, secondColon);
-                            Integers.parse(lineNumberString)
-                                .then((Integer lineNumber) ->
+                            final Integer lineNumber = Integers.parse(lineNumberString)
+                                .catchError(NumberFormatException.class)
+                                .await();
+                            if (lineNumber != null)
+                            {
+                                final int thirdColon = errorLine.indexOf(':', secondColon + 1);
+                                final String issueTypeString = errorLine.substring(secondColon + 1, thirdColon).trim();
+                                final Issue.Type issueType = (warnings == Warnings.Error || issueTypeString.equalsIgnoreCase(Issue.Type.Error.toString()))
+                                    ? Issue.Type.Error
+                                    : Issue.Type.Warning;
+                                final String message = errorLine.substring(thirdColon + 1).trim();
+
+                                if (errorLines.hasCurrent())
                                 {
-                                    final int thirdColon = errorLine.indexOf(':', secondColon + 1);
-                                    final String issueTypeString = errorLine.substring(secondColon + 1, thirdColon).trim();
-                                    final Issue.Type issueType = issueTypeString.equalsIgnoreCase(Issue.Type.Error.toString()) ? Issue.Type.Error : Issue.Type.Warning;
-                                    final String message = errorLine.substring(thirdColon + 1).trim();
+                                    // Take source code line.
+                                    errorLines.takeCurrent();
 
                                     if (errorLines.hasCurrent())
                                     {
-                                        final String codeLine = errorLines.takeCurrent();
-                                        if (errorLines.hasCurrent())
-                                        {
-                                            final String caretLine = errorLines.takeCurrent();
-                                            final int caretIndex = caretLine.indexOf('^');
-                                            final int columnNumber = caretIndex + 1;
+                                        final String caretLine = errorLines.takeCurrent();
+                                        final int caretIndex = caretLine.indexOf('^');
+                                        final int columnNumber = caretIndex + 1;
 
-                                            final String normalizedSourceFilePath = Path.parse(sourceFilePath).normalize().toString();
-                                            issues.add(new JavaCompilerIssue(normalizedSourceFilePath, lineNumber, columnNumber, issueType, message));
-                                        }
+                                        final String normalizedSourceFilePath = Path.parse(sourceFilePath).normalize().toString();
+                                        issues.add(new JavaCompilerIssue(normalizedSourceFilePath, lineNumber, columnNumber, issueType, message));
                                     }
-                                })
-                                .catchError(NumberFormatException.class, () ->
-                                {
-                                });
+                                }
+                            }
                         }
                     }
                 }

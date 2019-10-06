@@ -8,7 +8,12 @@ public class BuildJSONSourceFile
     private Path relativePath;
     private DateTime lastModified;
     private Iterable<Path> dependencies;
-    private List<JavaCompilerIssue> issues = List.create();
+    private List<JavaCompilerIssue> issues;
+
+    public BuildJSONSourceFile()
+    {
+        this.issues = List.create();
+    }
 
     /**
      * Get the path to the source file from the project root folder.
@@ -19,12 +24,21 @@ public class BuildJSONSourceFile
         return relativePath;
     }
 
+    public BuildJSONSourceFile setRelativePath(String relativePath)
+    {
+        PreCondition.assertNotNullAndNotEmpty(relativePath, "relativePath");
+
+        return this.setRelativePath(Path.parse(relativePath));
+    }
+
     /**
      * Set the path to the source file from the project root folder.
      * @param relativePath The path to the source file from the project root folder.
      */
     public BuildJSONSourceFile setRelativePath(Path relativePath)
     {
+        PreCondition.assertNotNull(relativePath, "relativePath");
+
         this.relativePath = relativePath;
         return this;
     }
@@ -87,6 +101,15 @@ public class BuildJSONSourceFile
         PreCondition.assertNotNull(issue, "issue");
 
         this.issues.add(issue);
+        return this;
+    }
+
+    public BuildJSONSourceFile setIssues(Iterable<JavaCompilerIssue> issues)
+    {
+        PreCondition.assertNotNull(issues, "issues");
+
+        this.issues = List.create(issues);
+
         return this;
     }
 
