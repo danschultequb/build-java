@@ -26,7 +26,7 @@ public class QubBuildParameters
         this.warnings = Warnings.Show;
         this.useBuildJson = true;
         this.verbose = new VerboseCharacterWriteStream(false, output);
-        this.javaCompiler = new JavacJavaCompiler(processFactory);
+        this.javaCompiler = new JavaCompiler(processFactory);
     }
 
     public CharacterWriteStream getOutput()

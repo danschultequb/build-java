@@ -31,7 +31,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -48,7 +48,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -65,7 +65,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -82,7 +82,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -99,7 +99,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -116,7 +116,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -133,7 +133,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -150,7 +150,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -167,7 +167,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -184,7 +184,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -201,7 +201,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -218,7 +218,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertFalse(parameters.getUseBuildJson());
@@ -235,7 +235,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -252,7 +252,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -269,7 +269,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -286,7 +286,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -303,7 +303,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavacJavaCompiler);
+                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
