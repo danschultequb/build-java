@@ -491,7 +491,7 @@ public interface QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
-                    currentFolder.createFolder("sources");
+                    currentFolder.createFolder("sources").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         QubBuild.main(console);

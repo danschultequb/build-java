@@ -206,7 +206,7 @@ public interface QubBuild
                 final Iterable<File> javaSourceFiles = getJavaSourceFiles(folderToBuild, sourceFileMatcher)
                     .catchError((Throwable error) ->
                     {
-                        error(output, exitCode, error.getMessage());
+                        error(output, exitCode, error.getMessage()).await();
                         return Iterable.create();
                     })
                     .await();
