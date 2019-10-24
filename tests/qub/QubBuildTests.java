@@ -31,7 +31,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -48,7 +47,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -65,7 +63,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -82,7 +79,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -99,7 +95,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -116,7 +111,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -133,7 +127,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -150,7 +143,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -167,7 +159,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -184,7 +175,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -201,7 +191,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -218,7 +207,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertFalse(parameters.getUseBuildJson());
@@ -235,7 +223,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -252,7 +239,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -269,7 +255,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -286,7 +271,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -303,7 +287,6 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertTrue(parameters.getJavaCompiler() instanceof JavaCompiler);
                         test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutput());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getUseBuildJson());
@@ -458,7 +441,7 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", "{}");
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().toString());
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         QubBuild.main(console);
@@ -474,7 +457,7 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         QubBuild.main(console);
@@ -490,7 +473,7 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
                     currentFolder.createFolder("sources").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
@@ -507,19 +490,21 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -539,17 +524,13 @@ public interface QubBuildTests
                     test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -560,16 +541,18 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"outputFolder\": \"bin\" } }");
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final Folder outputs = currentFolder.getFolder("bin").await();
+                    final Folder bin = currentFolder.getFolder("bin").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/bin", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/bin", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(bin)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/bin")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -584,26 +567,21 @@ public interface QubBuildTests
                         Iterable.create(
                             "/bin/A.class",
                             "/bin/build.json"),
-                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
+                        bin.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
-                    test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java bytecode", getFileContents(bin, "A.class"));
+                    test.assertEqual(0, getFileLastModified(bin, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java", java ->
-                                {
-                                    java.stringProperty("outputFolder", "bin");
-                                });
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
-                        getFileContents(outputs, "build.json"));
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()
+                                    .setOutputFolder("bin")))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
+                        getFileContents(bin, "build.json"));
                 });
 
                 runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder", (Test test) ->
@@ -617,12 +595,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -642,17 +622,13 @@ public interface QubBuildTests
                     test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -668,13 +644,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
-                                    outputs.setFileContentsAsString("B.class", "B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java", "sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -697,21 +674,16 @@ public interface QubBuildTests
                     test.assertEqual("B.java bytecode", getFileContents(outputs, "B.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                            parse.objectProperty("sources/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0)),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/B.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -726,13 +698,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "tests/B.java")
-                                .setFunction(() ->
-                                {
-                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
-                                    outputs.setFileContentsAsString("B.class", "B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java", "tests/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -755,21 +728,16 @@ public interface QubBuildTests
                     test.assertEqual("B.java bytecode", getFileContents(outputs, "B.class"));
                     test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                            parse.objectProperty("tests/B.java", bJava ->
-                            {
-                                bJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0)),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/B.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -788,12 +756,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -815,17 +785,13 @@ public interface QubBuildTests
                     final File parseFile = outputs.getFile("build.json").await();
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(parseFile));
                 });
 
@@ -837,14 +803,14 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File sourceFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create())))
+                            .toString());
 
                     final DateTime beforeClockAdvance = clock.getCurrentDateTime();
                     clock.advance(Duration.minutes(1));
@@ -870,17 +836,13 @@ public interface QubBuildTests
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 0);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
                         getFileContents(buildJsonFile));
                 });
 
@@ -893,25 +855,27 @@ public interface QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create())))
+                            .toString());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    outputs.setFileContentsAsString("A.class", "A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -930,17 +894,13 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
                     test.assertEqual("A.java bytecode", getFileContents(classFile));
                     test.assertEqual(
-                        JSON.object(parse ->
-                        {
-                            parse.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            parse.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(60000))))
+                            .toString(),
                         getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
@@ -954,29 +914,28 @@ public interface QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File parseFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File parseFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create())))
+                            .toString());
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:1: error: This doesn't look right to me.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("                   ^").await();
-                                    errorStream.writeLine("1 error").await();
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Error, "This doesn't look right to me."))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -989,7 +948,6 @@ public interface QubBuildTests
                             "sources/A.java (Line 1): This doesn't look right to me."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -1026,35 +984,31 @@ public interface QubBuildTests
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     clock.advance(Duration.minutes(1));
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
-                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", JSON.object(parse ->
-                    {
-                        parse.objectProperty("sources/A.java", aJava ->
-                        {
-                            aJava.numberProperty("lastModified", 0);
-                            aJava.arrayProperty("dependencies");
-                        });
-                    }).toString());
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))
+                                    .setDependencies(Iterable.create())))
+                            .toString());
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:1: warning: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("                   ^").await();
-                                    errorStream.writeLine("1 error").await();
-
-                                    classFile.setContentsAsString("A.java bytecode").await();
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        test.assertEqual(0, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1064,7 +1018,6 @@ public interface QubBuildTests
                             "sources/A.java (Line 1): Are you sure?"),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -1104,26 +1057,22 @@ public interface QubBuildTests
                             .setLastModified(DateTime.utc(0))
                             .setDependencies(Iterable.create())))
                         .toString());
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "tests/ATests.java", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:1: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("    ^").await();
-
-                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-                                    aTestsClassFile.setContentsAsString("ATests.java bytecode");
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("tests/ATests.java", "sources/A.java")
+                                .addCompilerIssues(
+                                    new JavaCompilerIssue("sources\\A.java", 1, 5, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -1138,7 +1087,6 @@ public interface QubBuildTests
                             "sources/A.java (Line 1): Are you sure?"),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -1150,43 +1098,19 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aTestsClassFile));
                     test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
-                        JSON.object(build ->
-                        {
-                            build.objectProperty("project.json", projectJson ->
-                            {
-                                projectJson.objectProperty("java");
-                            });
-                            build.objectProperty("sources/A.java", aJava ->
-                            {
-                                aJava.numberProperty("lastModified", 60000);
-                                aJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "sources/A.java");
-                                        issue.numberProperty("lineNumber", 1);
-                                        issue.numberProperty("columnNumber", 5);
-                                        issue.stringProperty("type", "Error");
-                                        issue.stringProperty("message", "Are you sure?");
-                                    });
-                                });
-                            });
-                            build.objectProperty("tests/ATests.java", aTestsJava ->
-                            {
-                                aTestsJava.numberProperty("lastModified", 60000);
-                                aTestsJava.arrayProperty("issues", issues ->
-                                {
-                                    issues.objectElement(issue ->
-                                    {
-                                        issue.stringProperty("sourceFilePath", "tests/ATests.java");
-                                        issue.numberProperty("lineNumber", 10);
-                                        issue.numberProperty("columnNumber", 7);
-                                        issue.stringProperty("type", "Warning");
-                                        issue.stringProperty("message", "Can't be this.");
-                                    });
-                                });
-                            });
-                        }).toString(),
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON()
+                                .setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 5, Issue.Type.Error, "Are you sure?")),
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("tests/ATests.java")
+                                    .setLastModified(DateTime.utc(60000))
+                                    .addIssue(new JavaCompilerIssue("tests/ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))))
+                            .toString(),
                         getFileContents(buildFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
@@ -1217,37 +1141,23 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine(" ^").await();
-
-                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("    ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-                                    aTestsClass.setContentsAsString("ATests.java bytecode").await();
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .addCompilerIssues(
+                                    new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("sources\\B.java", 1, 5, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("tests\\C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\C.java", 20, 7, Issue.Type.Error, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        test.assertEqual(3, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1328,37 +1238,23 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=show"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine(" ^").await();
-
-                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("    ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-                                    aTestsClassFile.setContentsAsString("ATests.java bytecode").await();
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .addCompilerIssues(
+                                    new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("sources\\B.java", 1, 5, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("tests\\C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\C.java", 20, 7, Issue.Type.Error, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        test.assertEqual(3, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1439,37 +1335,23 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=hide"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine(" ^").await();
-
-                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("    ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-                                    aTestsClassFile.setContentsAsString("ATests.java bytecode").await();
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .addCompilerIssues(
+                                    new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("sources\\B.java", 1, 5, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("tests\\C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\C.java", 20, 7, Issue.Type.Error, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        test.assertEqual(3, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1545,37 +1427,23 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=error"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine(" ^").await();
-
-                                    errorStream.writeLine("sources\\B.java:1: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("    ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\C.java:20: error: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-
-                                    errorStream.writeLine("tests\\ATests.java:10: warning: Can't be this.").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine("      ^").await();
-                                    aTestsClassFile.setContentsAsString("ATests.java bytecode").await();
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
+                                .addCompilerIssues(
+                                    new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("sources\\B.java", 1, 5, Issue.Type.Error, "Are you sure?"),
+                                    new JavaCompilerIssue("tests\\C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\C.java", 20, 7, Issue.Type.Error, "Can't be this."),
+                                    new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        test.assertEqual(3, console.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1652,17 +1520,19 @@ public interface QubBuildTests
 
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java", "sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1673,7 +1543,6 @@ public interface QubBuildTests
                             "Compiling 2 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -1729,16 +1598,19 @@ public interface QubBuildTests
                     clock.advance(Duration.minutes(1));
 
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1749,7 +1621,6 @@ public interface QubBuildTests
                             "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -1803,17 +1674,19 @@ public interface QubBuildTests
                     clock.advance(Duration.minutes(1));
 
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java", "sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1824,7 +1697,6 @@ public interface QubBuildTests
                             "Compiling 2 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -1879,16 +1751,19 @@ public interface QubBuildTests
                     clock.advance(Duration.minutes(1));
 
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1899,7 +1774,6 @@ public interface QubBuildTests
                             "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -1953,15 +1827,19 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -1972,7 +1850,6 @@ public interface QubBuildTests
                             "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -2026,12 +1903,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -2106,18 +1985,19 @@ public interface QubBuildTests
                     clock.advance(Duration.minutes(1));
 
                     setFileContents(currentFolder, "sources/C.java", "C.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/C.java", "sources/B.java", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                    cClassFile.setContentsAsString("C.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/C.java", "sources/B.java", "sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -2128,7 +2008,6 @@ public interface QubBuildTests
                             "Compiling 3 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -2208,20 +2087,21 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\B.java:1: error: Missing definition for C.").await();
-                                    errorStream.writeLine("Code that references C class").await();
-                                    errorStream.writeLine("                        ^").await();
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/B.java", "sources/A.java")
+                                .addCompilerIssues(
+                                    new JavaCompilerIssue("sources\\B.java", 1, 25, Issue.Type.Error, "Missing definition for C."))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -2234,7 +2114,6 @@ public interface QubBuildTests
                             "sources/B.java (Line 1): Missing definition for C."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -2246,8 +2125,8 @@ public interface QubBuildTests
                     test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("N.java source", getFileContents(nClassFile));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
-                    test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
                     test.assertEqual("B.java source, depends on C", getFileContents(bClassFile));
@@ -2316,12 +2195,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/C.java")
-                                .setFunction(() ->
-                                {
-                                    cClassFile.setContentsAsString("C.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/C.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -2603,6 +2484,8 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console
@@ -2610,22 +2493,28 @@ public interface QubBuildTests
                                 .set("JAVA_HOME", jdk11Folder.toString())
                                 .set("QUB_HOME", "/qub/"))
                             .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                                .add(new FakeProcessRun("javac")
-                                    .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-source", "8", "-target", "8", "-bootclasspath", "/java/jre1.8.0_192/lib/rt.jar", "-classpath", "/outputs", "sources/A.java")
-                                    .setFunction(() ->
-                                    {
-                                        aClassFile.setContentsAsString("A.java bytecode").await();
-                                    })));
+                                .add(new FakeJavacProcessRun()
+                                    .setWorkingFolder(currentFolder)
+                                    .addOutputFolder(outputs)
+                                    .addXlintUnchecked()
+                                    .addXlintDeprecation()
+                                    .addJavaSourceVersion("1.8")
+                                    .addJavaTargetVersion("1.8")
+                                    .addBootClasspath("/java/jre1.8.0_192/lib/rt.jar")
+                                    .addClasspath("/outputs")
+                                    .addSourceFile("sources/A.java")
+                                    .setFunctionAutomatically()));
+
                         QubBuild.main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file..."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
                          test.assertEqual(0, console.getExitCode());
                     }
 
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling 1 file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -2676,6 +2565,8 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console
@@ -2683,12 +2574,17 @@ public interface QubBuildTests
                                 .set("JAVA_HOME", jdk11Folder.toString())
                                 .set("QUB_HOME", "/qub/"))
                             .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                                .add(new FakeProcessRun("javac")
-                                    .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-source", "8", "-target", "8", "-bootclasspath", "/java/jre1.8.0_192/lib/rt.jar", "-classpath", "/outputs", "sources/A.java")
-                                    .setFunction(() ->
-                                    {
-                                        aClassFile.setContentsAsString("A.java bytecode").await();
-                                    })));
+                                .add(new FakeJavacProcessRun()
+                                    .setWorkingFolder(currentFolder)
+                                    .addOutputFolder(outputs)
+                                    .addXlintUnchecked()
+                                    .addXlintDeprecation()
+                                    .addJavaSourceVersion("8")
+                                    .addJavaTargetVersion("8")
+                                    .addBootClasspath("/java/jre1.8.0_192/lib/rt.jar")
+                                    .addClasspath("/outputs")
+                                    .addSourceFile("sources/A.java")
+                                    .setFunctionAutomatically()));
                         QubBuild.main(console);
                          test.assertEqual(0, console.getExitCode());
                     }
@@ -2698,7 +2594,6 @@ public interface QubBuildTests
                             "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -2953,18 +2848,22 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("QUB_HOME", "/qub/"))
                             .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                                .add(new FakeProcessRun("javac")
-                                    .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                    .setFunction(() ->
-                                    {
-                                        aClassFile.setContentsAsString("A.java bytecode").await();
-                                    })));
+                                .add(new FakeJavacProcessRun()
+                                    .setWorkingFolder(currentFolder)
+                                    .addOutputFolder(outputs)
+                                    .addXlintUnchecked()
+                                    .addXlintDeprecation()
+                                    .addClasspath("/outputs")
+                                    .addSourceFile("sources/A.java")
+                                    .setFunctionAutomatically()));
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
@@ -2974,7 +2873,6 @@ public interface QubBuildTests
                             "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -3029,6 +2927,8 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
@@ -3038,12 +2938,15 @@ public interface QubBuildTests
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("QUB_HOME", qubFolder.toString()))
                             .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                                .add(new FakeProcessRun("javac")
-                                    .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs;/qub/a/b/d/b.jar", "sources/A.java")
-                                    .setFunction(() ->
-                                    {
-                                        aClassFile.setContentsAsString("A.java bytecode").await();
-                                    })));
+                                .add(new FakeJavacProcessRun()
+                                    .setWorkingFolder(currentFolder)
+                                    .addOutputFolder(outputs)
+                                    .addXlintUnchecked()
+                                    .addXlintDeprecation()
+                                    .addClasspath(Iterable.create("/outputs", "/qub/a/b/d/b.jar"))
+                                    .addSourceFile("sources/A.java")
+                                    .setFunctionAutomatically()));
+
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
                     }
@@ -3053,7 +2956,6 @@ public interface QubBuildTests
                             "Compiling 1 file..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -3106,17 +3008,19 @@ public interface QubBuildTests
 
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java", "sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3127,7 +3031,6 @@ public interface QubBuildTests
                             "Compiling 2 files..."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -3182,23 +3085,24 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "--verbose"))
                     {
                         QubBuild.main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "VERBOSE: Parsing project.json...",
+                                "VERBOSE: Parsing outputs/build.json...",
+                                "VERBOSE: Deleted source files:",
+                                "VERBOSE: /sources/B.java",
+                                "VERBOSE: Updating outputs/build.json...",
+                                "VERBOSE: Setting project.json...",
+                                "VERBOSE: Setting source files...",
+                                "VERBOSE: Detecting java source files to compile...",
+                                "No files need to be compiled.",
+                                "VERBOSE: Writing build.json file...",
+                                "VERBOSE: Done writing build.json file."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: Deleted source files:",
-                            "VERBOSE: /sources/B.java",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "No files need to be compiled.",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
@@ -3251,12 +3155,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "--verbose"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3273,10 +3179,10 @@ public interface QubBuildTests
                             "VERBOSE: Added source files:",
                             "VERBOSE: /sources/B.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
+                            "VERBOSE: Done writing build.json file."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertEqual(
@@ -3325,16 +3231,19 @@ public interface QubBuildTests
                     clock.advance(Duration.minutes(1));
 
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
 
                     try (final Console console = createConsole(output, currentFolder, "--verbose"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3351,13 +3260,12 @@ public interface QubBuildTests
                             "VERBOSE: Modified source files:",
                             "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
+                            "VERBOSE: Done writing build.json file."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -3399,45 +3307,46 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "--verbose"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java")
-                                .setFunction((ByteWriteStream javacOutput, ByteWriteStream javacError) ->
-                                {
-                                    final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
-                                    errorStream.writeLine("sources\\A.java:12: error: Are you sure?").await();
-                                    errorStream.writeLine("Something is wrong here").await();
-                                    errorStream.writeLine(" ^").await();
-
-                                    return 1;
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/A.java")
+                                .addCompilerIssues(
+                                    new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"))
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "VERBOSE: Parsing project.json...",
+                                "VERBOSE: Parsing outputs/build.json...",
+                                "VERBOSE: Updating outputs/build.json...",
+                                "VERBOSE: Setting project.json...",
+                                "VERBOSE: Setting source files...",
+                                "VERBOSE: Detecting java source files to compile...",
+                                "VERBOSE: Source files that previously contained issues:",
+                                "VERBOSE: /sources/A.java",
+                                "Compiling 1 file...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                                "VERBOSE: Compilation finished.",
+                                "1 Error:",
+                                "sources/A.java (Line 12): Are you sure?",
+                                "VERBOSE: Writing build.json file...",
+                                "VERBOSE: Done writing build.json file."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
                         test.assertEqual(1, console.getExitCode());
                     }
 
-                    test.assertEqual(
-                        Iterable.create(
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: Source files that previously contained issues:",
-                            "VERBOSE: /sources/A.java",
-                            "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
-                            "VERBOSE: Compilation finished.",
-                            "1 Error:",
-                            "sources/A.java (Line 12): Are you sure?",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
-
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/A.class",
@@ -3484,15 +3393,19 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
                     try (final Console console = createConsole(output, currentFolder, "--verbose"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3513,13 +3426,12 @@ public interface QubBuildTests
                             "VERBOSE: Source files with modified dependencies:",
                             "VERBOSE: /sources/B.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
+                            "VERBOSE: Done writing build.json file."),
                         Strings.getLines(output.getText().await()).skipLast());
 
-                    final Folder outputs = currentFolder.getFolder("outputs").await();
                     test.assertEqual(
                         Iterable.create(
                             "/outputs/B.class",
@@ -3562,14 +3474,14 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/AB.java", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                    abClassFile.setContentsAsString("AB.java bytecode").await();
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java", "sources/AB.java", "sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -3633,22 +3545,24 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java", "sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 2 files..."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling 2 files..."),
-                        Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertEqual(
                         Iterable.create(
@@ -3682,22 +3596,24 @@ public interface QubBuildTests
                     try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
                     {
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs", "sources/A.java", "sources/B.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                    bClassFile.setContentsAsString("B.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java", "sources/B.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 2 files..."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling 2 files..."),
-                        Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertEqual(
                         Iterable.create(
@@ -3770,13 +3686,14 @@ public interface QubBuildTests
                         console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", qubFolder.toString()));
                         QubBuild.main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub)."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
                         test.assertEqual(1, console.getExitCode());
                     }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub)."),
-                        Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertFalse(currentFolder.folderExists("outputs").await());
                 });
@@ -3829,31 +3746,34 @@ public interface QubBuildTests
                         publisherFolder.createFile("a/1/a.jar").await();
 
                         console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
-                            .add(new FakeProcessRun("javac")
-                                .addArguments("-d", "/outputs", "-Xlint:unchecked", "-Xlint:deprecation", "-classpath", "/outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar", "sources/A.java")
-                                .setFunction(() ->
-                                {
-                                    aClassFile.setContentsAsString("A.java bytecode").await();
-                                })));
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/2/b.jar", "/qub/me/a/1/a.jar"))
+                                .addSourceFile("sources/A.java")
+                                .setFunctionAutomatically()));
 
                         QubBuild.main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "VERBOSE: Parsing project.json...",
+                                "VERBOSE: Updating outputs/build.json...",
+                                "VERBOSE: Setting project.json...",
+                                "VERBOSE: Setting source files...",
+                                "VERBOSE: Detecting java source files to compile...",
+                                "VERBOSE: Compiling all source files.",
+                                "Compiling 1 file...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar sources/A.java...",
+                                "VERBOSE: Compilation finished.",
+                                "VERBOSE: Writing build.json file...",
+                                "VERBOSE: Done writing build.json file."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-
-                    test.assertEqual(
-                        Iterable.create(
-                            "VERBOSE: Parsing project.json...",
-                            "VERBOSE: Updating outputs/build.json...",
-                            "VERBOSE: Setting project.json...",
-                            "VERBOSE: Setting source files...",
-                            "VERBOSE: Detecting java source files to compile...",
-                            "VERBOSE: Compiling all source files.",
-                            "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d /outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar sources/A.java...",
-                            "VERBOSE: Compilation finished.",
-                            "VERBOSE: Writing build.json file...",
-                            "VERBOSE: Done writing build.json file..."),
-                        Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertEqual(
                         Iterable.create(
@@ -3909,6 +3829,8 @@ public interface QubBuildTests
 
                     try (final Console console = createConsole(output, currentFolder, "-verbose"))
                     {
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeJavacProcessRun()));
                         console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
                         final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
@@ -3930,11 +3852,71 @@ public interface QubBuildTests
                             "ERROR: Found more than one required version for package me/a:",
                             "1. me/a@1",
                             "2. me/a@2",
-                            "     from me/b@2",
+                            "    from me/b@2",
                             ""),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertFalse(currentFolder.folderExists("outputs").await());
+                });
+
+                runner.test("with source file modified during build", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    currentFolder.createFolder("sources");
+                    final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File aClassFile = outputs.getFile("A.class").await();
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    {
+                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .setFunction(() ->
+                                {
+                                    aClassFile.setContentsAsString("A.java bytecode").await();
+                                    clock.advance(Duration.seconds(1));
+                                    aJavaFile.setContentsAsString("A.java source 2").await();
+                                })));
+
+                        QubBuild.main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling 1 file..."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
+                        "Wrong files in outputs folder");
+                    test.assertEqual("A.java bytecode", getFileContents(aClassFile));
+                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual("A.java source 2", getFileContents(aJavaFile));
+                    test.assertEqual(61000, getFileLastModified(aJavaFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(
+                        new BuildJSON()
+                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.utc(0))))
+                            .toString(),
+                        getFileContents(outputs, "build.json"));
                 });
             });
         });

@@ -52,8 +52,11 @@ public class JavaCompilerIssue
             Comparer.equal(message, rhs.message);
     }
 
-    @Override
-    public String toString()
+    /**
+     * Get the JSON representation of this JavaCompilerIssue.
+     * @return The JSON representation of this JavaCompilerIssue.
+     */
+    public JSONObject toJson()
     {
         return JSON.object(json ->
         {
@@ -62,6 +65,38 @@ public class JavaCompilerIssue
             json.numberProperty("columnNumber", columnNumber);
             json.stringProperty("type", type.toString());
             json.stringProperty("message", message);
-        }).toString();
+        });
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.toJson().toString();
+    }
+
+    /**
+     * Get a new JavaCompilerIssue error object.
+     * @param sourceFilePath The path to the source file.
+     * @param lineNumber The line number.
+     * @param columnNumber The column number within the line.
+     * @param errorMessage The message that describes the error.
+     * @return The created issue.
+     */
+    public static JavaCompilerIssue error(String sourceFilePath, int lineNumber, int columnNumber, String errorMessage)
+    {
+        return new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, Issue.Type.Error, errorMessage);
+    }
+
+    /**
+     * Get a new JavaCompilerIssue warning object.
+     * @param sourceFilePath The path to the source file.
+     * @param lineNumber The line number.
+     * @param columnNumber The column number within the line.
+     * @param warningMessage The message that describes the warning.
+     * @return The created issue.
+     */
+    public static JavaCompilerIssue warning(String sourceFilePath, int lineNumber, int columnNumber, String warningMessage)
+    {
+        return new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, Issue.Type.Warning, warningMessage);
     }
 }

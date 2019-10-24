@@ -89,6 +89,21 @@ public class ProjectJSON
     }
 
     @Override
+    public boolean equals(Object rhs)
+    {
+        return rhs instanceof ProjectJSON && this.equals((ProjectJSON)rhs);
+    }
+
+    public boolean equals(ProjectJSON rhs)
+    {
+        return rhs != null &&
+            Comparer.equal(this.publisher, rhs.publisher) &&
+            Comparer.equal(this.project, rhs.project) &&
+            Comparer.equal(this.version, rhs.version) &&
+            Comparer.equal(this.java, rhs.java);
+    }
+
+    @Override
     public String toString()
     {
         return JSON.object(this::write).toString();

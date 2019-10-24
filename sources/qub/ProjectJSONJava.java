@@ -195,6 +195,26 @@ public class ProjectJSONJava
         return this;
     }
 
+    @Override
+    public boolean equals(Object rhs)
+    {
+        return rhs instanceof ProjectJSONJava && this.equals((ProjectJSONJava)rhs);
+    }
+
+    public boolean equals(ProjectJSONJava rhs)
+    {
+        return rhs != null &&
+            Comparer.equal(this.mainClass, rhs.mainClass) &&
+            Comparer.equal(this.shortcutName, rhs.shortcutName) &&
+            Comparer.equal(this.captureVMArguments, rhs.captureVMArguments) &&
+            Comparer.equal(this.version, rhs.version) &&
+            Comparer.equal(this.outputFolder, rhs.outputFolder) &&
+            Comparer.equal(this.maximumErrors, rhs.maximumErrors) &&
+            Comparer.equal(this.maximumWarnings, rhs.maximumWarnings) &&
+            Comparer.equal(this.sourceFilePatterns, rhs.sourceFilePatterns) &&
+            Comparer.equal(this.dependencies, rhs.dependencies);
+    }
+
     public void write(JSONObjectBuilder builder)
     {
         PreCondition.assertNotNull(builder, "builder");

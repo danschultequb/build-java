@@ -9,7 +9,6 @@ public class QubBuildParameters
     private Warnings warnings;
     private boolean useBuildJson;
     private VerboseCharacterWriteStream verbose;
-    private JavaCompiler javaCompiler;
 
     public QubBuildParameters(CharacterWriteStream output, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
     {
@@ -26,7 +25,6 @@ public class QubBuildParameters
         this.warnings = Warnings.Show;
         this.useBuildJson = true;
         this.verbose = new VerboseCharacterWriteStream(false, output);
-        this.javaCompiler = new JavaCompiler(processFactory);
     }
 
     public CharacterWriteStream getOutput()
@@ -47,11 +45,6 @@ public class QubBuildParameters
     public ProcessFactory getProcessFactory()
     {
         return this.processFactory;
-    }
-
-    public JavaCompiler getJavaCompiler()
-    {
-        return this.javaCompiler;
     }
 
     public QubBuildParameters setWarnings(Warnings warnings)
