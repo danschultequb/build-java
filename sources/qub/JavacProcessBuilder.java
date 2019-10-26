@@ -3,18 +3,14 @@ package qub;
 /**
  * A ProcessBuilder that is specific to the javac application.
  */
-public class JavacProcessBuilder implements ProcessBuilder
+public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBuilder>
 {
     public static final String executablePathString = "javac";
     public static final Path executablePath = Path.parse(JavacProcessBuilder.executablePathString);
 
-    private final ProcessBuilder processBuilder;
-
     private JavacProcessBuilder(ProcessBuilder processBuilder)
     {
-        PreCondition.assertNotNull(processBuilder, "processBuilder");
-
-        this.processBuilder = processBuilder;
+        super(processBuilder);
     }
 
     /**
@@ -419,152 +415,5 @@ public class JavacProcessBuilder implements ProcessBuilder
 
             return result;
         });
-    }
-
-    @Override
-    public Result<Integer> run()
-    {
-        return this.processBuilder.run();
-    }
-
-    @Override
-    public Path getExecutablePath()
-    {
-        return this.processBuilder.getExecutablePath();
-    }
-
-    @Override
-    public String getCommand()
-    {
-        return this.processBuilder.getCommand();
-    }
-
-    @Override
-    public JavacProcessBuilder addArgument(String argument)
-    {
-        this.processBuilder.addArgument(argument);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder addArguments(String... arguments)
-    {
-        this.processBuilder.addArguments(arguments);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder addArguments(Iterable<String> arguments)
-    {
-        this.processBuilder.addArguments(arguments);
-        return this;
-    }
-
-    @Override
-    public Iterable<String> getArguments()
-    {
-        return this.processBuilder.getArguments();
-    }
-
-    @Override
-    public JavacProcessBuilder setWorkingFolder(String workingFolderPath)
-    {
-        this.processBuilder.setWorkingFolder(workingFolderPath);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder setWorkingFolder(Path workingFolderPath)
-    {
-        this.processBuilder.setWorkingFolder(workingFolderPath);
-        return this;
-    }
-
-    @Override
-    public ProcessBuilder setWorkingFolder(Folder workingFolder)
-    {
-        this.processBuilder.setWorkingFolder(workingFolder);
-        return this;
-    }
-
-    @Override
-    public Path getWorkingFolderPath()
-    {
-        return this.processBuilder.getWorkingFolderPath();
-    }
-
-    @Override
-    public JavacProcessBuilder redirectInput(ByteReadStream redirectedInputStream)
-    {
-        this.processBuilder.redirectInput(redirectedInputStream);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder redirectOutput(Action1<ByteReadStream> redirectOutputAction)
-    {
-        this.processBuilder.redirectOutput(redirectOutputAction);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder redirectOutput(ByteWriteStream redirectedOutputStream)
-    {
-        this.processBuilder.redirectOutput(redirectedOutputStream);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder redirectOutputLines(Action1<String> onOutputLine)
-    {
-        this.processBuilder.redirectOutputLines(onOutputLine);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder redirectOutputTo(StringBuilder builder)
-    {
-        this.processBuilder.redirectOutputTo(builder);
-        return this;
-    }
-
-    @Override
-    public StringBuilder redirectOutput()
-    {
-        return this.processBuilder.redirectOutput();
-    }
-
-    @Override
-    public JavacProcessBuilder redirectError(Action1<ByteReadStream> redirectErrorAction)
-    {
-        this.processBuilder.redirectError(redirectErrorAction);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder redirectError(ByteWriteStream redirectedErrorStream)
-    {
-        this.processBuilder.redirectError(redirectedErrorStream);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder redirectErrorLines(Action1<String> onErrorLine)
-    {
-        this.processBuilder.redirectErrorLines(onErrorLine);
-        return this;
-    }
-
-    @Override
-    public JavacProcessBuilder redirectErrorTo(StringBuilder builder)
-    {
-        this.processBuilder.redirectErrorTo(builder);
-        return this;
-    }
-
-    @Override
-    public StringBuilder redirectError()
-    {
-        return this.processBuilder.redirectError();
     }
 }
