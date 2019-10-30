@@ -503,7 +503,7 @@ public interface QubBuildTests
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
-                                .addSourceFilePathStrings("sources/A.java")
+                                .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
                         QubBuild.main(console);
@@ -551,7 +551,7 @@ public interface QubBuildTests
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
                                 .addClasspath("/bin")
-                                .addSourceFilePathStrings("sources/A.java")
+                                .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
                         QubBuild.main(console);
@@ -601,7 +601,7 @@ public interface QubBuildTests
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
-                                .addSourceFilePathStrings("sources/A.java")
+                                .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
                         QubBuild.main(console);

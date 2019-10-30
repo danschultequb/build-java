@@ -480,7 +480,9 @@ public interface QubBuild
         catch (Throwable error)
         {
             final Throwable unwrappedError = Exceptions.unwrap(error);
-            if (unwrappedError instanceof PreConditionFailure || unwrappedError instanceof PostConditionFailure)
+            if (unwrappedError instanceof PreConditionFailure ||
+                unwrappedError instanceof PostConditionFailure ||
+                unwrappedError instanceof NullPointerException)
             {
                 throw error;
             }

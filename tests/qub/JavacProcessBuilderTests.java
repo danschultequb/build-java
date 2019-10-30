@@ -49,7 +49,7 @@ public interface JavacProcessBuilderTests
                 {
                     final JavacProcessBuilder builder = JavacProcessBuilder.get(test.getProcess()).await();
 
-                    test.assertThrows(() -> builder.addOutputFolder(null),
+                    test.assertThrows(() -> builder.addOutputFolder((Folder)null),
                         new PreConditionFailure("outputFolder cannot be null."));
 
                     test.assertEqual(Iterable.create(), builder.getArguments());
