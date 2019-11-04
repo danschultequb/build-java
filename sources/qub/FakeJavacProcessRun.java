@@ -1,8 +1,7 @@
 package qub;
 
-public class FakeJavacProcessRun implements FakeProcessRun, JavacArguments<FakeJavacProcessRun>
+public class FakeJavacProcessRun extends FakeProcessRunDecorator<FakeJavacProcessRun> implements JavacArguments<FakeJavacProcessRun>
 {
-    private final FakeProcessRun fakeProcessRun;
     private final List<Path> sourceFilePaths;
     private final List<JavaCompilerIssue> issues;
     private Path outputFolderPath;
@@ -10,56 +9,9 @@ public class FakeJavacProcessRun implements FakeProcessRun, JavacArguments<FakeJ
 
     public FakeJavacProcessRun()
     {
-        this.fakeProcessRun = new BasicFakeProcessRun(JavacProcessBuilder.executablePath);
+        super(new BasicFakeProcessRun(JavacProcessBuilder.executablePath));
         this.sourceFilePaths = List.create();
         this.issues = List.create();
-    }
-
-    @Override
-    public Path getExecutablePath()
-    {
-        return this.fakeProcessRun.getExecutablePath();
-    }
-
-    @Override
-    public FakeJavacProcessRun addArgument(String argument)
-    {
-        this.fakeProcessRun.addArgument(argument);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun addArguments(String... arguments)
-    {
-        this.fakeProcessRun.addArguments(arguments);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun addArguments(Iterable<String> arguments)
-    {
-        this.fakeProcessRun.addArguments(arguments);
-        return this;
-    }
-
-    @Override
-    public Iterable<String> getArguments()
-    {
-        return this.fakeProcessRun.getArguments();
-    }
-
-    @Override
-    public FakeJavacProcessRun setWorkingFolder(String workingFolderPath)
-    {
-        this.fakeProcessRun.setWorkingFolder(workingFolderPath);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setWorkingFolder(Path workingFolderPath)
-    {
-        this.fakeProcessRun.setWorkingFolder(workingFolderPath);
-        return this;
     }
 
     @Override
@@ -70,83 +22,7 @@ public class FakeJavacProcessRun implements FakeProcessRun, JavacArguments<FakeJ
 
         this.fileSystem = workingFolder.getFileSystem();
 
-        this.fakeProcessRun.setWorkingFolder(workingFolder);
-        return this;
-    }
-
-    @Override
-    public Path getWorkingFolderPath()
-    {
-        return this.fakeProcessRun.getWorkingFolderPath();
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(int exitCode)
-    {
-        this.fakeProcessRun.setFunction(exitCode);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Action0 action)
-    {
-        this.fakeProcessRun.setFunction(action);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Function0<Integer> function)
-    {
-        this.fakeProcessRun.setFunction(function);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Action1<ByteWriteStream> action)
-    {
-        this.fakeProcessRun.setFunction(action);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Function1<ByteWriteStream,Integer> function)
-    {
-        this.fakeProcessRun.setFunction(function);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Action2<ByteWriteStream,ByteWriteStream> action)
-    {
-        this.fakeProcessRun.setFunction(action);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Function2<ByteWriteStream,ByteWriteStream,Integer> function)
-    {
-        this.fakeProcessRun.setFunction(function);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Action3<ByteReadStream,ByteWriteStream,ByteWriteStream> action)
-    {
-        this.fakeProcessRun.setFunction(action);
-        return this;
-    }
-
-    @Override
-    public FakeJavacProcessRun setFunction(Function3<ByteReadStream,ByteWriteStream,ByteWriteStream,Integer> function)
-    {
-        this.fakeProcessRun.setFunction(function);
-        return this;
-    }
-
-    @Override
-    public Function3<ByteReadStream,ByteWriteStream,ByteWriteStream,Integer> getFunction()
-    {
-        return this.fakeProcessRun.getFunction();
+        return super.setWorkingFolder(workingFolder);
     }
 
     /**
