@@ -21,6 +21,33 @@ public interface QubBuild
         }
     }
 
+    static CommandLineParameter<Folder> addFolderToBuildParameter(CommandLineParameters parameters, Process process)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+        PreCondition.assertNotNull(process, "process");
+
+        return parameters.addPositionalFolder("folder", process)
+            .setValueName("<folder-path-to-build>")
+            .setDescription("The folder to build. The current folder will be used if this isn't defined.");
+    }
+
+    static CommandLineParameter<Warnings> addWarningsParameter(CommandLineParameters parameters)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+
+        return parameters.addEnum("warnings", QubBuildParameters.getWarningsDefault())
+            .setValueName("<show|error|hide>")
+            .setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
+    }
+
+    static CommandLineParameterBoolean addBuildJsonParameter(CommandLineParameters parameters)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+
+        return parameters.addBoolean("buildjson", QubBuildParameters.getBuildJsonDefault())
+            .setDescription("Whether or not to read and write a build.json file. Defaults to true.");
+    }
+
     /**
      * Get QubBuildParameters from the arguments provided to the process. This will return null if
      * the help message is shown.
@@ -34,14 +61,9 @@ public interface QubBuild
         final CommandLineParameters parameters = process.createCommandLineParameters()
             .setApplicationName("qub-build")
             .setApplicationDescription("Used to compile and package source code projects.");
-        final CommandLineParameter<Folder> folderToBuildParameter = parameters.addPositionalFolder("folder", process)
-            .setValueName("<folder-path-to-build>")
-            .setDescription("The folder to build. The current folder will be used if this isn't defined.");
-        final CommandLineParameter<Warnings> warningsParameter = parameters.addEnum("warnings", Warnings.Show)
-            .setValueName("<show|error|hide>")
-            .setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
-        final CommandLineParameterBoolean buildJsonParameter = parameters.addBoolean("buildjson", true)
-            .setDescription("Whether or not to read and write a build.json file. Defaults to true.");
+        final CommandLineParameter<Folder> folderToBuildParameter = QubBuild.addFolderToBuildParameter(parameters, process);
+        final CommandLineParameter<Warnings> warningsParameter = QubBuild.addWarningsParameter(parameters);
+        final CommandLineParameterBoolean buildJsonParameter = QubBuild.addBuildJsonParameter(parameters);
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
         final CommandLineParameterProfiler profiler = parameters.addProfiler(process, QubBuild.class);
         final CommandLineParameterHelp help = parameters.addHelp();
@@ -55,10 +77,13 @@ public interface QubBuild
             final Folder folderToBuild = folderToBuildParameter.getValue().await();
             final EnvironmentVariables environmentVariables = process.getEnvironmentVariables();
             final ProcessFactory processFactory = process.getProcessFactory();
+            final Warnings warnings = warningsParameter.getValue().await();
+            final Boolean buildJson = buildJsonParameter.getValue().await();
+            final VerboseCharacterWriteStream verbose = verboseParameter.getVerboseCharacterWriteStream().await();
             result = new QubBuildParameters(output, folderToBuild, environmentVariables, processFactory)
-                .setWarnings(warningsParameter.getValue().await())
-                .setUseBuildJson(buildJsonParameter.getValue().await())
-                .setVerbose(verboseParameter.getVerboseCharacterWriteStream().await());
+                .setWarnings(warnings)
+                .setBuildJson(buildJson)
+                .setVerbose(verbose);
         }
 
         return result;
@@ -68,11 +93,11 @@ public interface QubBuild
     {
         PreCondition.assertNotNull(parameters, "parameters");
 
-        final CharacterWriteStream output = parameters.getOutput();
+        final CharacterWriteStream output = parameters.getOutputCharacterWriteStream();
         final Folder folderToBuild = parameters.getFolderToBuild();
         final EnvironmentVariables environmentVariables = parameters.getEnvironmentVariables();
         final Warnings warnings = parameters.getWarnings();
-        final boolean useBuildJson = parameters.getUseBuildJson();
+        final boolean useBuildJson = parameters.getBuildJson();
         final VerboseCharacterWriteStream verbose = parameters.getVerbose();
 
         int exitCode = 0;

@@ -2,88 +2,155 @@ package qub;
 
 public class QubBuildParameters
 {
-    private final CharacterWriteStream output;
+    private final CharacterWriteStream outputCharacterWriteStream;
     private final Folder folderToBuild;
     private final EnvironmentVariables environmentVariables;
     private final ProcessFactory processFactory;
     private Warnings warnings;
-    private boolean useBuildJson;
+    private boolean buildJson;
     private VerboseCharacterWriteStream verbose;
 
-    public QubBuildParameters(CharacterWriteStream output, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
+    public QubBuildParameters(CharacterWriteStream outputCharacterWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
     {
-        PreCondition.assertNotNull(output, "output");
+        PreCondition.assertNotNull(outputCharacterWriteStream, "outputCharacterWriteStream");
         PreCondition.assertNotNull(folderToBuild, "folderToBuild");
         PreCondition.assertNotNull(environmentVariables, "environmentVariables");
         PreCondition.assertNotNull(processFactory, "processFactory");
 
-        this.output = output;
+        this.outputCharacterWriteStream = outputCharacterWriteStream;
         this.folderToBuild = folderToBuild;
         this.environmentVariables = environmentVariables;
         this.processFactory = processFactory;
 
-        this.warnings = Warnings.Show;
-        this.useBuildJson = true;
-        this.verbose = new VerboseCharacterWriteStream(false, output);
+        this.warnings = QubBuildParameters.getWarningsDefault();
+        this.buildJson = QubBuildParameters.getBuildJsonDefault();
+        this.verbose = QubBuildParameters.getVerboseDefault();
     }
 
-    public CharacterWriteStream getOutput()
+    /**
+     * Get the CharacterWriteStream that output will be written to.
+     * @return The CharacterWriteStream that output will be written to.
+     */
+    public CharacterWriteStream getOutputCharacterWriteStream()
     {
-        return this.output;
+        return this.outputCharacterWriteStream;
     }
 
+    /**
+     * Get the folder that will be built.
+     * @return The folder that will be built.
+     */
     public Folder getFolderToBuild()
     {
         return this.folderToBuild;
     }
 
+    /**
+     * Get the environment variables that this application is being run with.
+     * @return The environment variables that this application is being run with.
+     */
     public EnvironmentVariables getEnvironmentVariables()
     {
         return this.environmentVariables;
     }
 
+    /**
+     * Get the ProcessFactory that will be used to invoke other processes.
+     * @return The ProcessFactory that will be used to invoke other processes.
+     */
     public ProcessFactory getProcessFactory()
     {
         return this.processFactory;
     }
 
-    public QubBuildParameters setWarnings(Warnings warnings)
-    {
-        PreCondition.assertNotNull(warnings, "warnings");
-
-        this.warnings = warnings;
-
-        return this;
-    }
-
+    /**
+     * Get how warnings should be treated at build time.
+     * @return How warnings should be treated at build time.
+     */
     public Warnings getWarnings()
     {
         return this.warnings;
     }
 
-    public QubBuildParameters setUseBuildJson(boolean useBuildJson)
+    /**
+     * Set how warnings should be treated at build time.
+     * @param warnings How warnings should be treated at build time.
+     * @return This object for method chaining.
+     */
+    public QubBuildParameters setWarnings(Warnings warnings)
     {
-        this.useBuildJson = useBuildJson;
+        PreCondition.assertNotNull(warnings, "warnings");
 
+        this.warnings = warnings;
         return this;
     }
 
-    public boolean getUseBuildJson()
+    /**
+     * Get whether or not to use a build.json file.
+     * @return Whether or not to use a build.json file.
+     */
+    public boolean getBuildJson()
     {
-        return this.useBuildJson;
+        return this.buildJson;
     }
 
+    /**
+     * Set whether or not to use a build.json file.
+     * @param buildJson Whether or not to use a build.json file.
+     * @return This object for method chaining.
+     */
+    public QubBuildParameters setBuildJson(boolean buildJson)
+    {
+        this.buildJson = buildJson;
+        return this;
+    }
+
+    /**
+     * Get the VerboseCharacterWriteStream where verbose logs will be written to.
+     * @return The VerboseCharacterWriteStream where verbose logs will be written to.
+     */
+    public VerboseCharacterWriteStream getVerbose()
+    {
+        return this.verbose;
+    }
+
+    /**
+     * Set the VerboseCharacterWriteStream where verbose logs will be written to.
+     * @param verbose The VerboseCharacterWriteStream where verbose logs will be written to.
+     * @return This object for method chaining.
+     */
     public QubBuildParameters setVerbose(VerboseCharacterWriteStream verbose)
     {
         PreCondition.assertNotNull(verbose, "verbose");
 
         this.verbose = verbose;
-
         return this;
     }
 
-    public VerboseCharacterWriteStream getVerbose()
+    /**
+     * Get the default value for the --warnings parameter.
+     * @return The default value for the --warnings parameter.
+     */
+    static Warnings getWarningsDefault()
     {
-        return this.verbose;
+        return Warnings.Show;
+    }
+
+    /**
+     * Get the default value for the --buildjson parameter.
+     * @return The default value for the --buildjson parameter.
+     */
+    static boolean getBuildJsonDefault()
+    {
+        return true;
+    }
+
+    /**
+     * Get the default value for the --verbose parameter.
+     * @return The default value for the --verbose parameter.
+     */
+    static VerboseCharacterWriteStream getVerboseDefault()
+    {
+        return new VerboseCharacterWriteStream(false, new InMemoryCharacterStream());
     }
 }
