@@ -4,7 +4,6 @@ public class ProjectJSONJava
 {
     public final static String mainClassPropertyName = "mainClass";
     public final static String shortcutNamePropertyName = "shortcutName";
-    public final static String captureVMArgumentsPropertyName = "captureVMArguments";
     public final static String versionPropertyName = "version";
     public final static String outputFolderPropertyName = "outputFolder";
     public final static String sourceFilesPropertyName = "sourceFiles";
@@ -14,7 +13,6 @@ public class ProjectJSONJava
 
     private String mainClass;
     private String shortcutName;
-    private Boolean captureVMArguments;
     private String version;
     private String outputFolder;
     private Integer maximumErrors;
@@ -57,27 +55,6 @@ public class ProjectJSONJava
     public ProjectJSONJava setShortcutName(String shortcutName)
     {
         this.shortcutName = shortcutName;
-        return this;
-    }
-
-    /**
-     * Get whether or not the Java VM arguments should be exposed to the application.
-     * @return Whether or not the Java VM arguments should be exposed to the application.
-     */
-    public Boolean getCaptureVMArguments()
-    {
-        return captureVMArguments;
-    }
-
-    /**
-     * Set whether or not the Java VM arguments should be exposed to the application.
-     * @param captureVMArguments Whether or not the Java VM arguments should be exposed to the
-     *                           application.
-     * @return This object for method chaining.
-     */
-    public ProjectJSONJava setCaptureVMArguments(Boolean captureVMArguments)
-    {
-        this.captureVMArguments = captureVMArguments;
         return this;
     }
 
@@ -206,7 +183,6 @@ public class ProjectJSONJava
         return rhs != null &&
             Comparer.equal(this.mainClass, rhs.mainClass) &&
             Comparer.equal(this.shortcutName, rhs.shortcutName) &&
-            Comparer.equal(this.captureVMArguments, rhs.captureVMArguments) &&
             Comparer.equal(this.version, rhs.version) &&
             Comparer.equal(this.outputFolder, rhs.outputFolder) &&
             Comparer.equal(this.maximumErrors, rhs.maximumErrors) &&
@@ -226,10 +202,6 @@ public class ProjectJSONJava
         if (!Strings.isNullOrEmpty(shortcutName))
         {
             builder.stringProperty(shortcutNamePropertyName, shortcutName);
-        }
-        if (captureVMArguments != null)
-        {
-            builder.booleanProperty(captureVMArgumentsPropertyName, captureVMArguments);
         }
         if (!Strings.isNullOrEmpty(version))
         {
@@ -274,10 +246,6 @@ public class ProjectJSONJava
             .await();
         javaObject.getUnquotedStringPropertyValue(shortcutNamePropertyName)
             .then(result::setShortcutName)
-            .catchError()
-            .await();
-        javaObject.getBooleanPropertyValue(captureVMArgumentsPropertyName)
-            .then(result::setCaptureVMArguments)
             .catchError()
             .await();
         javaObject.getUnquotedStringPropertyValue(versionPropertyName)

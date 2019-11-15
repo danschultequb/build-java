@@ -648,7 +648,6 @@ public interface ProjectJSONTests
                     test.assertNull(java.getVersion());
                     test.assertNull(java.getMainClass());
                     test.assertNull(java.getShortcutName());
-                    test.assertNull(java.getCaptureVMArguments());
                     test.assertNull(java.getMaximumErrors());
                     test.assertEqual(100, java.getMaximumWarnings());
                     test.assertNull(java.getDependencies());
@@ -672,7 +671,6 @@ public interface ProjectJSONTests
                     test.assertNull(java.getVersion());
                     test.assertNull(java.getMainClass());
                     test.assertNull(java.getShortcutName());
-                    test.assertEqual(true, java.getCaptureVMArguments());
                     test.assertNull(java.getMaximumErrors());
                     test.assertNull(java.getMaximumWarnings());
                     test.assertNull(java.getDependencies());
@@ -696,7 +694,6 @@ public interface ProjectJSONTests
                     test.assertNull(java.getVersion());
                     test.assertNull(java.getMainClass());
                     test.assertNull(java.getShortcutName());
-                    test.assertEqual(false, java.getCaptureVMArguments());
                     test.assertNull(java.getMaximumErrors());
                     test.assertNull(java.getMaximumWarnings());
                     test.assertNull(java.getDependencies());
@@ -718,14 +715,6 @@ public interface ProjectJSONTests
                         .setProject("b")
                         .setVersion("c");
                     test.assertEqual("{\"publisher\":\"a\",\"project\":\"b\",\"version\":\"c\"}", projectJSON.toString());
-                });
-
-                runner.test("with captureVMArguments", (Test test) ->
-                {
-                    final ProjectJSON projectJSON = new ProjectJSON()
-                        .setJava(new ProjectJSONJava()
-                            .setCaptureVMArguments(true));
-                    test.assertEqual("{\"java\":{\"captureVMArguments\":true}}", projectJSON.toString());
                 });
             });
         });
