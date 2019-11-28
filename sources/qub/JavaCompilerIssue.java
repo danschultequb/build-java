@@ -5,6 +5,12 @@ package qub;
  */
 public class JavaCompilerIssue
 {
+    private static final String sourceFilePathPropertyName = "sourceFilePath";
+    private static final String lineNumberPropertyName = "lineNumber";
+    private static final String columnNumberPropertyName = "columnNumber";
+    private static final String typePropertyName = "type";
+    private static final String messagePropertyName = "message";
+
     /**
      * The path to the source file that contains this issue. This path will be relative to the
      * project root folder.
@@ -52,26 +58,46 @@ public class JavaCompilerIssue
             Comparer.equal(message, rhs.message);
     }
 
+    @Override
+    public String toString()
+    {
+        return this.toJson().toString();
+    }
+
     /**
      * Get the JSON representation of this JavaCompilerIssue.
      * @return The JSON representation of this JavaCompilerIssue.
      */
     public JSONObject toJson()
     {
-        return JSON.object(json ->
-        {
-            json.stringProperty("sourceFilePath", sourceFilePath);
-            json.numberProperty("lineNumber", lineNumber);
-            json.numberProperty("columnNumber", columnNumber);
-            json.stringProperty("type", type.toString());
-            json.stringProperty("message", message);
-        });
+        return JSON.object(this::toJson);
     }
 
-    @Override
-    public String toString()
+    public void toJson(JSONObjectBuilder json)
     {
-        return this.toJson().toString();
+        PreCondition.assertNotNull(json, "json");
+
+        json.stringProperty(JavaCompilerIssue.sourceFilePathPropertyName, sourceFilePath);
+        json.numberProperty(JavaCompilerIssue.lineNumberPropertyName, lineNumber);
+        json.numberProperty(JavaCompilerIssue.columnNumberPropertyName, columnNumber);
+        json.stringProperty(JavaCompilerIssue.typePropertyName, type.toString());
+        json.stringProperty(JavaCompilerIssue.messagePropertyName, message);
+    }
+
+    public static Result<JavaCompilerIssue> parse(JSONObject json)
+    {
+        PreCondition.assertNotNull(json, "json");
+
+        return Result.create(() ->
+        {
+            final String sourceFilePath = json.getUnquotedStringPropertyValue(JavaCompilerIssue.sourceFilePathPropertyName).await();
+            final int lineNumber = json.getNumberPropertyValue(JavaCompilerIssue.lineNumberPropertyName).await().intValue();
+            final int columnNumber = json.getNumberPropertyValue(JavaCompilerIssue.columnNumberPropertyName).await().intValue();
+            final String typeString = json.getUnquotedStringPropertyValue(JavaCompilerIssue.typePropertyName).await();
+            final Issue.Type type = Strings.isNullOrEmpty(typeString) ? null : Issue.Type.valueOf(typeString);
+            final String message = json.getUnquotedStringPropertyValue(JavaCompilerIssue.messagePropertyName).await();
+            return new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, type, message);
+        });
     }
 
     /**

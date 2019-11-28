@@ -1,14 +1,15 @@
 package qub;
 
-public class BuildJSONTests
+public interface BuildJSONTests
 {
-    public static void test(TestRunner runner)
+    static void test(TestRunner runner)
     {
         runner.testGroup(BuildJSON.class, () ->
         {
             runner.test("constructor()", (Test test) ->
             {
                 final BuildJSON buildJson = new BuildJSON();
+                test.assertNull(buildJson.getProjectJson());
                 test.assertNull(buildJson.getSourceFiles());
             });
 
@@ -33,11 +34,11 @@ public class BuildJSONTests
                     final BuildJSON buildJson = new BuildJSON();
                     buildJson.setSourceFiles(Iterable.create(
                         new BuildJSONSourceFile()
-                            .setLastModified(DateTime.utc(5))));
+                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))));
                     test.assertEqual(
                         Iterable.create(
                             new BuildJSONSourceFile()
-                            .setLastModified(DateTime.utc(5))),
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))),
                         buildJson.getSourceFiles());
                 });
             });
@@ -47,7 +48,8 @@ public class BuildJSONTests
                 runner.test("with null relativePath", (Test test) ->
                 {
                     final BuildJSON buildJson = new BuildJSON();
-                    test.assertThrows(() -> buildJson.getSourceFile(null), new PreConditionFailure("relativePath cannot be null."));
+                    test.assertThrows(() -> buildJson.getSourceFile(null),
+                        new PreConditionFailure("relativePath cannot be null."));
                 });
 
                 runner.test("with null sourceFiles", (Test test) ->
@@ -72,7 +74,7 @@ public class BuildJSONTests
                     buildJson.setSourceFiles(Iterable.create(
                         new BuildJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
-                            .setLastModified(DateTime.utc(10))));
+                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(10)))));
                     test.assertThrows(() -> buildJson.getSourceFile(Path.parse("sources/B.java")).await(),
                         new NotFoundException("No source file found in the BuildJSON object with the path \"sources/B.java\"."));
                 });
@@ -83,11 +85,11 @@ public class BuildJSONTests
                     buildJson.setSourceFiles(Iterable.create(
                         new BuildJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
-                            .setLastModified(DateTime.utc(10))));
+                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(10)))));
                     test.assertEqual(
                         new BuildJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
-                            .setLastModified(DateTime.utc(10)),
+                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(10))),
                         buildJson.getSourceFile(Path.parse("sources/A.java")).await());
                 });
             });

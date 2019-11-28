@@ -5,6 +5,10 @@ package qub;
  */
 public class BuildJSONSourceFile
 {
+    private static final String lastModifiedPropertyName = "lastModifiedNanoseconds";
+    private static final String dependenciesPropertyName = "dependencies";
+    private static final String issuesPropertyName = "issues";
+
     private Path relativePath;
     private DateTime lastModified;
     private Iterable<Path> dependencies;
@@ -82,16 +86,6 @@ public class BuildJSONSourceFile
     }
 
     /**
-     * Clear the known issues about the source file.
-     * @return This object for method chaining.
-     */
-    public BuildJSONSourceFile clearIssues()
-    {
-        this.issues.clear();
-        return this;
-    }
-
-    /**
      * Add the provided issue to the source file.
      * @param issue The issue to add to the source file.
      * @return This object for method chaining.
@@ -140,38 +134,105 @@ public class BuildJSONSourceFile
     @Override
     public String toString()
     {
-        return JSON.object(sourceFile ->
+        return Strings.escapeAndQuote(this.relativePath) + ":" + this.toJson().toString();
+    }
+
+    /**
+     * Get the JSON representation of this object.
+     * @return The JSON representation of this object.
+     */
+    public JSONObject toJson()
+    {
+        return JSON.object(this::toJson);
+    }
+
+    /**
+     * Write this BuildJSONSourceFile in its JSON representation to the provided JSONObjectBuilder.
+     * @param buildJsonSourceFile The JSONObjectBuilder to write this BuildJSONSourceFile to in its
+     *                            JSON representation.
+     */
+    public void toJson(JSONObjectBuilder buildJsonSourceFile)
+    {
+        PreCondition.assertNotNull(buildJsonSourceFile, "json");
+
+        if (lastModified != null)
         {
-            if (relativePath != null)
+            buildJsonSourceFile.numberProperty(BuildJSONSourceFile.lastModifiedPropertyName, (long)lastModified.getDurationSinceEpoch().toNanoseconds().getValue());
+        }
+        if (!Iterable.isNullOrEmpty(dependencies))
+        {
+            buildJsonSourceFile.stringArrayProperty(BuildJSONSourceFile.dependenciesPropertyName, dependencies.map(Path::toString));
+        }
+        if (!Iterable.isNullOrEmpty(issues))
+        {
+            buildJsonSourceFile.arrayProperty(BuildJSONSourceFile.issuesPropertyName, issuesJson ->
             {
-                sourceFile.stringProperty("relativePath", relativePath.toString());
-            }
-            if (lastModified != null)
-            {
-                sourceFile.numberProperty("lastModified", lastModified.getMillisecondsSinceEpoch());
-            }
-            if (!Iterable.isNullOrEmpty(dependencies))
-            {
-                sourceFile.stringArrayProperty("dependencies", dependencies.map(Path::toString));
-            }
-            if (!Iterable.isNullOrEmpty(issues))
-            {
-                sourceFile.arrayProperty("issues", issuesJson ->
+                for (final JavaCompilerIssue issue : issues)
                 {
-                    for (final JavaCompilerIssue issue : issues)
+                    issuesJson.objectElement(issueJson ->
                     {
-                        issuesJson.objectElement(issueJson ->
-                        {
-                            issueJson.stringProperty("sourceFilePath", issue.sourceFilePath);
-                            issueJson.numberProperty("lineNumber", issue.lineNumber);
-                            issueJson.numberProperty("columnNumber", issue.columnNumber);
-                            issueJson.stringProperty("type", issue.type.toString());
-                            issueJson.stringProperty("message", issue.message);
-                        });
-                    }
-                });
-            }
-        }).toString();
+                        issueJson.stringProperty("sourceFilePath", issue.sourceFilePath);
+                        issueJson.numberProperty("lineNumber", issue.lineNumber);
+                        issueJson.numberProperty("columnNumber", issue.columnNumber);
+                        issueJson.stringProperty("type", issue.type.toString());
+                        issueJson.stringProperty("message", issue.message);
+                    });
+                }
+            });
+        }
+    }
+
+    public void toJsonProperty(JSONObjectBuilder buildJson)
+    {
+        PreCondition.assertNotNull(buildJson, "buildJson");
+
+        buildJson.objectProperty(this.getRelativePath().toString(), this::toJson);
+    }
+
+    /**
+     * Parse a BuildJSONSourceFile from the provided JSONProperty.
+     * @param sourceFileProperty The JSONProperty to parse a JSONSourceFile from.
+     * @return The parsed BuildJSONSourceFile.
+     */
+    public static Result<BuildJSONSourceFile> parse(JSONProperty sourceFileProperty)
+    {
+        PreCondition.assertNotNull(sourceFileProperty, "sourceFileProperty");
+
+        return Result.create(() ->
+        {
+            final Path relativePath = Path.parse(sourceFileProperty.getName());
+            final JSONObject sourceFileObject = sourceFileProperty.getObjectValue().await();
+            final Double lastModifiedNanoseconds = sourceFileObject.getNumberPropertyValue(BuildJSONSourceFile.lastModifiedPropertyName)
+                .catchError()
+                .await();
+            final DateTime lastModified = lastModifiedNanoseconds == null ? null : DateTime.createFromDurationSinceEpoch(Duration.nanoseconds(lastModifiedNanoseconds));
+            final JSONArray dependenciesArray = sourceFileObject.getArrayPropertyValue(BuildJSONSourceFile.dependenciesPropertyName)
+                .catchError()
+                .await();
+            final Iterable<Path> dependencies = dependenciesArray == null
+                ? Iterable.create()
+                : dependenciesArray
+                    .getElements()
+                    .instanceOf(JSONQuotedString.class)
+                    .map(JSONQuotedString::toUnquotedString)
+                    .map(Path::parse)
+                    .toList();
+            final JSONArray issuesArray = sourceFileObject.getArrayPropertyValue(BuildJSONSourceFile.issuesPropertyName)
+                .catchError()
+                .await();
+            final Iterable<JavaCompilerIssue> issues = issuesArray == null
+                ? Iterable.create()
+                : issuesArray
+                    .getElements()
+                    .instanceOf(JSONObject.class)
+                    .map((JSONObject issueJson) -> JavaCompilerIssue.parse(issueJson).await())
+                    .toList();
+            return new BuildJSONSourceFile()
+                .setRelativePath(relativePath)
+                .setLastModified(lastModified)
+                .setDependencies(dependencies)
+                .setIssues(issues);
+        });
     }
 
     /**
@@ -228,101 +289,6 @@ public class BuildJSONSourceFile
             }
         }
         result.setDependencies(sourceFileDependencyPaths);
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    /**
-     * Write this BuildJSONSourceFile in its JSON representation to the provided JSONObjectBuilder.
-     * @param builder The JSONObjectBuilder to write this BuildJSONSourceFile to in its JSON
-     *                representation.
-     */
-    public void writeJson(JSONObjectBuilder builder)
-    {
-        PreCondition.assertNotNull(builder, "builder");
-
-        builder.objectProperty(getRelativePath().toString(), (JSONObjectBuilder buildJsonSourceFileBuilder) ->
-        {
-            if (lastModified != null)
-            {
-                buildJsonSourceFileBuilder.numberProperty("lastModified", lastModified.getMillisecondsSinceEpoch());
-            }
-            if (!Iterable.isNullOrEmpty(dependencies))
-            {
-                buildJsonSourceFileBuilder.stringArrayProperty("dependencies", dependencies.map(Path::toString));
-            }
-            if (!Iterable.isNullOrEmpty(issues))
-            {
-                buildJsonSourceFileBuilder.arrayProperty("issues", issuesJson ->
-                {
-                    for (final JavaCompilerIssue issue : issues)
-                    {
-                        issuesJson.objectElement(issueJson ->
-                        {
-                            issueJson.stringProperty("sourceFilePath", issue.sourceFilePath);
-                            issueJson.numberProperty("lineNumber", issue.lineNumber);
-                            issueJson.numberProperty("columnNumber", issue.columnNumber);
-                            issueJson.stringProperty("type", issue.type.toString());
-                            issueJson.stringProperty("message", issue.message);
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    /**
-     * Parse a BuildJSONSourceFile from the provided JSONProperty.
-     * @param sourceFileProperty The JSONProperty to parse a JSONSourceFile from.
-     * @return The parsed BuildJSONSourceFile.
-     */
-    public static BuildJSONSourceFile parse(JSONProperty sourceFileProperty)
-    {
-        PreCondition.assertNotNull(sourceFileProperty, "sourceFileProperty");
-
-        final BuildJSONSourceFile result = new BuildJSONSourceFile();
-
-        result.setRelativePath(Path.parse(sourceFileProperty.getName()));
-        sourceFileProperty.getObjectValue()
-            .then((JSONObject sourceFileObject) ->
-            {
-                sourceFileObject.getNumberPropertyValue("lastModified")
-                    .then((Double lastModifiedMillisecondsSinceEpoch) ->
-                    {
-                        result.setLastModified(DateTime.local(lastModifiedMillisecondsSinceEpoch.longValue()));
-                    });
-                sourceFileObject.getArrayPropertyValue("dependencies")
-                    .then((JSONArray dependenciesArray) ->
-                    {
-                        result.setDependencies(dependenciesArray.getElements()
-                            .instanceOf(JSONQuotedString.class)
-                            .map(JSONQuotedString::toUnquotedString)
-                            .map(Path::parse));
-                    });
-                sourceFileObject.getArrayPropertyValue("issues")
-                    .then((JSONArray issuesArray) ->
-                    {
-                        for (final JSONObject element : issuesArray.getElements().instanceOf(JSONObject.class))
-                        {
-                            try
-                            {
-                                final String sourceFilePath = element.getUnquotedStringPropertyValue("sourceFilePath").await();
-                                final int lineNumber = element.getNumberPropertyValue("lineNumber").await().intValue();
-                                final int columnNumber = element.getNumberPropertyValue("columnNumber").await().intValue();
-                                final String typeString = element.getUnquotedStringPropertyValue("type").await();
-                                final Issue.Type type = Strings.isNullOrEmpty(typeString) ? null : Issue.Type.valueOf(typeString);
-                                final String message = element.getUnquotedStringPropertyValue("message").await();
-                                final JavaCompilerIssue issue = new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, type, message);
-                                result.addIssue(issue);
-                            }
-                            catch (Throwable ignored)
-                            {
-                            }
-                        }
-                    });
-            });
 
         PostCondition.assertNotNull(result, "result");
 

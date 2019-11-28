@@ -1,8 +1,8 @@
 package qub;
 
-public class BuildJSONSourceFileTests
+public interface BuildJSONSourceFileTests
 {
-    public static void test(TestRunner runner)
+    static void test(TestRunner runner)
     {
         runner.testGroup(BuildJSONSourceFile.class, () ->
         {
@@ -20,7 +20,7 @@ public class BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(parseJsonSourceFile.equals((Object)null));
                 });
 
@@ -28,7 +28,7 @@ public class BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(parseJsonSourceFile.equals("Hello"));
                 });
 
@@ -36,36 +36,36 @@ public class BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(
                         parseJsonSourceFile.equals((Object)
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("b"))
-                                .setLastModified(DateTime.utc(5))));
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))));
                 });
 
                 runner.test("with different lastModified", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(
                         parseJsonSourceFile.equals((Object)
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.utc(6))));
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(6)))));
                 });
 
                 runner.test("with different dependencies", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(
                         parseJsonSourceFile.equals((Object)
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.utc(6))
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(6)))
                                 .setDependencies(Iterable.create())));
                 });
 
@@ -73,19 +73,19 @@ public class BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertTrue(
                         parseJsonSourceFile.equals((Object)
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.utc(5))));
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))));
                 });
 
                 runner.test("with same", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertTrue(parseJsonSourceFile.equals((Object)parseJsonSourceFile));
                 });
             });
@@ -96,7 +96,7 @@ public class BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(parseJsonSourceFile.equals((BuildJSONSourceFile)null));
                 });
 
@@ -104,36 +104,36 @@ public class BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(
                         parseJsonSourceFile.equals(
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("b"))
-                                .setLastModified(DateTime.utc(5))));
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))));
                 });
 
                 runner.test("with different lastModified", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(
                         parseJsonSourceFile.equals(
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.utc(6))));
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(6)))));
                 });
 
                 runner.test("with different dependencies", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertFalse(
                         parseJsonSourceFile.equals(
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.utc(6))
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(6)))
                                 .setDependencies(Iterable.create())));
                 });
 
@@ -141,19 +141,19 @@ public class BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertTrue(
                         parseJsonSourceFile.equals(
                             new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.utc(5))));
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))));
                 });
 
                 runner.test("with same", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(5));
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)));
                     test.assertTrue(parseJsonSourceFile.equals(parseJsonSourceFile));
                 });
             });
@@ -163,17 +163,17 @@ public class BuildJSONSourceFileTests
                 runner.test("with no properties", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile();
-                    test.assertEqual("{}", parseJsonSourceFile.toString());
+                    test.assertEqual("null:{}", parseJsonSourceFile.toString());
                 });
 
                 runner.test("with all properties", (Test test) ->
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.utc(20))
+                        .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.nanoseconds(20)))
                         .setDependencies(Iterable.create(Path.parse("b"), Path.parse("c")));
                     test.assertEqual(
-                        "{\"relativePath\":\"a\",\"lastModified\":20,\"dependencies\":[\"b\",\"c\"]}",
+                        "\"a\":{\"lastModifiedNanoseconds\":20,\"dependencies\":[\"b\",\"c\"]}",
                         parseJsonSourceFile.toString());
                 });
             });

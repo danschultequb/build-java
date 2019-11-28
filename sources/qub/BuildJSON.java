@@ -2,6 +2,8 @@ package qub;
 
 public class BuildJSON
 {
+    private static final String projectJsonPropertyName = "project.json";
+
     private ProjectJSON projectJson;
     private Iterable<BuildJSONSourceFile> sourceFiles;
     private Map<Path,BuildJSONSourceFile> pathMap;
@@ -56,28 +58,35 @@ public class BuildJSON
     {
         PreCondition.assertNotNull(relativePath, "relativePath");
 
-        return pathMap == null
-            ? Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + "."))
-            : pathMap.get(relativePath)
-                .catchErrorResult(NotFoundException.class, () ->
-                    Result.error(new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + ".")));
+        return Result.create(() ->
+        {
+            if (this.pathMap == null)
+            {
+                throw new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + ".");
+            }
+            return this.pathMap.get(relativePath)
+                .convertError(NotFoundException.class, () -> new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + "."))
+                .await();
+        });
     }
 
     public JSONObject toJson()
     {
-        return JSON.object((JSONObjectBuilder buildJsonBuilder) ->
-        {
-            final ProjectJSON projectJson = getProjectJson();
-            if (projectJson != null)
-            {
-                buildJsonBuilder.objectProperty("project.json", projectJson::write);
-            }
+        return JSON.object(this::toJson);
+    }
 
-            for (final BuildJSONSourceFile buildJSONSourceFile : getSourceFiles())
-            {
-                buildJSONSourceFile.writeJson(buildJsonBuilder);
-            }
-        });
+    public void toJson(JSONObjectBuilder buildJson)
+    {
+        final ProjectJSON projectJson = getProjectJson();
+        if (projectJson != null)
+        {
+            buildJson.objectProperty(BuildJSON.projectJsonPropertyName, projectJson::write);
+        }
+
+        for (final BuildJSONSourceFile buildJSONSourceFile : this.getSourceFiles())
+        {
+            buildJSONSourceFile.toJsonProperty(buildJson);
+        }
     }
 
     @Override
@@ -108,8 +117,15 @@ public class BuildJSON
     {
         PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
 
-        return parseJSONFile.getContentByteReadStream()
-            .thenResult(BuildJSON::parse);
+        return Result.create(() ->
+        {
+            BuildJSON result;
+            try (final ByteReadStream byteReadStream = parseJSONFile.getContentByteReadStream().await())
+            {
+                result = BuildJSON.parse(byteReadStream).await();
+            }
+            return result;
+        });
     }
 
     public static Result<BuildJSON> parse(ByteReadStream readStream)
@@ -117,30 +133,37 @@ public class BuildJSON
         PreCondition.assertNotNull(readStream, "readStream");
         PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
 
-        return parse(readStream.asCharacterReadStream());
+        return BuildJSON.parse(readStream.asCharacterReadStream());
     }
 
     public static Result<BuildJSON> parse(Iterator<Character> characters)
     {
         PreCondition.assertNotNull(characters, "character");
 
-        return JSON.parse(characters).getRootObject().then((JSONObject rootObject) -> parse(rootObject));
+        return Result.create(() ->
+        {
+            final JSONObject rootObject = JSON.parse(characters).getRootObject().await();
+            return BuildJSON.parse(rootObject).await();
+        });
     }
 
-    public static BuildJSON parse(JSONObject rootObject)
+    public static Result<BuildJSON> parse(JSONObject rootObject)
     {
         PreCondition.assertNotNull(rootObject, "rootObject");
 
-        final BuildJSON result = new BuildJSON();
-        rootObject.getObjectPropertyValue("project.json")
-            .then((JSONObject jsonObject) -> ProjectJSON.parse(jsonObject))
-            .then(result::setProjectJson);
-        result.setSourceFiles(rootObject.getProperties()
-            .where(property -> !property.getName().equals("project.json"))
-            .map(BuildJSONSourceFile::parse));
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
+        return Result.create(() ->
+        {
+            final JSONObject projectJsonObject = rootObject.getObjectPropertyValue(BuildJSON.projectJsonPropertyName)
+                .catchError()
+                .await();
+            final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.parse(projectJsonObject);
+            final Iterable<BuildJSONSourceFile> buildJSONSourceFiles = rootObject.getProperties()
+                .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
+                .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())
+                .toList();
+            return new BuildJSON()
+                .setProjectJson(projectJson)
+                .setSourceFiles(buildJSONSourceFiles);
+        });
     }
 }
