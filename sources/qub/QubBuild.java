@@ -309,23 +309,31 @@ public interface QubBuild
                             final BuildJSONSourceFile buildJsonSource = buildJson.getSourceFile(javaSourceFileRelativePath)
                                 .catchError(NotFoundException.class)
                                 .await();
-                            if (buildJsonSource == null)
+                            if (buildJsonSource == null || buildJsonSource.getLastModified() == null)
                             {
+                                verbose.writeLine(javaSourceFile + " - New file").await();
                                 newJavaSourceFiles.add(javaSourceFile);
                                 buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                             }
-                            else if (!javaSourceFile.getLastModified().await().equals(buildJsonSource.getLastModified()))
+                            else if (!javaSourceFile.getLastModified().await().equals(buildJsonSource.getLastModified(), Duration.milliseconds(1)))
                             {
+                                verbose.writeLine(javaSourceFile + " - Last modified: " + javaSourceFile.getLastModified().await()).await();
+                                verbose.writeLine(Strings.repeat(' ', javaSourceFile.toString().length()) + " - Last built:    " + buildJsonSource.getLastModified()).await();
+
                                 modifiedJavaSourceFiles.add(javaSourceFile);
                                 buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                             }
                             else if (!Iterable.isNullOrEmpty(buildJsonSource.getIssues()))
                             {
+                                verbose.writeLine(javaSourceFile + " - Has issues").await();
+
                                 issuedJavaSourceFiles.add(javaSourceFile);
                                 buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                             }
                             else
                             {
+                                verbose.writeLine(javaSourceFile + " - No changes or issues").await();
+
                                 nonModifiedJavaSourceFiles.add(javaSourceFile);
                                 buildJsonSourceFiles.add(buildJsonSource);
                             }

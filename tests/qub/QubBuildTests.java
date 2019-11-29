@@ -3090,6 +3090,7 @@ public interface QubBuildTests
                             Iterable.create(
                                 "VERBOSE: Parsing project.json...",
                                 "VERBOSE: Parsing outputs/build.json...",
+                                "VERBOSE: /sources/A.java - No changes or issues",
                                 "VERBOSE: Deleted source files:",
                                 "VERBOSE: /sources/B.java",
                                 "VERBOSE: Updating outputs/build.json...",
@@ -3172,6 +3173,8 @@ public interface QubBuildTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: /sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/B.java - New file",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -3253,6 +3256,8 @@ public interface QubBuildTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -3329,6 +3334,7 @@ public interface QubBuildTests
                             Iterable.create(
                                 "VERBOSE: Parsing project.json...",
                                 "VERBOSE: Parsing outputs/build.json...",
+                                "VERBOSE: /sources/A.java - Has issues",
                                 "VERBOSE: Updating outputs/build.json...",
                                 "VERBOSE: Setting project.json...",
                                 "VERBOSE: Setting source files...",
@@ -3415,6 +3421,7 @@ public interface QubBuildTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: /sources/B.java - No changes or issues",
                             "VERBOSE: Deleted source files:",
                             "VERBOSE: /sources/A.java",
                             "VERBOSE: Updating outputs/build.json...",
