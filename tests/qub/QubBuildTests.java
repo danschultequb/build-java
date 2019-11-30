@@ -522,7 +522,7 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(outputs, "A.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
@@ -570,7 +570,7 @@ public interface QubBuildTests
                         bin.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", getFileContents(bin, "A.class"));
-                    test.assertEqual(0, getFileLastModified(bin, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(bin, "A.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(new ProjectJSON()
@@ -620,7 +620,7 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(outputs, "A.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
@@ -670,9 +670,9 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(outputs, "A.class").getDurationSinceEpoch());
                     test.assertEqual("B.java bytecode", getFileContents(outputs, "B.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(outputs, "B.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
@@ -724,9 +724,9 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folders");
                     test.assertEqual("A.java bytecode", getFileContents(outputs, "A.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "A.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(outputs, "A.class").getDurationSinceEpoch());
                     test.assertEqual("B.java bytecode", getFileContents(outputs, "B.class"));
-                    test.assertEqual(0, getFileLastModified(outputs, "B.class").getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(outputs, "B.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
@@ -1628,7 +1628,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
@@ -1784,7 +1784,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(aClassFile));
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
-                    test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(bClassFile).getDurationSinceEpoch());
                     test.assertEqual("B.java source", getFileContents(bClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -1928,10 +1928,10 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.minutes(1), getFileLastModified(bClassFile).getDurationSinceEpoch());
                     test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2017,16 +2017,16 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(nClassFile).getDurationSinceEpoch());
                     test.assertEqual("N.java source", getFileContents(nClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.minutes(1), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.minutes(1), getFileLastModified(bClassFile).getDurationSinceEpoch());
                     test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(cClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.minutes(1), getFileLastModified(cClassFile).getDurationSinceEpoch());
                     test.assertEqual("C.java bytecode", getFileContents(cClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2122,13 +2122,13 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(nClassFile).getDurationSinceEpoch());
                     test.assertEqual("N.java source", getFileContents(nClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.minutes(1), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
-                    test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(bClassFile).getDurationSinceEpoch());
                     test.assertEqual("B.java source, depends on C", getFileContents(bClassFile));
 
                     test.assertFalse(cClassFile.exists().await());
@@ -2222,16 +2222,16 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(nClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(nClassFile).getDurationSinceEpoch());
                     test.assertEqual("N.java source", getFileContents(nClassFile));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source, depends on B", getFileContents(aClassFile));
 
-                    test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(bClassFile).getDurationSinceEpoch());
                     test.assertEqual("B.java source, depends on C", getFileContents(bClassFile));
 
-                    test.assertEqual(60000, getFileLastModified(cClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.minutes(1), getFileLastModified(cClassFile).getDurationSinceEpoch());
                     test.assertEqual("C.java bytecode", getFileContents(cClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2322,7 +2322,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2381,7 +2381,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2440,7 +2440,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2521,7 +2521,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(60), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2600,7 +2600,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(60), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2667,7 +2667,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2734,7 +2734,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2801,7 +2801,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2879,7 +2879,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(60), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -2962,7 +2962,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(60), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -3112,7 +3112,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertFalse(bClassFile.exists().await());
@@ -3195,7 +3195,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(bClassFile));
@@ -3277,7 +3277,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(60), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -3359,7 +3359,7 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source", getFileContents(aClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
@@ -3447,7 +3447,7 @@ public interface QubBuildTests
 
                     test.assertFalse(aClassFile.exists().await());
 
-                    test.assertEqual(60000, bClassFile.getLastModified().await().getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(60), bClassFile.getLastModified().await().getDurationSinceEpoch());
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
@@ -3507,13 +3507,13 @@ public interface QubBuildTests
                             "/outputs/build.json"),
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
 
-                    test.assertEqual(0, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
 
-                    test.assertEqual(0, getFileLastModified(abClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(abClassFile).getDurationSinceEpoch());
                     test.assertEqual("AB.java bytecode", getFileContents(abClassFile));
 
-                    test.assertEqual(0, getFileLastModified(bClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.zero, getFileLastModified(bClassFile).getDurationSinceEpoch());
                     test.assertEqual("B.java bytecode", getFileContents(bClassFile));
 
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "build.json"), "Wrong build.json file lastModified");
@@ -3912,9 +3912,9 @@ public interface QubBuildTests
                         outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", getFileContents(aClassFile));
-                    test.assertEqual(60000, getFileLastModified(aClassFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(60), getFileLastModified(aClassFile).getDurationSinceEpoch());
                     test.assertEqual("A.java source 2", getFileContents(aJavaFile));
-                    test.assertEqual(61000, getFileLastModified(aJavaFile).getMillisecondsSinceEpoch());
+                    test.assertEqual(Duration.seconds(61), getFileLastModified(aJavaFile).getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
