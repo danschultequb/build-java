@@ -90,12 +90,12 @@ public class JavaCompilerIssue
 
         return Result.create(() ->
         {
-            final String sourceFilePath = json.getUnquotedStringPropertyValue(JavaCompilerIssue.sourceFilePathPropertyName).await();
+            final String sourceFilePath = json.getStringPropertyValue(JavaCompilerIssue.sourceFilePathPropertyName).await();
             final int lineNumber = json.getNumberPropertyValue(JavaCompilerIssue.lineNumberPropertyName).await().intValue();
             final int columnNumber = json.getNumberPropertyValue(JavaCompilerIssue.columnNumberPropertyName).await().intValue();
-            final String typeString = json.getUnquotedStringPropertyValue(JavaCompilerIssue.typePropertyName).await();
+            final String typeString = json.getStringPropertyValue(JavaCompilerIssue.typePropertyName).await();
             final Issue.Type type = Strings.isNullOrEmpty(typeString) ? null : Issue.Type.valueOf(typeString);
-            final String message = json.getUnquotedStringPropertyValue(JavaCompilerIssue.messagePropertyName).await();
+            final String message = json.getStringPropertyValue(JavaCompilerIssue.messagePropertyName).await();
             return new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, type, message);
         });
     }

@@ -240,24 +240,24 @@ public class ProjectJSONJava
         PreCondition.assertNotNull(javaObject, "javaObject");
 
         final ProjectJSONJava result = new ProjectJSONJava();
-        javaObject.getUnquotedStringPropertyValue(mainClassPropertyName)
+        javaObject.getStringPropertyValue(mainClassPropertyName)
             .then(result::setMainClass)
             .catchError()
             .await();
-        javaObject.getUnquotedStringPropertyValue(shortcutNamePropertyName)
+        javaObject.getStringPropertyValue(shortcutNamePropertyName)
             .then(result::setShortcutName)
             .catchError()
             .await();
-        javaObject.getUnquotedStringPropertyValue(versionPropertyName)
+        javaObject.getStringPropertyValue(versionPropertyName)
             .catchErrorResult(WrongTypeException.class, () -> javaObject.getNumberPropertyValue("version").then(Object::toString))
             .then(result::setVersion)
             .catchError()
             .await();
-        javaObject.getUnquotedStringPropertyValue(outputFolderPropertyName)
+        javaObject.getStringPropertyValue(outputFolderPropertyName)
             .then(result::setOutputFolder)
             .catchError()
             .await();
-        javaObject.getUnquotedStringPropertyValue(sourceFilesPropertyName)
+        javaObject.getStringPropertyValue(sourceFilesPropertyName)
             .then((String sourceFilesPattern) ->
             {
                 if (!Strings.isNullOrEmpty(sourceFilesPattern))

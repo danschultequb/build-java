@@ -114,15 +114,15 @@ public class Dependency
     public static Dependency parse(JSONObject dependencyObject)
     {
         final Dependency dependency = new Dependency();
-        dependencyObject.getUnquotedStringPropertyValue(publisherPropertyName)
+        dependencyObject.getStringPropertyValue(publisherPropertyName)
             .then(dependency::setPublisher)
             .catchError()
             .await();
-        dependencyObject.getUnquotedStringPropertyValue(projectPropertyName)
+        dependencyObject.getStringPropertyValue(projectPropertyName)
             .then(dependency::setProject)
             .catchError()
             .await();
-        dependencyObject.getUnquotedStringPropertyValue(versionPropertyName)
+        dependencyObject.getStringPropertyValue(versionPropertyName)
             .then(dependency::setVersion)
             .catchError()
             .await();

@@ -192,15 +192,15 @@ public class ProjectJSON
 
         ProjectJSON projectJson = new ProjectJSON();
 
-        rootObject.getUnquotedStringPropertyValue(publisherPropertyName)
+        rootObject.getStringPropertyValue(publisherPropertyName)
             .then(projectJson::setPublisher)
             .catchError()
             .await();
-        rootObject.getUnquotedStringPropertyValue(projectPropertyName)
+        rootObject.getStringPropertyValue(projectPropertyName)
             .then(projectJson::setProject)
             .catchError()
             .await();
-        rootObject.getUnquotedStringPropertyValue(versionPropertyName)
+        rootObject.getStringPropertyValue(versionPropertyName)
             .then(projectJson::setVersion)
             .catchError()
             .await();
