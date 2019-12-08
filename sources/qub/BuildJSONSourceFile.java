@@ -5,7 +5,7 @@ package qub;
  */
 public class BuildJSONSourceFile
 {
-    private static final String lastModifiedPropertyName = "lastModifiedNanoseconds";
+    private static final String lastModifiedPropertyName = "lastModified";
     private static final String dependenciesPropertyName = "dependencies";
     private static final String issuesPropertyName = "issues";
 
@@ -42,6 +42,7 @@ public class BuildJSONSourceFile
     public BuildJSONSourceFile setRelativePath(Path relativePath)
     {
         PreCondition.assertNotNull(relativePath, "relativePath");
+        PreCondition.assertFalse(relativePath.isRooted(), "relativePath.isRooted()");
 
         this.relativePath = relativePath;
         return this;
@@ -157,7 +158,7 @@ public class BuildJSONSourceFile
 
         if (lastModified != null)
         {
-            buildJsonSourceFile.numberProperty(BuildJSONSourceFile.lastModifiedPropertyName, (long)lastModified.getDurationSinceEpoch().toNanoseconds().getValue());
+            buildJsonSourceFile.stringProperty(BuildJSONSourceFile.lastModifiedPropertyName, lastModified.toString());
         }
         if (!Iterable.isNullOrEmpty(dependencies))
         {
@@ -169,14 +170,7 @@ public class BuildJSONSourceFile
             {
                 for (final JavaCompilerIssue issue : issues)
                 {
-                    issuesJson.objectElement(issueJson ->
-                    {
-                        issueJson.stringProperty("sourceFilePath", issue.sourceFilePath);
-                        issueJson.numberProperty("lineNumber", issue.lineNumber);
-                        issueJson.numberProperty("columnNumber", issue.columnNumber);
-                        issueJson.stringProperty("type", issue.type.toString());
-                        issueJson.stringProperty("message", issue.message);
-                    });
+                    issuesJson.objectElement(issue::toJson);
                 }
             });
         }
@@ -202,10 +196,10 @@ public class BuildJSONSourceFile
         {
             final Path relativePath = Path.parse(sourceFileProperty.getName());
             final JSONObject sourceFileObject = sourceFileProperty.getObjectValue().await();
-            final Double lastModifiedNanoseconds = sourceFileObject.getNumberPropertyValue(BuildJSONSourceFile.lastModifiedPropertyName)
+            final DateTime lastModified = sourceFileObject.getStringPropertyValue(BuildJSONSourceFile.lastModifiedPropertyName)
+                .then((String lastModifiedString) -> DateTime.parse(lastModifiedString).await())
                 .catchError()
                 .await();
-            final DateTime lastModified = lastModifiedNanoseconds == null ? null : DateTime.createFromDurationSinceEpoch(Duration.nanoseconds(lastModifiedNanoseconds));
             final JSONArray dependenciesArray = sourceFileObject.getArrayPropertyValue(BuildJSONSourceFile.dependenciesPropertyName)
                 .catchError()
                 .await();

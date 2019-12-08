@@ -315,7 +315,7 @@ public interface QubBuild
                                 newJavaSourceFiles.add(javaSourceFile);
                                 buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                             }
-                            else if (!javaSourceFile.getLastModified().await().equals(buildJsonSource.getLastModified(), Duration.milliseconds(1)))
+                            else if (!javaSourceFile.getLastModified().await().equals(buildJsonSource.getLastModified()))
                             {
                                 verbose.writeLine(javaSourceFile + " - Last modified: " + javaSourceFile.getLastModified().await()).await();
                                 verbose.writeLine(Strings.repeat(' ', javaSourceFile.toString().length()) + " - Last built:    " + buildJsonSource.getLastModified()).await();
