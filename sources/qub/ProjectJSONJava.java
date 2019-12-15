@@ -18,7 +18,7 @@ public class ProjectJSONJava
     private Integer maximumErrors;
     private Integer maximumWarnings;
     private Iterable<PathPattern> sourceFilePatterns;
-    private Iterable<Dependency> dependencies;
+    private Iterable<ProjectSignature> dependencies;
 
     /**
      * Get the main class.
@@ -157,7 +157,7 @@ public class ProjectJSONJava
      * Get the dependencies for this project.
      * @return The dependencies for this project.
      */
-    public Iterable<Dependency> getDependencies()
+    public Iterable<ProjectSignature> getDependencies()
     {
         return dependencies;
     }
@@ -166,7 +166,7 @@ public class ProjectJSONJava
      * Set the dependencies for this project.
      * @param dependencies The dependencies for this project.
      */
-    public ProjectJSONJava setDependencies(Iterable<Dependency> dependencies)
+    public ProjectJSONJava setDependencies(Iterable<ProjectSignature> dependencies)
     {
         this.dependencies = dependencies;
         return this;
@@ -227,9 +227,9 @@ public class ProjectJSONJava
         {
             builder.arrayProperty(dependenciesPropertyName, dependenciesBuilder ->
             {
-                for (final Dependency dependency : dependencies)
+                for (final ProjectSignature dependency : dependencies)
                 {
-                    dependenciesBuilder.objectElement(dependency::write);
+                    dependenciesBuilder.objectElement(dependency::toJson);
                 }
             });
         }
@@ -290,9 +290,15 @@ public class ProjectJSONJava
         javaObject.getArrayPropertyValue(dependenciesPropertyName)
             .then((JSONArray dependenciesArray) ->
             {
-                result.setDependencies(dependenciesArray.getElements()
-                    .instanceOf(JSONObject.class)
-                    .map(Dependency::parse));
+                final List<ProjectSignature> dependencies = List.create();
+                for (final JSONObject dependencyJson : dependenciesArray.getElements().instanceOf(JSONObject.class))
+                {
+                    ProjectSignature.parse(dependencyJson)
+                        .then(dependencies::add)
+                        .catchError()
+                        .await();
+                }
+                result.setDependencies(dependencies);
             })
             .catchError()
             .await();

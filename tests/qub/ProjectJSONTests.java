@@ -441,7 +441,7 @@ public interface ProjectJSONTests
                     test.assertNull(java.getVersion());
                     test.assertNull(java.getMainClass());
                     test.assertNull(java.getShortcutName());
-                    test.assertEqual(Iterable.create(new Dependency()), java.getDependencies());
+                    test.assertEqual(Iterable.create(), java.getDependencies());
                 });
 
                 runner.test("with one non-empty java dependency", (Test test) ->
@@ -462,10 +462,7 @@ public interface ProjectJSONTests
                     test.assertNull(java.getShortcutName());
                     test.assertEqual(
                         Iterable.create(
-                            new Dependency()
-                                .setPublisher("a")
-                                .setProject("b")
-                                .setVersion("c")),
+                            new ProjectSignature("a", "b", "c")),
                         java.getDependencies());
                 });
 

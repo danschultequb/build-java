@@ -2770,10 +2770,7 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", new ProjectJSON()
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setPublisher("a")
-                                    .setProject("b")
-                                    .setVersion("c"))))
+                                new ProjectSignature("a", "b", "c"))))
                         .toString());
 
                     clock.advance(Duration.minutes(1));
@@ -2810,10 +2807,7 @@ public interface QubBuildTests
                             .setProjectJson(new ProjectJSON()
                                 .setJava(new ProjectJSONJava()
                                     .setDependencies(Iterable.create(
-                                        new Dependency()
-                                            .setPublisher("a")
-                                            .setProject("b")
-                                            .setVersion("c")))))
+                                        new ProjectSignature("a", "b", "c")))))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2834,11 +2828,7 @@ public interface QubBuildTests
                         .setProjectJson(new ProjectJSON()
                             .setJava(new ProjectJSONJava()
                                 .setDependencies(Iterable.create(
-                                    new Dependency()
-                                        .setPublisher("a")
-                                        .setProject("b")
-                                        .setVersion("c")
-                                ))))
+                                    new ProjectSignature("a", "b", "c")))))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                             .setRelativePath("sources/A.java")
@@ -2906,11 +2896,7 @@ public interface QubBuildTests
                         .setProjectJson(new ProjectJSON()
                             .setJava(new ProjectJSONJava()
                                 .setDependencies(Iterable.create(
-                                    new Dependency()
-                                        .setPublisher("a")
-                                        .setProject("b")
-                                        .setVersion("c")
-                                ))))
+                                    new ProjectSignature("a", "b", "c")))))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                             .setRelativePath("sources/A.java")
@@ -2919,10 +2905,7 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", new ProjectJSON()
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setPublisher("a")
-                                    .setProject("b")
-                                    .setVersion("d"))))
+                                new ProjectSignature("a", "b", "d"))))
                         .toString());
 
                     clock.advance(Duration.minutes(1));
@@ -2971,10 +2954,7 @@ public interface QubBuildTests
                             .setProjectJson(new ProjectJSON()
                                 .setJava(new ProjectJSONJava()
                                 .setDependencies(Iterable.create(
-                                    new Dependency()
-                                        .setPublisher("a")
-                                        .setProject("b")
-                                        .setVersion("d")))))
+                                    new ProjectSignature("a", "b", "d")))))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -3646,10 +3626,7 @@ public interface QubBuildTests
                         .setProject("fake-project")
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setPublisher("fake-qub")
-                                    .setProject("qub-java")
-                                    .setVersion("1"))))
+                                new ProjectSignature("fake-qub", "qub-java", "1"))))
                         .toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
@@ -3678,10 +3655,7 @@ public interface QubBuildTests
                         .setProject("fake-project")
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setPublisher("qub")
-                                    .setProject("fake-qub-java")
-                                    .setVersion("1"))))
+                                new ProjectSignature("qub", "fake-qub-java", "1"))))
                         .toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
@@ -3721,20 +3695,14 @@ public interface QubBuildTests
                         .setVersion("2")
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setProject("a")
-                                    .setPublisher("me")
-                                    .setVersion("1"))));
+                                new ProjectSignature("me", "a", "1"))));
                     final ProjectJSON cProjectJson = new ProjectJSON()
                         .setProject("c")
                         .setPublisher("me")
                         .setVersion("3")
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                .setProject("b")
-                                .setPublisher("me")
-                                .setVersion("2"))));
+                                new ProjectSignature("me", "b", "2"))));
                     setFileContents(currentFolder, "project.json", cProjectJson.toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
@@ -3812,24 +3780,15 @@ public interface QubBuildTests
                         .setVersion("2")
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setProject("a")
-                                    .setPublisher("me")
-                                    .setVersion("2"))));
+                                new ProjectSignature("me", "a", "2"))));
                     final ProjectJSON cProjectJson = new ProjectJSON()
                         .setProject("c")
                         .setPublisher("me")
                         .setVersion("3")
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setProject("a")
-                                    .setPublisher("me")
-                                    .setVersion("1"),
-                                new Dependency()
-                                    .setProject("b")
-                                    .setPublisher("me")
-                                    .setVersion("2"))));
+                                new ProjectSignature("me", "a", "1"),
+                                new ProjectSignature("me", "b", "2"))));
                     currentFolder.getFile("project.json").await()
                         .setContentsAsString(JSON.object(cProjectJson::write).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");

@@ -164,43 +164,40 @@ public interface QubBuild
 
             final List<String> classPaths = List.create();
             classPaths.add(outputsFolder.toString());
-            Iterable<Dependency> dependencies = projectJsonJava.getDependencies();
+            Iterable<ProjectSignature> dependencies = projectJsonJava.getDependencies();
             if (!Iterable.isNullOrEmpty(dependencies))
             {
                 final QubFolder qubFolder = new QubFolder(fileSystem.getFolder(qubHome).await());
 
-                final Map<Dependency,Iterable<Dependency>> dependencyMap = getAllDependencies(qubFolder, dependencies);
+                final Map<ProjectSignature,Iterable<ProjectSignature>> dependencyMap = getAllDependencies(qubFolder, dependencies);
                 dependencies = dependencyMap.getKeys();
 
-                final Set<Dependency> errorDependencies = Set.create();
-                for (final Dependency dependency : dependencies)
+                final Set<ProjectSignature> errorDependencies = Set.create();
+                for (final ProjectSignature dependency : dependencies)
                 {
                     if (!errorDependencies.contains(dependency))
                     {
-                        final Iterable<Dependency> matchingDependencies = dependencies.where((Dependency otherDependency) ->
-                                Comparer.equal(dependency.getPublisher(), otherDependency.getPublisher()) &&
-                                Comparer.equal(dependency.getProject(), otherDependency.getProject()))
-                            .toList();
+                        final Iterable<ProjectSignature> matchingDependencies = dependencies.where(dependency::equalsIgnoreVersion).toList();
                         if (matchingDependencies.getCount() > 1)
                         {
                             errorDependencies.addAll(matchingDependencies);
                             final InMemoryCharacterStream errorMessage = new InMemoryCharacterStream();
                             final IndentedCharacterWriteStream indentedErrorMessage = new IndentedCharacterWriteStream(errorMessage)
                                 .setSingleIndent(" ");
-                            indentedErrorMessage.writeLine("Found more than one required version for package " + dependency.getPublisher() + "/" + dependency.getProject() + ":").await();
+                            indentedErrorMessage.writeLine("Found more than one required version for package " + dependency.toStringIgnoreVersion() + ":").await();
                             int number = 0;
-                            for (final Dependency matchingDependency : matchingDependencies)
+                            for (final ProjectSignature matchingProjectSignature : matchingDependencies)
                             {
                                 ++number;
                                 final String numberString = number + ". ";
                                 indentedErrorMessage.setCurrentIndent("");
-                                errorMessage.writeLine(numberString + matchingDependency.getPublisher() + "/" + matchingDependency.getProject() + "@" + matchingDependency.getVersion()).await();
+                                errorMessage.writeLine(numberString + matchingProjectSignature).await();
                                 indentedErrorMessage.setCurrentIndent(Strings.repeat(' ', numberString.length()));
-                                final Iterable<Dependency> path = dependencyMap.get(matchingDependency).await();
-                                for (final Dependency pathDependency : path)
+                                final Iterable<ProjectSignature> path = dependencyMap.get(matchingProjectSignature).await();
+                                for (final ProjectSignature pathProjectSignature : path)
                                 {
                                     indentedErrorMessage.increaseIndent();
-                                    indentedErrorMessage.writeLine("from " + matchingDependency.getPublisher() + "/" + pathDependency.getProject() + "@" + pathDependency.getVersion()).await();
+                                    indentedErrorMessage.writeLine("from " + pathProjectSignature).await();
                                 }
                             }
                             throw new RuntimeException(errorMessage.getText().await());
@@ -208,7 +205,7 @@ public interface QubBuild
                     }
                 }
 
-                for (final Dependency dependency : dependencies)
+                for (final ProjectSignature dependency : dependencies)
                 {
                     final QubPublisherFolder publisherFolder = qubFolder.getPublisherFolder(dependency.getPublisher()).await();
                     if (!publisherFolder.exists().await())
@@ -392,14 +389,14 @@ public interface QubBuild
                 {
                     final Path relativePath = nonModifiedJavaSourceFile.relativeTo(folderToBuild);
                     final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(relativePath).await();
-                    final Iterable<Path> sourceFileDependencyPaths = sourceFile.getDependencies();
-                    if (!Iterable.isNullOrEmpty(sourceFileDependencyPaths))
+                    final Iterable<Path> sourceFileProjectSignaturePaths = sourceFile.getDependencies();
+                    if (!Iterable.isNullOrEmpty(sourceFileProjectSignaturePaths))
                     {
-                        final Iterable<File> sourceFileDependencyFiles = sourceFileDependencyPaths
-                            .map((Path sourceFileDependencyPath) -> folderToBuild.getFile(sourceFileDependencyPath).await());
-                        for (final File sourceFileDependencyFile : sourceFileDependencyFiles)
+                        final Iterable<File> sourceFileProjectSignatureFiles = sourceFileProjectSignaturePaths
+                            .map((Path sourceFileProjectSignaturePath) -> folderToBuild.getFile(sourceFileProjectSignaturePath).await());
+                        for (final File sourceFileProjectSignatureFile : sourceFileProjectSignatureFiles)
                         {
-                            if (deletedJavaSourceFiles.contains(sourceFileDependencyFile))
+                            if (deletedJavaSourceFiles.contains(sourceFileProjectSignatureFile))
                             {
                                 javaSourceFilesWithDeletedDependencies.add(nonModifiedJavaSourceFile);
                                 javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
@@ -420,12 +417,12 @@ public interface QubBuild
                     {
                         final Path relativePath = fileToNotCompile.relativeTo(folderToBuild);
                         final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(relativePath).await();
-                        final Iterable<Path> sourceFileDependencyPaths = sourceFile.getDependencies();
-                        if (!Iterable.isNullOrEmpty(sourceFileDependencyPaths))
+                        final Iterable<Path> sourceFileProjectSignaturePaths = sourceFile.getDependencies();
+                        if (!Iterable.isNullOrEmpty(sourceFileProjectSignaturePaths))
                         {
-                            final Iterable<File> sourceFileDependencyFiles = sourceFileDependencyPaths
-                                .map((Path sourceFileDependencyPath) -> folderToBuild.getFile(sourceFileDependencyPath).await());
-                            for (final File dependencyFile : sourceFileDependencyFiles)
+                            final Iterable<File> sourceFileProjectSignatureFiles = sourceFileProjectSignaturePaths
+                                .map((Path sourceFileProjectSignaturePath) -> folderToBuild.getFile(sourceFileProjectSignaturePath).await());
+                            for (final File dependencyFile : sourceFileProjectSignatureFiles)
                             {
                                 if (javaSourceFilesToCompile.contains(dependencyFile))
                                 {
@@ -563,13 +560,13 @@ public interface QubBuild
 
             if (!result)
             {
-                final Iterable<Dependency> oldProjectJsonJavaDependencies = oldProjectJsonJava.getDependencies();
-                final Iterable<Dependency> newProjectJsonJavaDependencies = newProjectJsonJava.getDependencies();
+                final Iterable<ProjectSignature> oldProjectJsonJavaDependencies = oldProjectJsonJava.getDependencies();
+                final Iterable<ProjectSignature> newProjectJsonJavaDependencies = newProjectJsonJava.getDependencies();
                 if (!Iterable.isNullOrEmpty(oldProjectJsonJavaDependencies))
                 {
                     result = Iterable.isNullOrEmpty(newProjectJsonJavaDependencies) ||
-                        oldProjectJsonJavaDependencies.contains((Dependency oldDependency) ->
-                            !newProjectJsonJavaDependencies.contains(oldDependency));
+                        oldProjectJsonJavaDependencies.contains((ProjectSignature oldProjectSignature) ->
+                            !newProjectJsonJavaDependencies.contains(oldProjectSignature));
                 }
             }
         }
@@ -620,11 +617,11 @@ public interface QubBuild
         return outputFolder.getFile(sourceFileRelativeToSourcePath.changeFileExtension(".class")).await();
     }
 
-    static Map<Dependency,Iterable<Dependency>> getAllDependencies(QubFolder qubFolder, Iterable<Dependency> dependencies)
+    static Map<ProjectSignature,Iterable<ProjectSignature>> getAllDependencies(QubFolder qubFolder, Iterable<ProjectSignature> dependencies)
     {
         PreCondition.assertNotNull(qubFolder, "qubFolder");
 
-        final MutableMap<Dependency,Iterable<Dependency>> result = Map.create();
+        final MutableMap<ProjectSignature,Iterable<ProjectSignature>> result = Map.create();
         if (!Iterable.isNullOrEmpty(dependencies))
         {
             getAllDependencies(qubFolder, dependencies, result, List.create());
@@ -635,14 +632,14 @@ public interface QubBuild
         return result;
     }
 
-    static void getAllDependencies(QubFolder qubFolder, Iterable<Dependency> dependencies, MutableMap<Dependency,Iterable<Dependency>> resultMap, List<Dependency> currentPath)
+    static void getAllDependencies(QubFolder qubFolder, Iterable<ProjectSignature> dependencies, MutableMap<ProjectSignature,Iterable<ProjectSignature>> resultMap, List<ProjectSignature> currentPath)
     {
         PreCondition.assertNotNull(qubFolder, "qubFolder");
         PreCondition.assertNotNullAndNotEmpty(dependencies, "dependencies");
         PreCondition.assertNotNull(resultMap, "resultMap");
         PreCondition.assertNotNull(currentPath, "currentPath");
 
-        for (final Dependency dependency : dependencies)
+        for (final ProjectSignature dependency : dependencies)
         {
             if (!resultMap.containsKey(dependency))
             {
@@ -660,7 +657,7 @@ public interface QubBuild
                     final ProjectJSONJava dependencyProjectJsonJava = dependencyProjectJson.getJava();
                     if (dependencyProjectJsonJava != null)
                     {
-                        final Iterable<Dependency> nextDependencies = dependencyProjectJsonJava.getDependencies();
+                        final Iterable<ProjectSignature> nextDependencies = dependencyProjectJsonJava.getDependencies();
                         if (!Iterable.isNullOrEmpty(nextDependencies))
                         {
                             currentPath.add(dependency);
