@@ -4,19 +4,19 @@ public interface QubBuild
 {
     static void main(String[] args)
     {
-        Console.run(args, QubBuild::main);
+        Process.run(args, QubBuild::main);
     }
 
-    static void main(Console console)
+    static void main(Process process)
     {
-        PreCondition.assertNotNull(console, "console");
+        PreCondition.assertNotNull(process, "process");
 
-        final QubBuildParameters parameters = QubBuild.getParameters(console);
+        final QubBuildParameters parameters = QubBuild.getParameters(process);
         if (parameters != null)
         {
-            console.showDuration(() ->
+            process.showDuration(() ->
             {
-                console.setExitCode(QubBuild.run(parameters));
+                process.setExitCode(QubBuild.run(parameters));
             });
         }
     }
