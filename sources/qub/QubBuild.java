@@ -113,7 +113,7 @@ public interface QubBuild
             final FileSystem fileSystem = folderToBuild.getFileSystem();
 
             verbose.writeLine("Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...").await();
-            final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile).await();
+            final ProjectJSON projectJson = QubBuild.parseProjectJSONFile(projectJsonFile).await();
             final ProjectJSONJava projectJsonJava = projectJson.getJava();
             if (projectJsonJava == null)
             {
@@ -649,7 +649,7 @@ public interface QubBuild
                     dependency.getPublisher(),
                     dependency.getProject(),
                     dependency.getVersion()).await();
-                final ProjectJSON dependencyProjectJson = ProjectJSON.parse(dependencyProjectJsonFile)
+                final ProjectJSON dependencyProjectJson = QubBuild.parseProjectJSONFile(dependencyProjectJsonFile)
                     .catchError(NotFoundException.class)
                     .await();
                 if (dependencyProjectJson != null)
@@ -668,5 +668,20 @@ public interface QubBuild
                 }
             }
         }
+    }
+
+    static Result<ProjectJSON> parseProjectJSONFile(File projectJsonFile)
+    {
+        PreCondition.assertNotNull(projectJsonFile, "projectJsonFile");
+
+        return Result.create(() ->
+        {
+            ProjectJSON result;
+            try (final ByteReadStream projectJsonStream = projectJsonFile.getContentByteReadStream().await())
+            {
+                result = ProjectJSON.parse(new BufferedByteReadStream(projectJsonStream).asCharacterReadStream()).await();
+            }
+            return result;
+        });
     }
 }

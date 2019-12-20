@@ -80,7 +80,7 @@ public class BuildJSON
         final ProjectJSON projectJson = getProjectJson();
         if (projectJson != null)
         {
-            buildJson.objectProperty(BuildJSON.projectJsonPropertyName, projectJson::write);
+            buildJson.objectProperty(BuildJSON.projectJsonPropertyName, projectJson::toJson);
         }
 
         for (final BuildJSONSourceFile buildJSONSourceFile : this.getSourceFiles())
@@ -156,7 +156,7 @@ public class BuildJSON
             final JSONObject projectJsonObject = rootObject.getObjectPropertyValue(BuildJSON.projectJsonPropertyName)
                 .catchError()
                 .await();
-            final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.parse(projectJsonObject);
+            final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.parse(projectJsonObject).await();
             final Iterable<BuildJSONSourceFile> buildJSONSourceFiles = rootObject.getProperties()
                 .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
                 .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())

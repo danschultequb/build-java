@@ -3790,7 +3790,7 @@ public interface QubBuildTests
                                 new ProjectSignature("me", "a", "1"),
                                 new ProjectSignature("me", "b", "2"))));
                     currentFolder.getFile("project.json").await()
-                        .setContentsAsString(JSON.object(cProjectJson::write).toString());
+                        .setContentsAsString(cProjectJson.toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
                     try (final Console console = createConsole(output, currentFolder, "-verbose"))
@@ -3801,11 +3801,11 @@ public interface QubBuildTests
                             .set("QUB_HOME", "/qub/"));
                         final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
                         publisherFolder.create().await();
-                        publisherFolder.setFileContentsAsString("b/2/project.json", JSON.object(bProjectJSON::write).toString()).await();
+                        publisherFolder.setFileContentsAsString("b/2/project.json", bProjectJSON.toString()).await();
                         publisherFolder.createFile("b/2/b.jar").await();
-                        publisherFolder.setFileContentsAsString("a/1/project.json", JSON.object(a1ProjectJSON::write).toString()).await();
+                        publisherFolder.setFileContentsAsString("a/1/project.json", a1ProjectJSON.toString()).await();
                         publisherFolder.createFile("a/1/a.jar").await();
-                        publisherFolder.setFileContentsAsString("a/2/project.json", JSON.object(a2ProjectJSON::write).toString()).await();
+                        publisherFolder.setFileContentsAsString("a/2/project.json", a2ProjectJSON.toString()).await();
                         publisherFolder.createFile("a/2/a.jar").await();
 
                         QubBuild.main(console);
