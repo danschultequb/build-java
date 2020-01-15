@@ -4,7 +4,7 @@ public interface QubBuild
 {
     static void main(String[] args)
     {
-        Process.run(args, QubBuild::main);
+        Process.run(args, QubBuild::getParameters, QubBuild::run);
     }
 
     static void main(Process process)

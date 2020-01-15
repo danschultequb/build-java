@@ -144,43 +144,29 @@ public class BuildJSONSourceFile
      */
     public JSONObject toJson()
     {
-        return JSON.object(this::toJson);
-    }
-
-    /**
-     * Write this BuildJSONSourceFile in its JSON representation to the provided JSONObjectBuilder.
-     * @param buildJsonSourceFile The JSONObjectBuilder to write this BuildJSONSourceFile to in its
-     *                            JSON representation.
-     */
-    public void toJson(JSONObjectBuilder buildJsonSourceFile)
-    {
-        PreCondition.assertNotNull(buildJsonSourceFile, "json");
+        final JSONObject result = JSONObject.create();
 
         if (lastModified != null)
         {
-            buildJsonSourceFile.stringProperty(BuildJSONSourceFile.lastModifiedPropertyName, lastModified.toString());
+            result.setString(BuildJSONSourceFile.lastModifiedPropertyName, lastModified.toString());
         }
         if (!Iterable.isNullOrEmpty(dependencies))
         {
-            buildJsonSourceFile.stringArrayProperty(BuildJSONSourceFile.dependenciesPropertyName, dependencies.map(Path::toString));
+            result.set(BuildJSONSourceFile.dependenciesPropertyName, JSONArray.create(dependencies.map(Path::toString).map(JSONString::get)));
         }
         if (!Iterable.isNullOrEmpty(issues))
         {
-            buildJsonSourceFile.arrayProperty(BuildJSONSourceFile.issuesPropertyName, issuesJson ->
-            {
-                for (final JavaCompilerIssue issue : issues)
-                {
-                    issuesJson.objectElement(issue::toJson);
-                }
-            });
+            result.set(BuildJSONSourceFile.issuesPropertyName, JSONArray.create(issues.map(JavaCompilerIssue::toJson)));
         }
+
+        PostCondition.assertNotNull(result, "result");
+
+        return result;
     }
 
-    public void toJsonProperty(JSONObjectBuilder buildJson)
+    public JSONObjectProperty toJsonProperty()
     {
-        PreCondition.assertNotNull(buildJson, "buildJson");
-
-        buildJson.objectProperty(this.getRelativePath().toString(), this::toJson);
+        return JSONObjectProperty.create(this.getRelativePath().toString(), this.toJson());
     }
 
     /**
@@ -188,36 +174,34 @@ public class BuildJSONSourceFile
      * @param sourceFileProperty The JSONProperty to parse a JSONSourceFile from.
      * @return The parsed BuildJSONSourceFile.
      */
-    public static Result<BuildJSONSourceFile> parse(JSONProperty sourceFileProperty)
+    public static Result<BuildJSONSourceFile> parse(JSONObjectProperty sourceFileProperty)
     {
         PreCondition.assertNotNull(sourceFileProperty, "sourceFileProperty");
 
         return Result.create(() ->
         {
             final Path relativePath = Path.parse(sourceFileProperty.getName());
-            final JSONObject sourceFileObject = sourceFileProperty.getObjectValue().await();
-            final DateTime lastModified = sourceFileObject.getStringPropertyValue(BuildJSONSourceFile.lastModifiedPropertyName)
+            final JSONObject sourceFileObject = (JSONObject)sourceFileProperty.getValue();
+            final DateTime lastModified = sourceFileObject.getString(BuildJSONSourceFile.lastModifiedPropertyName)
                 .then((String lastModifiedString) -> DateTime.parse(lastModifiedString).await())
                 .catchError()
                 .await();
-            final JSONArray dependenciesArray = sourceFileObject.getArrayPropertyValue(BuildJSONSourceFile.dependenciesPropertyName)
+            final JSONArray dependenciesArray = sourceFileObject.getArray(BuildJSONSourceFile.dependenciesPropertyName)
                 .catchError()
                 .await();
             final Iterable<Path> dependencies = dependenciesArray == null
                 ? Iterable.create()
                 : dependenciesArray
-                    .getElements()
-                    .instanceOf(JSONQuotedString.class)
-                    .map(JSONQuotedString::toUnquotedString)
+                    .instanceOf(JSONString.class)
+                    .map(JSONString::getValue)
                     .map(Path::parse)
                     .toList();
-            final JSONArray issuesArray = sourceFileObject.getArrayPropertyValue(BuildJSONSourceFile.issuesPropertyName)
+            final JSONArray issuesArray = sourceFileObject.getArray(BuildJSONSourceFile.issuesPropertyName)
                 .catchError()
                 .await();
             final Iterable<JavaCompilerIssue> issues = issuesArray == null
                 ? Iterable.create()
                 : issuesArray
-                    .getElements()
                     .instanceOf(JSONObject.class)
                     .map((JSONObject issueJson) -> JavaCompilerIssue.parse(issueJson).await())
                     .toList();

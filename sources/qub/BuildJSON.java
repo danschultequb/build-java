@@ -72,21 +72,19 @@ public class BuildJSON
 
     public JSONObject toJson()
     {
-        return JSON.object(this::toJson);
-    }
+        final JSONObject result = JSONObject.create();
 
-    public void toJson(JSONObjectBuilder buildJson)
-    {
-        final ProjectJSON projectJson = getProjectJson();
+        final ProjectJSON projectJson = this.getProjectJson();
         if (projectJson != null)
         {
-            buildJson.objectProperty(BuildJSON.projectJsonPropertyName, projectJson::toJson);
+            result.set(BuildJSON.projectJsonPropertyName, projectJson.toJson());
         }
 
-        for (final BuildJSONSourceFile buildJSONSourceFile : this.getSourceFiles())
-        {
-            buildJSONSourceFile.toJsonProperty(buildJson);
-        }
+        result.setAll(this.getSourceFiles().map(BuildJSONSourceFile::toJsonProperty));
+
+        PostCondition.assertNotNull(result, "result");
+
+        return result;
     }
 
     @Override
@@ -140,26 +138,23 @@ public class BuildJSON
     {
         PreCondition.assertNotNull(characters, "character");
 
-        return Result.create(() ->
-        {
-            final JSONObject rootObject = JSON.parse(characters).getRootObject().await();
-            return BuildJSON.parse(rootObject).await();
-        });
+        return JSON.parseObject(characters)
+            .then((JSONObject object) -> BuildJSON.parse(object).await());
     }
 
-    public static Result<BuildJSON> parse(JSONObject rootObject)
+    public static Result<BuildJSON> parse(JSONObject json)
     {
-        PreCondition.assertNotNull(rootObject, "rootObject");
+        PreCondition.assertNotNull(json, "json");
 
         return Result.create(() ->
         {
-            final JSONObject projectJsonObject = rootObject.getObjectPropertyValue(BuildJSON.projectJsonPropertyName)
+            final JSONObject projectJsonObject = json.getObject(BuildJSON.projectJsonPropertyName)
                 .catchError()
                 .await();
             final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.parse(projectJsonObject).await();
-            final Iterable<BuildJSONSourceFile> buildJSONSourceFiles = rootObject.getProperties()
+            final Iterable<BuildJSONSourceFile> buildJSONSourceFiles = json.getProperties()
                 .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
-                .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())
+                .map((JSONObjectProperty property) -> BuildJSONSourceFile.parse(property).await())
                 .toList();
             return new BuildJSON()
                 .setProjectJson(projectJson)

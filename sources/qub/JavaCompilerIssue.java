@@ -70,18 +70,12 @@ public class JavaCompilerIssue
      */
     public JSONObject toJson()
     {
-        return JSON.object(this::toJson);
-    }
-
-    public void toJson(JSONObjectBuilder json)
-    {
-        PreCondition.assertNotNull(json, "json");
-
-        json.stringProperty(JavaCompilerIssue.sourceFilePathPropertyName, sourceFilePath);
-        json.numberProperty(JavaCompilerIssue.lineNumberPropertyName, lineNumber);
-        json.numberProperty(JavaCompilerIssue.columnNumberPropertyName, columnNumber);
-        json.stringProperty(JavaCompilerIssue.typePropertyName, type.toString());
-        json.stringProperty(JavaCompilerIssue.messagePropertyName, message);
+        return JSONObject.create()
+            .setString(JavaCompilerIssue.sourceFilePathPropertyName, sourceFilePath)
+            .setNumber(JavaCompilerIssue.lineNumberPropertyName, lineNumber)
+            .setNumber(JavaCompilerIssue.columnNumberPropertyName, columnNumber)
+            .setString(JavaCompilerIssue.typePropertyName, type.toString())
+            .setString(JavaCompilerIssue.messagePropertyName, message);
     }
 
     public static Result<JavaCompilerIssue> parse(JSONObject json)
@@ -90,12 +84,12 @@ public class JavaCompilerIssue
 
         return Result.create(() ->
         {
-            final String sourceFilePath = json.getStringPropertyValue(JavaCompilerIssue.sourceFilePathPropertyName).await();
-            final int lineNumber = json.getNumberPropertyValue(JavaCompilerIssue.lineNumberPropertyName).await().intValue();
-            final int columnNumber = json.getNumberPropertyValue(JavaCompilerIssue.columnNumberPropertyName).await().intValue();
-            final String typeString = json.getStringPropertyValue(JavaCompilerIssue.typePropertyName).await();
+            final String sourceFilePath = json.getString(JavaCompilerIssue.sourceFilePathPropertyName).await();
+            final int lineNumber = json.getNumber(JavaCompilerIssue.lineNumberPropertyName).await().intValue();
+            final int columnNumber = json.getNumber(JavaCompilerIssue.columnNumberPropertyName).await().intValue();
+            final String typeString = json.getString(JavaCompilerIssue.typePropertyName).await();
             final Issue.Type type = Strings.isNullOrEmpty(typeString) ? null : Issue.Type.valueOf(typeString);
-            final String message = json.getStringPropertyValue(JavaCompilerIssue.messagePropertyName).await();
+            final String message = json.getString(JavaCompilerIssue.messagePropertyName).await();
             return new JavaCompilerIssue(sourceFilePath, lineNumber, columnNumber, type, message);
         });
     }
