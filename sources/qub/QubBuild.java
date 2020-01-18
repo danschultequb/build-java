@@ -289,6 +289,7 @@ public interface QubBuild
                     final BuildJSON buildJson = BuildJSON.parse(buildJsonFile)
                         .catchError(FileNotFoundException.class)
                         .await();
+
                     if (buildJson == null)
                     {
                         compileEverything = true;
@@ -505,7 +506,10 @@ public interface QubBuild
             if (useBuildJson && updateBuildJsonFile)
             {
                 verbose.writeLine("Writing build.json file...").await();
-                updatedBuildJson.write(buildJsonFile).await();
+                try (final CharacterWriteStream writeStream = new BufferedByteWriteStream(buildJsonFile.getContentByteWriteStream().await()).asCharacterWriteStream())
+                {
+                    writeStream.write(updatedBuildJson.toString(JSONFormat.pretty)).await();
+                }
                 verbose.writeLine("Done writing build.json file.").await();
             }
         }

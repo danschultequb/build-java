@@ -4,14 +4,14 @@ public interface QubBuildTests
 {
     static void test(TestRunner runner)
     {
-        runner.testGroup(QubBuild.class, runner.skip("Just until new JSON is in use"), () ->
+        runner.testGroup(QubBuild.class, () ->
         {
             runner.testGroup("main(String[])", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
                     test.assertThrows(() -> QubBuild.main((String[])null),
-                        new PreConditionFailure("args cannot be null."));
+                        new PreConditionFailure("arguments cannot be null."));
                 });
             });
 
@@ -417,7 +417,7 @@ public interface QubBuildTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "ERROR: No root was found in the JSON document."),
+                            "ERROR: Missing object left curly bracket ('{')."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
 
@@ -433,7 +433,7 @@ public interface QubBuildTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "ERROR: Expected the root of the JSON document to be an object."),
+                            "ERROR: Expected object left curly bracket ('{')."),
                         Strings.getLines(output.getText().await()).skipLast());
                 });
 
@@ -530,7 +530,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -580,7 +580,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(bin, "build.json"));
                 });
 
@@ -628,7 +628,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -683,7 +683,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -737,7 +737,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("tests/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(outputs, "build.json"));
                 });
 
@@ -791,7 +791,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(parseFile));
                 });
 
@@ -842,7 +842,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile));
                 });
 
@@ -900,7 +900,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
@@ -970,7 +970,7 @@ public interface QubBuildTests
                                             20,
                                             Issue.Type.Error,
                                             "This doesn't look right to me."))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(parseFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
@@ -1034,7 +1034,7 @@ public interface QubBuildTests
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(clock.getCurrentDateTime())
                                     .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
@@ -1110,7 +1110,7 @@ public interface QubBuildTests
                                     .setRelativePath("tests/ATests.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
                                     .addIssue(new JavaCompilerIssue("tests/ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildFile));
                 });
@@ -1206,7 +1206,7 @@ public interface QubBuildTests
                                         new JavaCompilerIssue("tests/C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
                                         new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this.")))
                             ))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
@@ -1303,7 +1303,7 @@ public interface QubBuildTests
                                         new JavaCompilerIssue("tests/C.java", 10, 7, Issue.Type.Warning, "Can't be this."),
                                         new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this.")))
                             ))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
@@ -1395,7 +1395,7 @@ public interface QubBuildTests
                                     .setIssues(Iterable.create(
                                         new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this.")))
                             ))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
@@ -1491,7 +1491,7 @@ public interface QubBuildTests
                                         new JavaCompilerIssue("tests/C.java", 20, 7, Issue.Type.Error, "Can't be this."),
                                         new JavaCompilerIssue("tests/C.java", 10, 7, Issue.Type.Error, "Can't be this.")))
                             ))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile), "Wrong build.json file contents");
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                 });
@@ -1569,7 +1569,7 @@ public interface QubBuildTests
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(clock.getCurrentDateTime())
                                     .setDependencies(Iterable.create(Path.parse("sources/A.java")))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -1645,7 +1645,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -1722,7 +1722,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -1799,7 +1799,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -1873,7 +1873,7 @@ public interface QubBuildTests
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
                                     .setDependencies(Iterable.create(Path.parse("sources/B.java")))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -1945,7 +1945,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2048,7 +2048,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/N.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2150,7 +2150,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/N.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2253,7 +2253,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/N.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2335,7 +2335,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2394,7 +2394,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2453,7 +2453,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2534,7 +2534,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2613,7 +2613,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2680,7 +2680,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2747,7 +2747,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2812,7 +2812,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2880,7 +2880,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -2959,7 +2959,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -3036,7 +3036,7 @@ public interface QubBuildTests
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
                                     .setDependencies(Iterable.create(Path.parse("sources/A.java")))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -3105,7 +3105,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -3192,7 +3192,7 @@ public interface QubBuildTests
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/B.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))))
-                        .toString(),
+                        .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -3268,7 +3268,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -3352,7 +3352,7 @@ public interface QubBuildTests
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
                                 .setIssues(Iterable.create(
                                     new JavaCompilerIssue("sources/A.java", 12, 2, Issue.Type.Error, "Are you sure?")))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -3438,7 +3438,7 @@ public interface QubBuildTests
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
                                     .setDependencies(Iterable.create(Path.parse("sources/A.java")))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(buildJsonFile),
                         "Wrong build.json file contents");
                 });
@@ -3511,7 +3511,7 @@ public interface QubBuildTests
                                     .setRelativePath("sources/B.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
                                     .setDependencies(Iterable.create(Path.parse("sources/AB.java")))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(outputs, "build.json"),
                         "Wrong build.json file contents");
                 });
@@ -3881,7 +3881,7 @@ public interface QubBuildTests
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
                                     .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
-                            .toString(),
+                            .toString(JSONFormat.pretty),
                         getFileContents(outputs, "build.json"));
                 });
             });

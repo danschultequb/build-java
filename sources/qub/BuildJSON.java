@@ -90,25 +90,14 @@ public class BuildJSON
     @Override
     public String toString()
     {
-        return this.toJson().toString();
+        return this.toString(JSONFormat.consise);
     }
 
-    /**
-     * Write this BuildJSON object to the provided file.
-     * @param file The file to write this BuildJSON object to.
-     * @return The result of writing this BuildJSON object.
-     */
-    public Result<Void> write(File file)
+    public String toString(JSONFormat format)
     {
-        PreCondition.assertNotNull(file, "file");
+        PreCondition.assertNotNull(format, "format");
 
-        return Result.create(() ->
-        {
-            try (final CharacterWriteStream writeStream = new BufferedByteWriteStream(file.getContentByteWriteStream().await()).asCharacterWriteStream())
-            {
-                writeStream.write(this.toString()).await();
-            }
-        });
+        return this.toJson().toString(format);
     }
 
     public static Result<BuildJSON> parse(File parseJSONFile)

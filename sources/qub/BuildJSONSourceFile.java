@@ -135,7 +135,14 @@ public class BuildJSONSourceFile
     @Override
     public String toString()
     {
-        return Strings.escapeAndQuote(this.relativePath) + ":" + this.toJson().toString();
+        return this.toString(JSONFormat.consise);
+    }
+
+    public String toString(JSONFormat format)
+    {
+        PreCondition.assertNotNull(format, "format");
+
+        return Strings.escapeAndQuote(this.relativePath) + ":" + format.getAfterPropertySeparator() + this.toJson().toString(format);
     }
 
     /**
