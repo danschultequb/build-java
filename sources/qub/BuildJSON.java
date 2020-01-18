@@ -154,7 +154,7 @@ public class BuildJSON
             final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.parse(projectJsonObject).await();
             final Iterable<BuildJSONSourceFile> buildJSONSourceFiles = json.getProperties()
                 .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
-                .map((JSONObjectProperty property) -> BuildJSONSourceFile.parse(property).await())
+                .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())
                 .toList();
             return new BuildJSON()
                 .setProjectJson(projectJson)

@@ -164,9 +164,9 @@ public class BuildJSONSourceFile
         return result;
     }
 
-    public JSONObjectProperty toJsonProperty()
+    public JSONProperty toJsonProperty()
     {
-        return JSONObjectProperty.create(this.getRelativePath().toString(), this.toJson());
+        return JSONProperty.create(this.getRelativePath().toString(), this.toJson());
     }
 
     /**
@@ -174,14 +174,14 @@ public class BuildJSONSourceFile
      * @param sourceFileProperty The JSONProperty to parse a JSONSourceFile from.
      * @return The parsed BuildJSONSourceFile.
      */
-    public static Result<BuildJSONSourceFile> parse(JSONObjectProperty sourceFileProperty)
+    public static Result<BuildJSONSourceFile> parse(JSONProperty sourceFileProperty)
     {
         PreCondition.assertNotNull(sourceFileProperty, "sourceFileProperty");
 
         return Result.create(() ->
         {
             final Path relativePath = Path.parse(sourceFileProperty.getName());
-            final JSONObject sourceFileObject = (JSONObject)sourceFileProperty.getValue();
+            final JSONObject sourceFileObject = sourceFileProperty.getObjectValue().await();
             final DateTime lastModified = sourceFileObject.getString(BuildJSONSourceFile.lastModifiedPropertyName)
                 .then((String lastModifiedString) -> DateTime.parse(lastModifiedString).await())
                 .catchError()
