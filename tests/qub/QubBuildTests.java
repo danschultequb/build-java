@@ -3957,10 +3957,7 @@ public interface QubBuildTests
 
     static String getFileContents(File file)
     {
-        return file.getContentByteReadStream()
-            .then((ByteReadStream contents) -> contents.asCharacterReadStream())
-            .thenResult(CharacterReadStream::readEntireString)
-            .await();
+        return file.getContentsAsString().await();
     }
 
     static Console createConsole(CharacterWriteStream output, Folder currentFolder, Clock clock, String... commandLineArguments)

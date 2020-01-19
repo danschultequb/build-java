@@ -104,15 +104,9 @@ public class BuildJSON
     {
         PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
 
-        return Result.create(() ->
-        {
-            BuildJSON result;
-            try (final ByteReadStream byteReadStream = parseJSONFile.getContentByteReadStream().await())
-            {
-                result = BuildJSON.parse(byteReadStream).await();
-            }
-            return result;
-        });
+        return Result.createUsing(
+            () -> parseJSONFile.getContentByteReadStream().await(),
+            (ByteReadStream byteReadStream) -> BuildJSON.parse(byteReadStream).await());
     }
 
     public static Result<BuildJSON> parse(ByteReadStream readStream)

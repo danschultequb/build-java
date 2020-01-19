@@ -678,14 +678,8 @@ public interface QubBuild
     {
         PreCondition.assertNotNull(projectJsonFile, "projectJsonFile");
 
-        return Result.create(() ->
-        {
-            ProjectJSON result;
-            try (final ByteReadStream projectJsonStream = projectJsonFile.getContentByteReadStream().await())
-            {
-                result = ProjectJSON.parse(new BufferedByteReadStream(projectJsonStream).asCharacterReadStream()).await();
-            }
-            return result;
-        });
+        return Result.createUsing(
+            () -> new BufferedByteReadStream(projectJsonFile.getContentByteReadStream().await()).asCharacterReadStream(),
+            (CharacterReadStream projectJsonStream) -> ProjectJSON.parse(projectJsonStream).await());
     }
 }
