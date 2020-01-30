@@ -113,7 +113,7 @@ public interface QubBuild
             final FileSystem fileSystem = folderToBuild.getFileSystem();
 
             verbose.writeLine("Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...").await();
-            final ProjectJSON projectJson = QubBuild.parseProjectJSONFile(projectJsonFile).await();
+            final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile).await();
             final ProjectJSONJava projectJsonJava = projectJson.getJava();
             if (projectJsonJava == null)
             {
@@ -167,9 +167,9 @@ public interface QubBuild
             Iterable<ProjectSignature> dependencies = projectJsonJava.getDependencies();
             if (!Iterable.isNullOrEmpty(dependencies))
             {
-                final QubFolder qubFolder = new QubFolder(fileSystem.getFolder(qubHome).await());
+                final QubFolder qubFolder = QubFolder.create(fileSystem.getFolder(qubHome).await());
 
-                final Map<ProjectSignature,Iterable<ProjectSignature>> dependencyMap = getAllDependencies(qubFolder, dependencies);
+                final Map<ProjectSignature,Iterable<ProjectSignature>> dependencyMap = projectJsonJava.getTransitiveDependencyPaths(qubFolder);
                 dependencies = dependencyMap.getKeys();
 
                 final Set<ProjectSignature> errorDependencies = Set.create();
@@ -619,67 +619,5 @@ public interface QubBuild
         final Folder sourceFolder = rootFolder.getFolder(sourceFileRelativePathFirstSegment).await();
         final Path sourceFileRelativeToSourcePath = sourceFile.relativeTo(sourceFolder);
         return outputFolder.getFile(sourceFileRelativeToSourcePath.changeFileExtension(".class")).await();
-    }
-
-    static Map<ProjectSignature,Iterable<ProjectSignature>> getAllDependencies(QubFolder qubFolder, Iterable<ProjectSignature> dependencies)
-    {
-        PreCondition.assertNotNull(qubFolder, "qubFolder");
-
-        final MutableMap<ProjectSignature,Iterable<ProjectSignature>> result = Map.create();
-        if (!Iterable.isNullOrEmpty(dependencies))
-        {
-            getAllDependencies(qubFolder, dependencies, result, List.create());
-        }
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    static void getAllDependencies(QubFolder qubFolder, Iterable<ProjectSignature> dependencies, MutableMap<ProjectSignature,Iterable<ProjectSignature>> resultMap, List<ProjectSignature> currentPath)
-    {
-        PreCondition.assertNotNull(qubFolder, "qubFolder");
-        PreCondition.assertNotNullAndNotEmpty(dependencies, "dependencies");
-        PreCondition.assertNotNull(resultMap, "resultMap");
-        PreCondition.assertNotNull(currentPath, "currentPath");
-
-        for (final ProjectSignature dependency : dependencies)
-        {
-            if (!resultMap.containsKey(dependency))
-            {
-                resultMap.set(dependency, currentPath.toArray());
-
-                final File dependencyProjectJsonFile = qubFolder.getProjectJSONFile(
-                    dependency.getPublisher(),
-                    dependency.getProject(),
-                    dependency.getVersion()).await();
-                final ProjectJSON dependencyProjectJson = QubBuild.parseProjectJSONFile(dependencyProjectJsonFile)
-                    .catchError(NotFoundException.class)
-                    .await();
-                if (dependencyProjectJson != null)
-                {
-                    final ProjectJSONJava dependencyProjectJsonJava = dependencyProjectJson.getJava();
-                    if (dependencyProjectJsonJava != null)
-                    {
-                        final Iterable<ProjectSignature> nextDependencies = dependencyProjectJsonJava.getDependencies();
-                        if (!Iterable.isNullOrEmpty(nextDependencies))
-                        {
-                            currentPath.add(dependency);
-                            getAllDependencies(qubFolder, nextDependencies, resultMap, currentPath);
-                            currentPath.removeLast();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    static Result<ProjectJSON> parseProjectJSONFile(File projectJsonFile)
-    {
-        PreCondition.assertNotNull(projectJsonFile, "projectJsonFile");
-
-        return Result.createUsing(
-            () -> new BufferedByteReadStream(projectJsonFile.getContentByteReadStream().await()).asCharacterReadStream(),
-            (CharacterReadStream projectJsonStream) -> ProjectJSON.parse(projectJsonStream).await());
     }
 }
