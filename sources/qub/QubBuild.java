@@ -4,10 +4,10 @@ public interface QubBuild
 {
     static void main(String[] args)
     {
-        Process.run(args, QubBuild::getParameters, QubBuild::run);
+        QubProcess.run(args, QubBuild::getParameters, QubBuild::run);
     }
 
-    static void main(Process process)
+    static void main(QubProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 
@@ -21,7 +21,7 @@ public interface QubBuild
         }
     }
 
-    static CommandLineParameter<Folder> addFolderToBuildParameter(CommandLineParameters parameters, Process process)
+    static CommandLineParameter<Folder> addFolderToBuildParameter(CommandLineParameters parameters, QubProcess process)
     {
         PreCondition.assertNotNull(parameters, "parameters");
         PreCondition.assertNotNull(process, "process");
@@ -54,7 +54,7 @@ public interface QubBuild
      * @param process The process to get QubBuildParameters from.
      * @return The QubBuildParameters.
      */
-    static QubBuildParameters getParameters(Process process)
+    static QubBuildParameters getParameters(QubProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 

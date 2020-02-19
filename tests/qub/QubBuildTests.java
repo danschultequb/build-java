@@ -15,7 +15,7 @@ public interface QubBuildTests
                 });
             });
 
-            runner.testGroup("getParameters(Process)", () ->
+            runner.testGroup("getParameters(QubProcess)", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
@@ -25,13 +25,13 @@ public interface QubBuildTests
 
                 runner.test("with no arguments", (Test test) ->
                 {
-                    try (final Console console = createConsole())
+                    try (final QubProcess process = QubBuildTests.createProcess())
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -41,13 +41,13 @@ public interface QubBuildTests
 
                 runner.test("with positional folder to build argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("/folder/to/build/"))
+                    try (final QubProcess process = QubBuildTests.createProcess("/folder/to/build/"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -57,13 +57,13 @@ public interface QubBuildTests
 
                 runner.test("with named folder to build argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--folder=/folder/to/build/"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--folder=/folder/to/build/"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -73,13 +73,13 @@ public interface QubBuildTests
 
                 runner.test("with --warnings argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--warnings"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--warnings"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -89,13 +89,13 @@ public interface QubBuildTests
 
                 runner.test("with --warnings= argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--warnings="))
+                    try (final QubProcess process = QubBuildTests.createProcess("--warnings="))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -105,13 +105,13 @@ public interface QubBuildTests
 
                 runner.test("with --warnings=Show argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--warnings=Show"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--warnings=Show"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -121,13 +121,13 @@ public interface QubBuildTests
 
                 runner.test("with --warnings=error argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--warnings=error"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--warnings=error"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -137,13 +137,13 @@ public interface QubBuildTests
 
                 runner.test("with --warnings=HIDE argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--warnings=HIDE"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--warnings=HIDE"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -153,13 +153,13 @@ public interface QubBuildTests
 
                 runner.test("with --warnings=spam argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--warnings=spam"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--warnings=spam"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -169,13 +169,13 @@ public interface QubBuildTests
 
                 runner.test("with --buildjson argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--buildjson"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -185,13 +185,13 @@ public interface QubBuildTests
 
                 runner.test("with --buildjson= argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--buildjson="))
+                    try (final QubProcess process = QubBuildTests.createProcess("--buildjson="))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -201,13 +201,13 @@ public interface QubBuildTests
 
                 runner.test("with --buildjson=false argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--buildjson=false"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--buildjson=false"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertFalse(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -217,13 +217,13 @@ public interface QubBuildTests
 
                 runner.test("with --buildjson=true argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--buildjson=true"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--buildjson=true"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -233,13 +233,13 @@ public interface QubBuildTests
 
                 runner.test("with --verbose argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--verbose"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
@@ -249,13 +249,13 @@ public interface QubBuildTests
 
                 runner.test("with --verbose= argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--verbose="))
+                    try (final QubProcess process = QubBuildTests.createProcess("--verbose="))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
@@ -265,13 +265,13 @@ public interface QubBuildTests
 
                 runner.test("with --verbose=false argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--verbose=false"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--verbose=false"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -281,13 +281,13 @@ public interface QubBuildTests
 
                 runner.test("with --verbose=true argument", (Test test) ->
                 {
-                    try (final Console console = createConsole("--verbose=true"))
+                    try (final QubProcess process = QubBuildTests.createProcess("--verbose=true"))
                     {
-                        final QubBuildParameters parameters = QubBuild.getParameters(console);
+                        final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(console.getCurrentFolder().await(), parameters.getFolderToBuild());
-                        test.assertSame(console.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(console.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
+                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
@@ -298,9 +298,9 @@ public interface QubBuildTests
                 runner.test("with --help argument", (Test test) ->
                 {
                     final InMemoryCharacterStream output = new InMemoryCharacterStream();
-                    try (final Console console = createConsole(output, "--help"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, "--help"))
                     {
-                        test.assertNull(QubBuild.getParameters(console));
+                        test.assertNull(QubBuild.getParameters(process));
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -318,9 +318,9 @@ public interface QubBuildTests
                 runner.test("with -? command line argument", (Test test) ->
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
-                    try (final Console console = createConsole(output, "-?"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, "-?"))
                     {
-                        test.assertNull(QubBuild.getParameters(console));
+                        test.assertNull(QubBuild.getParameters(process));
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -336,11 +336,11 @@ public interface QubBuildTests
                 });
             });
 
-            runner.testGroup("main(Process)", () ->
+            runner.testGroup("main(QubProcess)", () ->
             {
                 runner.test("with null process", (Test test) ->
                 {
-                    test.assertThrows(() -> QubBuild.main((Process)null),
+                    test.assertThrows(() -> QubBuild.main((QubProcess)null),
                         new PreConditionFailure("process cannot be null."));
                 });
 
@@ -348,10 +348,10 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "/fake/folder/", "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "/fake/folder/", "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -363,10 +363,10 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "-folder=/fake/folder/", "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-folder=/fake/folder/", "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -378,10 +378,10 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "-verbose", "/fake/folder/", "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-verbose", "/fake/folder/", "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -394,10 +394,10 @@ public interface QubBuildTests
                 {
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -410,10 +410,10 @@ public interface QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "");
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -426,10 +426,10 @@ public interface QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "[]");
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -442,10 +442,10 @@ public interface QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", new ProjectJSON().toString());
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -458,10 +458,10 @@ public interface QubBuildTests
                     final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -475,10 +475,10 @@ public interface QubBuildTests
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
                     currentFolder.createFolder("sources").await();
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
                     test.assertEqual(
                         Iterable.create(
@@ -494,9 +494,9 @@ public interface QubBuildTests
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -506,8 +506,8 @@ public interface QubBuildTests
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -542,9 +542,9 @@ public interface QubBuildTests
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final Folder bin = currentFolder.getFolder("bin").await();
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(bin)
@@ -554,8 +554,8 @@ public interface QubBuildTests
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -592,9 +592,9 @@ public interface QubBuildTests
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder.getFile("sources/A.java"), "A.java source");
                     final Folder outputs = currentFolder.createFolder("outputs").await();
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -604,8 +604,8 @@ public interface QubBuildTests
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -641,9 +641,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     final Folder outputs = currentFolder.createFolder("outputs").await();
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -653,8 +653,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -695,9 +695,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "tests/B.java", "B.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -707,8 +707,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java", "tests/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -753,9 +753,9 @@ public interface QubBuildTests
                     clock.advance(Duration.minutes(1));
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
-                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, clock, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -765,8 +765,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -815,10 +815,10 @@ public interface QubBuildTests
                     final DateTime beforeClockAdvance = clock.getCurrentDateTime();
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, clock, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -865,9 +865,9 @@ public interface QubBuildTests
                             .toString());
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -877,8 +877,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -924,9 +924,9 @@ public interface QubBuildTests
                             .toString());
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -937,8 +937,8 @@ public interface QubBuildTests
                                 .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Error, "This doesn't look right to me."))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -994,9 +994,9 @@ public interface QubBuildTests
                             .toString());
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1007,8 +1007,8 @@ public interface QubBuildTests
                                 .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1059,9 +1059,9 @@ public interface QubBuildTests
                         .toString());
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1074,8 +1074,8 @@ public interface QubBuildTests
                                     new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1138,9 +1138,9 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File aTestsClass = outputs.getFile("ATests.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1156,8 +1156,8 @@ public interface QubBuildTests
                                     new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(3, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(3, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1235,9 +1235,9 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File aTestsClassFile = outputs.getFile("ATests.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=show"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson", "-warnings=show"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1253,8 +1253,8 @@ public interface QubBuildTests
                                     new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(3, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(3, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1332,9 +1332,9 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File aTestsClassFile = outputs.getFile("ATests.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=hide"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson", "-warnings=hide"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1350,8 +1350,8 @@ public interface QubBuildTests
                                     new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(3, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(3, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1424,9 +1424,9 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File aTestsClassFile = outputs.getFile("ATests.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson", "-warnings=error"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson", "-warnings=error"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1442,8 +1442,8 @@ public interface QubBuildTests
                                     new JavaCompilerIssue("tests\\ATests.java", 10, 7, Issue.Type.Warning, "Can't be this."))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(3, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(3, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1522,9 +1522,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1534,8 +1534,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1600,9 +1600,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1612,8 +1612,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1676,9 +1676,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/B.java", "B.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1688,8 +1688,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/B.java", "sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1753,9 +1753,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1765,8 +1765,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1829,9 +1829,9 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1841,8 +1841,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1900,9 +1900,9 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File bClassFile = outputs.getFile("B.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1912,8 +1912,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -1987,9 +1987,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/C.java", "C.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -1999,8 +1999,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/C.java", "sources/B.java", "sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2089,9 +2089,9 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -2103,8 +2103,8 @@ public interface QubBuildTests
                                     new JavaCompilerIssue("sources\\B.java", 1, 25, Issue.Type.Error, "Missing definition for C."))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2192,9 +2192,9 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File cClassFile = outputs.getFile("C.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -2204,8 +2204,8 @@ public interface QubBuildTests
                                 .addSourceFile("sources/C.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2266,11 +2266,11 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setEnvironmentVariables(new EnvironmentVariables());
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        process.setEnvironmentVariables(new EnvironmentVariables());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2304,10 +2304,10 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2363,10 +2363,10 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2422,10 +2422,10 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2486,13 +2486,13 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console
+                        process
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("JAVA_HOME", jdk11Folder.toString())
                                 .set("QUB_HOME", "/qub/"))
-                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                                 .add(new FakeJavacProcessRun()
                                     .setWorkingFolder(currentFolder)
                                     .addOutputFolder(outputs)
@@ -2505,14 +2505,14 @@ public interface QubBuildTests
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
+                        QubBuild.main(process);
 
                         test.assertEqual(
                             Iterable.create(
                                 "Compiling 1 file..."),
                             Strings.getLines(output.getText().await()).skipLast());
 
-                         test.assertEqual(0, console.getExitCode());
+                         test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2567,13 +2567,13 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console
+                        process
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("JAVA_HOME", jdk11Folder.toString())
                                 .set("QUB_HOME", "/qub/"))
-                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                                 .add(new FakeJavacProcessRun()
                                     .setWorkingFolder(currentFolder)
                                     .addOutputFolder(outputs)
@@ -2585,8 +2585,8 @@ public interface QubBuildTests
                                     .addClasspath("/outputs")
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
-                        QubBuild.main(console);
-                         test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                         test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2644,15 +2644,15 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console
+                        process
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("JAVA_HOME", jdk11Folder.toString())
                                 .set("QUB_HOME", "/qub/"));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2711,15 +2711,15 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console
+                        process
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("JAVA_HOME", jdk11Folder.toString())
                                 .set("QUB_HOME", "/qub/"));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2775,15 +2775,15 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, clock, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, clock, "-buildjson"))
                     {
-                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
-                        console.setEnvironmentVariables(new EnvironmentVariables()
+                        final Folder qubFolder = process.getFileSystem().getFolder("/qub/").await();
+                        process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", qubFolder.toString()));
                         qubFolder.createFile("a/b/c/b.jar").await();
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2840,12 +2840,12 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console
+                        process
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("QUB_HOME", "/qub/"))
-                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                                 .add(new FakeJavacProcessRun()
                                     .setWorkingFolder(currentFolder)
                                     .addOutputFolder(outputs)
@@ -2854,8 +2854,8 @@ public interface QubBuildTests
                                     .addClasspath("/outputs")
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2912,15 +2912,15 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        final Folder qubFolder = console.getFileSystem().getFolder("/qub/").await();
+                        final Folder qubFolder = process.getFileSystem().getFolder("/qub/").await();
                         qubFolder.createFile("a/b/d/b.jar").await();
 
-                        console
+                        process
                             .setEnvironmentVariables(new EnvironmentVariables()
                                 .set("QUB_HOME", qubFolder.toString()))
-                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                            .setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                                 .add(new FakeJavacProcessRun()
                                     .setWorkingFolder(currentFolder)
                                     .addOutputFolder(outputs)
@@ -2930,8 +2930,8 @@ public interface QubBuildTests
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -2990,9 +2990,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3002,8 +3002,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3062,9 +3062,9 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "--verbose"))
                     {
-                        QubBuild.main(console);
+                        QubBuild.main(process);
 
                         test.assertEqual(
                             Iterable.create(
@@ -3082,7 +3082,7 @@ public interface QubBuildTests
                                 "VERBOSE: Done writing build.json file."),
                             Strings.getLines(output.getText().await()).skipLast());
 
-                        test.assertEqual(0, console.getExitCode());
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -3133,9 +3133,9 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File bClassFile = outputs.getFile("B.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "--verbose"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3145,8 +3145,8 @@ public interface QubBuildTests
                                 .addSourceFile("sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3216,9 +3216,9 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "--verbose"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3228,8 +3228,8 @@ public interface QubBuildTests
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3294,9 +3294,9 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "--verbose"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3308,7 +3308,7 @@ public interface QubBuildTests
                                     new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"))
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
+                        QubBuild.main(process);
 
                         test.assertEqual(
                             Iterable.create(
@@ -3330,7 +3330,7 @@ public interface QubBuildTests
                                 "VERBOSE: Done writing build.json file."),
                             Strings.getLines(output.getText().await()).skipLast());
 
-                        test.assertEqual(1, console.getExitCode());
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3381,9 +3381,9 @@ public interface QubBuildTests
 
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "--verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "--verbose"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3393,8 +3393,8 @@ public interface QubBuildTests
                                 .addSourceFile("sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3458,9 +3458,9 @@ public interface QubBuildTests
                     final File abClassFile = outputs.getFile("AB.class").await();
                     final File bClassFile = outputs.getFile("B.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3470,8 +3470,8 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java", "sources/AB.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3529,9 +3529,9 @@ public interface QubBuildTests
                     final File aClassFile = outputs.getFile("A.class").await();
                     final File bClassFile = outputs.getFile("B.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson=false"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3541,14 +3541,14 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
+                        QubBuild.main(process);
 
                         test.assertEqual(
                             Iterable.create(
                                 "Compiling 2 files..."),
                             Strings.getLines(output.getText().await()).skipLast());
 
-                        test.assertEqual(0, console.getExitCode());
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3580,9 +3580,9 @@ public interface QubBuildTests
                     final File aClassFile = outputs.getFile("A.class").await();
                     final File bClassFile = outputs.getFile("B.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson=false"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3592,14 +3592,14 @@ public interface QubBuildTests
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
+                        QubBuild.main(process);
 
                         test.assertEqual(
                             Iterable.create(
                                 "Compiling 2 files..."),
                             Strings.getLines(output.getText().await()).skipLast());
 
-                        test.assertEqual(0, console.getExitCode());
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3630,12 +3630,12 @@ public interface QubBuildTests
                         .toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson=false"))
                     {
-                        console.setEnvironmentVariables(new EnvironmentVariables()
+                        process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub_home/"));
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3662,18 +3662,18 @@ public interface QubBuildTests
                     final Folder qubFolder = currentFolder.getFileSystem().createFolder("/qub_home/").await();
                     qubFolder.createFolder("qub").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson=false"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson=false"))
                     {
-                        console.setEnvironmentVariables(new EnvironmentVariables()
+                        process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", qubFolder.toString()));
-                        QubBuild.main(console);
+                        QubBuild.main(process);
 
                         test.assertEqual(
                             Iterable.create(
                                 "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub)."),
                             Strings.getLines(output.getText().await()).skipLast());
 
-                        test.assertEqual(1, console.getExitCode());
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertFalse(currentFolder.folderExists("outputs").await());
@@ -3709,18 +3709,18 @@ public interface QubBuildTests
                     final Folder outputs = currentFolder.getFolder("outputs").await();
                     final File aClassFile = outputs.getFile("A.class").await();
 
-                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-verbose"))
                     {
-                        console.setEnvironmentVariables(new EnvironmentVariables()
+                        process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
-                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
+                        final Folder publisherFolder = process.getFileSystem().getFolder("/qub/me/").await();
                         publisherFolder.create().await();
                         publisherFolder.setFileContentsAsString("b/2/project.json", bProjectJSON.toString()).await();
                         publisherFolder.createFile("b/2/b.jar").await();
                         publisherFolder.setFileContentsAsString("a/1/project.json", aProjectJSON.toString()).await();
                         publisherFolder.createFile("a/1/a.jar").await();
 
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3730,7 +3730,7 @@ public interface QubBuildTests
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
-                        QubBuild.main(console);
+                        QubBuild.main(process);
 
                         test.assertEqual(
                             Iterable.create(
@@ -3747,7 +3747,7 @@ public interface QubBuildTests
                                 "VERBOSE: Done writing build.json file."),
                             Strings.getLines(output.getText().await()).skipLast());
 
-                        test.assertEqual(0, console.getExitCode());
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3793,13 +3793,13 @@ public interface QubBuildTests
                         .setContentsAsString(cProjectJson.toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
 
-                    try (final Console console = createConsole(output, currentFolder, "-verbose"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-verbose"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()));
-                        console.setEnvironmentVariables(new EnvironmentVariables()
+                        process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
-                        final Folder publisherFolder = console.getFileSystem().getFolder("/qub/me/").await();
+                        final Folder publisherFolder = process.getFileSystem().getFolder("/qub/me/").await();
                         publisherFolder.create().await();
                         publisherFolder.setFileContentsAsString("b/2/project.json", bProjectJSON.toString()).await();
                         publisherFolder.createFile("b/2/b.jar").await();
@@ -3808,8 +3808,8 @@ public interface QubBuildTests
                         publisherFolder.setFileContentsAsString("a/2/project.json", a2ProjectJSON.toString()).await();
                         publisherFolder.createFile("a/2/a.jar").await();
 
-                        QubBuild.main(console);
-                        test.assertEqual(1, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(1, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3838,9 +3838,9 @@ public interface QubBuildTests
 
                     clock.advance(Duration.minutes(1));
 
-                    try (final Console console = createConsole(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
-                        console.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), console.getCurrentFolderPath())
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
                                 .setWorkingFolder(currentFolder)
                                 .addOutputFolder(outputs)
@@ -3855,8 +3855,8 @@ public interface QubBuildTests
                                     aJavaFile.setContentsAsString("A.java source 2").await();
                                 })));
 
-                        QubBuild.main(console);
-                        test.assertEqual(0, console.getExitCode());
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
                     }
 
                     test.assertEqual(
@@ -3960,46 +3960,46 @@ public interface QubBuildTests
         return file.getContentsAsString().await();
     }
 
-    static Console createConsole(CharacterWriteStream output, Folder currentFolder, Clock clock, String... commandLineArguments)
+    static QubProcess createProcess(CharacterWriteStream output, Folder currentFolder, Clock clock, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(currentFolder, "currentFolder");
         PreCondition.assertNotNull(clock, "clock");
         PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
 
-        final Console result = createConsole(output, currentFolder, commandLineArguments);
+        final QubProcess result = QubBuildTests.createProcess(output, currentFolder, commandLineArguments);
         result.setClock(clock);
 
         return result;
     }
 
-    static Console createConsole(CharacterWriteStream output, Folder currentFolder, String... commandLineArguments)
+    static QubProcess createProcess(CharacterWriteStream output, Folder currentFolder, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(currentFolder, "currentFolder");
         PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
 
-        final Console result = createConsole(output, commandLineArguments);
+        final QubProcess result = QubBuildTests.createProcess(output, commandLineArguments);
         result.setFileSystem(currentFolder.getFileSystem());
         result.setCurrentFolderPath(currentFolder.getPath());
 
         return result;
     }
 
-    static Console createConsole(CharacterWriteStream output, String... commandLineArguments)
+    static QubProcess createProcess(CharacterWriteStream output, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
 
-        final Console result = createConsole(commandLineArguments);
+        final QubProcess result = QubBuildTests.createProcess(commandLineArguments);
         result.setOutputCharacterWriteStream(output);
 
         return result;
     }
 
-    static Console createConsole(String... commandLineArguments)
+    static QubProcess createProcess(String... commandLineArguments)
     {
-        final Console result = Console.create(commandLineArguments);
+        final QubProcess result = QubProcess.create(commandLineArguments);
         result.setLineSeparator("\n");
 
         return result;
