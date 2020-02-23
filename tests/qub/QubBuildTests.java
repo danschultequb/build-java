@@ -3759,6 +3759,86 @@ public interface QubBuildTests
                             .map(FileSystemEntry::toString));
                 });
 
+                runner.test("with transitive dependency under versions folder", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    final ProjectJSON aProjectJSON = new ProjectJSON()
+                        .setPublisher("me")
+                        .setProject("a")
+                        .setVersion("1")
+                        .setJava(new ProjectJSONJava());
+                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                        .setPublisher("me")
+                        .setProject("b")
+                        .setVersion("2")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new ProjectSignature("me", "a", "1"))));
+                    final ProjectJSON cProjectJson = new ProjectJSON()
+                        .setProject("c")
+                        .setPublisher("me")
+                        .setVersion("3")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new ProjectSignature("me", "b", "2"))));
+                    setFileContents(currentFolder, "project.json", cProjectJson.toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    final File aClassFile = outputs.getFile("A.class").await();
+
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-verbose"))
+                    {
+                        process.setEnvironmentVariables(new EnvironmentVariables()
+                            .set("QUB_HOME", "/qub/"));
+                        final Folder publisherFolder = process.getFileSystem().getFolder("/qub/me/").await();
+                        publisherFolder.create().await();
+                        publisherFolder.setFileContentsAsString("b/2/project.json", bProjectJSON.toString()).await();
+                        publisherFolder.createFile("b/2/b.jar").await();
+                        publisherFolder.setFileContentsAsString("a/versions/1/project.json", aProjectJSON.toString()).await();
+                        publisherFolder.createFile("a/versions/1/a.jar").await();
+
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/2/b.jar", "/qub/me/a/versions/1/a.jar"))
+                                .addSourceFile("sources/A.java")
+                                .setFunctionAutomatically()));
+
+                        QubBuild.main(process);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "VERBOSE: Parsing project.json...",
+                                "VERBOSE: Updating outputs/build.json...",
+                                "VERBOSE: Setting project.json...",
+                                "VERBOSE: Setting source files...",
+                                "VERBOSE: Detecting java source files to compile...",
+                                "VERBOSE: Compiling all source files.",
+                                "Compiling 1 file...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
+                                "VERBOSE: Compilation finished.",
+                                "VERBOSE: Writing build.json file...",
+                                "VERBOSE: Done writing build.json file."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
+                        test.assertEqual(0, process.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs
+                            .getFilesAndFoldersRecursively().await()
+                            .map(FileSystemEntry::toString));
+                });
+
                 runner.test("with multiple versions of same project dependency", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
