@@ -221,30 +221,14 @@ public interface QubBuild
                         }
                         else
                         {
-                            QubProjectVersionFolder versionFolder = projectFolder.getProjectVersionFolder2(dependency.getVersion()).await();
+                            QubProjectVersionFolder versionFolder = projectFolder.getProjectVersionFolder(dependency.getVersion()).await();
                             if (!versionFolder.exists().await())
                             {
-                                versionFolder = projectFolder.getProjectVersionFolder(dependency.getVersion()).await();
-                                if (!versionFolder.exists().await())
-                                {
-                                    throw new NotFoundException("No version folder named " + Strings.escapeAndQuote(dependency.getVersion()) + " found in the " + Strings.escapeAndQuote(dependency.getProject()) + " project folder (" + projectFolder + ").");
-                                }
-                                else
-                                {
-                                    final File dependencyFile = versionFolder.getCompiledSourcesFile().await();
-                                    if (!dependencyFile.exists().await())
-                                    {
-                                        throw new NotFoundException("No dependency file named " + Strings.escapeAndQuote(dependencyFile.getName()) + " found in the " + Strings.escapeAndQuote(dependency.getVersion()) + " version folder (" + versionFolder + ").");
-                                    }
-                                    else
-                                    {
-                                        classPaths.add(dependencyFile.toString());
-                                    }
-                                }
+                                throw new NotFoundException("No version folder named " + Strings.escapeAndQuote(dependency.getVersion()) + " found in the " + Strings.escapeAndQuote(dependency.getProject()) + " project folder (" + projectFolder + ").");
                             }
                             else
                             {
-                                final File dependencyFile = versionFolder.getCompiledSourcesFile2().await();
+                                final File dependencyFile = versionFolder.getCompiledSourcesFile().await();
                                 if (!dependencyFile.exists().await())
                                 {
                                     throw new NotFoundException("No dependency file named " + Strings.escapeAndQuote(dependencyFile.getName()) + " found in the " + Strings.escapeAndQuote(dependency.getVersion()) + " version folder (" + versionFolder + ").");

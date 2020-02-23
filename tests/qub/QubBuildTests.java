@@ -2780,7 +2780,7 @@ public interface QubBuildTests
                         final Folder qubFolder = process.getFileSystem().getFolder("/qub/").await();
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", qubFolder.toString()));
-                        qubFolder.createFile("a/b/c/b.jar").await();
+                        qubFolder.createFile("a/b/versions/c/b.jar").await();
 
                         QubBuild.main(process);
                         test.assertEqual(0, process.getExitCode());
@@ -2915,7 +2915,7 @@ public interface QubBuildTests
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
                         final Folder qubFolder = process.getFileSystem().getFolder("/qub/").await();
-                        qubFolder.createFile("a/b/d/b.jar").await();
+                        qubFolder.createFile("a/b/versions/d/b.jar").await();
 
                         process
                             .setEnvironmentVariables(new EnvironmentVariables()
@@ -2926,7 +2926,7 @@ public interface QubBuildTests
                                     .addOutputFolder(outputs)
                                     .addXlintUnchecked()
                                     .addXlintDeprecation()
-                                    .addClasspath(Iterable.create("/outputs", "/qub/a/b/d/b.jar"))
+                                    .addClasspath(Iterable.create("/outputs", "/qub/a/b/versions/d/b.jar"))
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
 
@@ -3715,10 +3715,10 @@ public interface QubBuildTests
                             .set("QUB_HOME", "/qub/"));
                         final Folder publisherFolder = process.getFileSystem().getFolder("/qub/me/").await();
                         publisherFolder.create().await();
-                        publisherFolder.setFileContentsAsString("b/2/project.json", bProjectJSON.toString()).await();
-                        publisherFolder.createFile("b/2/b.jar").await();
-                        publisherFolder.setFileContentsAsString("a/1/project.json", aProjectJSON.toString()).await();
-                        publisherFolder.createFile("a/1/a.jar").await();
+                        publisherFolder.setFileContentsAsString("b/versions/2/project.json", bProjectJSON.toString()).await();
+                        publisherFolder.createFile("b/versions/2/b.jar").await();
+                        publisherFolder.setFileContentsAsString("a/versions/1/project.json", aProjectJSON.toString()).await();
+                        publisherFolder.createFile("a/versions/1/a.jar").await();
 
                         process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
@@ -3726,7 +3726,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/2/b.jar", "/qub/me/a/1/a.jar"))
+                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/versions/2/b.jar", "/qub/me/a/versions/1/a.jar"))
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -3741,7 +3741,7 @@ public interface QubBuildTests
                                 "VERBOSE: Detecting java source files to compile...",
                                 "VERBOSE: Compiling all source files.",
                                 "Compiling 1 file...",
-                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/1/a.jar sources/A.java...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/versions/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
                                 "VERBOSE: Compilation finished.",
                                 "VERBOSE: Writing build.json file...",
                                 "VERBOSE: Done writing build.json file."),
@@ -3795,8 +3795,8 @@ public interface QubBuildTests
                             .set("QUB_HOME", "/qub/"));
                         final Folder publisherFolder = process.getFileSystem().getFolder("/qub/me/").await();
                         publisherFolder.create().await();
-                        publisherFolder.setFileContentsAsString("b/2/project.json", bProjectJSON.toString()).await();
-                        publisherFolder.createFile("b/2/b.jar").await();
+                        publisherFolder.setFileContentsAsString("b/versions/2/project.json", bProjectJSON.toString()).await();
+                        publisherFolder.createFile("b/versions/2/b.jar").await();
                         publisherFolder.setFileContentsAsString("a/versions/1/project.json", aProjectJSON.toString()).await();
                         publisherFolder.createFile("a/versions/1/a.jar").await();
 
@@ -3806,7 +3806,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/2/b.jar", "/qub/me/a/versions/1/a.jar"))
+                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/versions/2/b.jar", "/qub/me/a/versions/1/a.jar"))
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -3821,7 +3821,7 @@ public interface QubBuildTests
                                 "VERBOSE: Detecting java source files to compile...",
                                 "VERBOSE: Compiling all source files.",
                                 "Compiling 1 file...",
-                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/versions/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
                                 "VERBOSE: Compilation finished.",
                                 "VERBOSE: Writing build.json file...",
                                 "VERBOSE: Done writing build.json file."),
@@ -3881,12 +3881,12 @@ public interface QubBuildTests
                             .set("QUB_HOME", "/qub/"));
                         final Folder publisherFolder = process.getFileSystem().getFolder("/qub/me/").await();
                         publisherFolder.create().await();
-                        publisherFolder.setFileContentsAsString("b/2/project.json", bProjectJSON.toString()).await();
-                        publisherFolder.createFile("b/2/b.jar").await();
-                        publisherFolder.setFileContentsAsString("a/1/project.json", a1ProjectJSON.toString()).await();
-                        publisherFolder.createFile("a/1/a.jar").await();
-                        publisherFolder.setFileContentsAsString("a/2/project.json", a2ProjectJSON.toString()).await();
-                        publisherFolder.createFile("a/2/a.jar").await();
+                        publisherFolder.setFileContentsAsString("b/versions/2/project.json", bProjectJSON.toString()).await();
+                        publisherFolder.createFile("b/versions/2/b.jar").await();
+                        publisherFolder.setFileContentsAsString("a/versions/1/project.json", a1ProjectJSON.toString()).await();
+                        publisherFolder.createFile("a/versions/1/a.jar").await();
+                        publisherFolder.setFileContentsAsString("a/versions/2/project.json", a2ProjectJSON.toString()).await();
+                        publisherFolder.createFile("a/versions/2/a.jar").await();
 
                         QubBuild.main(process);
                         test.assertEqual(1, process.getExitCode());
