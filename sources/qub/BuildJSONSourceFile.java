@@ -114,7 +114,11 @@ public class BuildJSONSourceFile
      */
     public Iterable<JavaCompilerIssue> getIssues()
     {
-        return this.issues;
+        final Iterable<JavaCompilerIssue> result = this.issues;
+
+        PostCondition.assertNotNull(result, "result");
+
+        return result;
     }
 
     @Override

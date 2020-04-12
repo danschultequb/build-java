@@ -2,7 +2,7 @@ package qub;
 
 public class QubBuildParameters
 {
-    private final CharacterWriteStream outputWriteStream;
+    private final CharacterToByteWriteStream outputWriteStream;
     private final Folder folderToBuild;
     private final EnvironmentVariables environmentVariables;
     private final ProcessFactory processFactory;
@@ -10,7 +10,7 @@ public class QubBuildParameters
     private boolean buildJson;
     private VerboseCharacterWriteStream verbose;
 
-    public QubBuildParameters(CharacterWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
+    public QubBuildParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
     {
         PreCondition.assertNotNull(outputWriteStream, "outputWriteStream");
         PreCondition.assertNotNull(folderToBuild, "folderToBuild");
@@ -31,7 +31,7 @@ public class QubBuildParameters
      * Get the CharacterWriteStream that output will be written to.
      * @return The CharacterWriteStream that output will be written to.
      */
-    public CharacterWriteStream getOutputWriteStream()
+    public CharacterToByteWriteStream getOutputWriteStream()
     {
         return this.outputWriteStream;
     }

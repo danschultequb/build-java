@@ -73,7 +73,7 @@ public interface QubBuild
         {
             profiler.await();
 
-            final CharacterWriteStream output = process.getOutputWriteStream();
+            final CharacterToByteWriteStream output = process.getOutputWriteStream();
             final Folder folderToBuild = folderToBuildParameter.getValue().await();
             final EnvironmentVariables environmentVariables = process.getEnvironmentVariables();
             final ProcessFactory processFactory = process.getProcessFactory();
