@@ -31,7 +31,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -47,7 +47,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -63,7 +63,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -79,7 +79,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -95,7 +95,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -111,7 +111,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -127,7 +127,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -143,7 +143,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -159,7 +159,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -175,7 +175,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -191,7 +191,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -207,7 +207,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertFalse(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -223,7 +223,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -239,7 +239,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
@@ -255,7 +255,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
@@ -271,7 +271,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
@@ -287,7 +287,7 @@ public interface QubBuildTests
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
-                        test.assertSame(process.getOutputCharacterWriteStream(), parameters.getOutputCharacterWriteStream());
+                        test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
@@ -297,7 +297,7 @@ public interface QubBuildTests
 
                 runner.test("with --help argument", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = new InMemoryCharacterStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
                     try (final QubProcess process = QubBuildTests.createProcess(output, "--help"))
                     {
                         test.assertNull(QubBuild.getParameters(process));
@@ -317,7 +317,7 @@ public interface QubBuildTests
 
                 runner.test("with -? command line argument", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     try (final QubProcess process = QubBuildTests.createProcess(output, "-?"))
                     {
                         test.assertNull(QubBuild.getParameters(process));
@@ -346,7 +346,7 @@ public interface QubBuildTests
 
                 runner.test("with no project.json in the unnamed specified folder command line argument", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "/fake/folder/", "-buildjson"))
                     {
@@ -361,7 +361,7 @@ public interface QubBuildTests
 
                 runner.test("with no project.json in the named specified folder command line argument", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-folder=/fake/folder/", "-buildjson"))
                     {
@@ -376,7 +376,7 @@ public interface QubBuildTests
 
                 runner.test("with no project.json in the specified folder with -verbose before folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-verbose", "/fake/folder/", "-buildjson"))
                     {
@@ -392,7 +392,7 @@ public interface QubBuildTests
 
                 runner.test("with no project.json in the current folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
@@ -407,7 +407,7 @@ public interface QubBuildTests
 
                 runner.test("with empty project.json", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "");
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
@@ -423,7 +423,7 @@ public interface QubBuildTests
 
                 runner.test("with empty array project.json", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "[]");
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
@@ -439,9 +439,9 @@ public interface QubBuildTests
 
                 runner.test("with empty object project.json", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().toString());
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
                         QubBuild.main(process);
@@ -455,9 +455,9 @@ public interface QubBuildTests
 
                 runner.test("with java sources version set to \"1.8\" but no \"sources\" folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
                         QubBuild.main(process);
@@ -471,9 +471,9 @@ public interface QubBuildTests
 
                 runner.test("with empty \"sources\" folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     currentFolder.createFolder("sources").await();
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
                     {
@@ -488,9 +488,9 @@ public interface QubBuildTests
 
                 runner.test("with non-empty \"sources\" folder and no \"outputs\" folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     currentFolder.createFolder("sources");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -525,7 +525,7 @@ public interface QubBuildTests
                     test.assertEqual(Duration.zero, getFileLastModified(outputs, "A.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -536,7 +536,7 @@ public interface QubBuildTests
 
                 runner.test("with non-empty \"sources\" folder and custom \"outputs\" folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"outputFolder\": \"bin\" } }");
                     currentFolder.createFolder("sources");
@@ -573,8 +573,8 @@ public interface QubBuildTests
                     test.assertEqual(Duration.zero, getFileLastModified(bin, "A.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                     .setOutputFolder("bin")))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
@@ -586,7 +586,7 @@ public interface QubBuildTests
 
                 runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
@@ -623,7 +623,7 @@ public interface QubBuildTests
                     test.assertEqual(Duration.zero, getFileLastModified(outputs, "A.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -634,7 +634,7 @@ public interface QubBuildTests
 
                 runner.test("with multiple source files and with existing and empty \"outputs\" folder", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     currentFolder.createFolder("sources");
@@ -675,7 +675,7 @@ public interface QubBuildTests
                     test.assertEqual(Duration.zero, getFileLastModified(outputs, "B.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -689,7 +689,7 @@ public interface QubBuildTests
 
                 runner.test("with multiple source folders", (Test test) ->
                 {
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test);
                     setFileContents(currentFolder.getFile("project.json"), "{ \"java\": {} }");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
@@ -729,7 +729,7 @@ public interface QubBuildTests
                     test.assertEqual(Duration.zero, getFileLastModified(outputs, "B.class").getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -744,7 +744,7 @@ public interface QubBuildTests
                 runner.test("with source file with same age as existing class file but no build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -786,7 +786,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -798,7 +798,7 @@ public interface QubBuildTests
                 runner.test("with source file with same age as existing class file and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -837,7 +837,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -849,7 +849,7 @@ public interface QubBuildTests
                 runner.test("with source file newer than existing class file and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -895,7 +895,7 @@ public interface QubBuildTests
                     test.assertEqual("A.java bytecode", getFileContents(classFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -908,7 +908,7 @@ public interface QubBuildTests
                 runner.test("with one source file with one error", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -957,8 +957,8 @@ public interface QubBuildTests
                     test.assertEqual("A.java source", getFileContents(classFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -978,7 +978,7 @@ public interface QubBuildTests
                 runner.test("with one source file with one warning", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1027,8 +1027,8 @@ public interface QubBuildTests
                     test.assertEqual("A.java bytecode", getFileContents(classFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1042,7 +1042,7 @@ public interface QubBuildTests
                 runner.test("with two source files with one error and one warning", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1099,8 +1099,8 @@ public interface QubBuildTests
                     test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1118,7 +1118,7 @@ public interface QubBuildTests
                 runner.test("with multiple source files with errors and warnings", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1184,8 +1184,8 @@ public interface QubBuildTests
                     test.assertEqual("ATests.java bytecode", getFileContents(aTestsClass));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1214,7 +1214,7 @@ public interface QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=show", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1281,8 +1281,8 @@ public interface QubBuildTests
                     test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1311,7 +1311,7 @@ public interface QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=hide", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1375,8 +1375,8 @@ public interface QubBuildTests
                     test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1403,7 +1403,7 @@ public interface QubBuildTests
                 runner.test("with multiple source files with errors and warnings and -warnings=error", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1469,8 +1469,8 @@ public interface QubBuildTests
                     test.assertEqual("ATests.java bytecode", getFileContents(aTestsClassFile));
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1499,7 +1499,7 @@ public interface QubBuildTests
                 runner.test("with multiple source files newer than their existing class files and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1559,8 +1559,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1577,7 +1577,7 @@ public interface QubBuildTests
                 runner.test("with one modified source file and another unmodified and undependant source file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1637,7 +1637,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1653,7 +1653,7 @@ public interface QubBuildTests
                 runner.test("with one modified source file and another unmodified and dependant source file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1713,7 +1713,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1730,7 +1730,7 @@ public interface QubBuildTests
                 runner.test("with one unmodified source file and another modified and dependant source file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1790,7 +1790,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1807,7 +1807,7 @@ public interface QubBuildTests
                 runner.test("with one deleted source file and another unmodified and dependant source file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": { \"shortcutName\": \"foo\" } }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source, depends on B");
@@ -1865,8 +1865,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                     .setShortcutName("foo")))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
@@ -1881,7 +1881,7 @@ public interface QubBuildTests
                 runner.test("with one new source file and another unmodified and undependant source file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -1937,7 +1937,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -1953,7 +1953,7 @@ public interface QubBuildTests
                 runner.test("N depends on nothing, A depends on B, B depends on C, C.java is modified: A, B, and C should be compiled", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     setFileContents(currentFolder, "sources/N.java", "N.java source");
@@ -2032,7 +2032,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2056,9 +2056,9 @@ public interface QubBuildTests
                 runner.test("N depends on nothing, A depends on B, B depends on C, C.java is deleted: A, B, and C should be compiled", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/N.java", "N.java source");
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
@@ -2136,7 +2136,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2158,9 +2158,9 @@ public interface QubBuildTests
                 runner.test("N depends on nothing, A depends on B, B depends on C, C.class is deleted: C should be compiled", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/N.java", "N.java source");
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on C");
@@ -2237,7 +2237,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2261,9 +2261,9 @@ public interface QubBuildTests
                 runner.test("with no QUB_HOME environment variable specified", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source, depends on B");
 
                     try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
@@ -2284,22 +2284,22 @@ public interface QubBuildTests
                 runner.test("nothing gets compiled when project.json publisher changes", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
+                        .setProjectJson(ProjectJSON.create()
                             .setPublisher("a")
-                            .setJava(new ProjectJSONJava()))
+                            .setJava(ProjectJSONJava.create()))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
                         .setPublisher("b")
-                        .setJava(new ProjectJSONJava())
+                        .setJava(ProjectJSONJava.create())
                         .toString());
 
                     clock.advance(Duration.minutes(1));
@@ -2328,9 +2328,9 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
+                            .setProjectJson(ProjectJSON.create()
                                 .setPublisher("b")
-                                .setJava(new ProjectJSONJava()))
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2343,22 +2343,22 @@ public interface QubBuildTests
                 runner.test("nothing gets compiled when project.json project changes", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
+                        .setProjectJson(ProjectJSON.create()
                             .setProject("a")
-                            .setJava(new ProjectJSONJava()))
+                            .setJava(ProjectJSONJava.create()))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
                         .setProject("b")
-                        .setJava(new ProjectJSONJava())
+                        .setJava(ProjectJSONJava.create())
                         .toString());
 
                     clock.advance(Duration.minutes(1));
@@ -2387,9 +2387,9 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
+                            .setProjectJson(ProjectJSON.create()
                                 .setProject("b")
-                                .setJava(new ProjectJSONJava()))
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2402,22 +2402,22 @@ public interface QubBuildTests
                 runner.test("nothing gets compiled when project.json version changes", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
+                        .setProjectJson(ProjectJSON.create()
                             .setVersion("a")
-                            .setJava(new ProjectJSONJava()))
+                            .setJava(ProjectJSONJava.create()))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
                         .setVersion("b")
-                        .setJava(new ProjectJSONJava())
+                        .setJava(ProjectJSONJava.create())
                         .toString());
 
                     clock.advance(Duration.minutes(1));
@@ -2446,9 +2446,9 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
+                            .setProjectJson(ProjectJSON.create()
                                 .setVersion("b")
-                                .setJava(new ProjectJSONJava()))
+                                .setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2461,7 +2461,7 @@ public interface QubBuildTests
                 runner.test("everything gets compiled when project.json java version changes from 11 to 1.8", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
@@ -2469,16 +2469,16 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
-                            .setJava(new ProjectJSONJava()
+                        .setProjectJson(ProjectJSON.create()
+                            .setJava(ProjectJSONJava.create()
                                 .setVersion("11")))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
-                        .setJava(new ProjectJSONJava()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
+                        .setJava(ProjectJSONJava.create()
                             .setVersion("1.8"))
                         .toString());
 
@@ -2527,8 +2527,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                     .setVersion("1.8")))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
@@ -2542,7 +2542,7 @@ public interface QubBuildTests
                 runner.test("everything gets compiled when project.json java version changes from 11 to 8", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
@@ -2550,16 +2550,16 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
-                            .setJava(new ProjectJSONJava()
+                        .setProjectJson(ProjectJSON.create()
+                            .setJava(ProjectJSONJava.create()
                                 .setVersion("11")))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
-                        .setJava(new ProjectJSONJava()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
+                        .setJava(ProjectJSONJava.create()
                             .setVersion("8"))
                         .toString());
 
@@ -2606,8 +2606,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                     .setVersion("8")))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
@@ -2621,7 +2621,7 @@ public interface QubBuildTests
                 runner.test("nothing gets compiled when project.json java version changes from 1.8 to 8", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
@@ -2629,16 +2629,16 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
-                            .setJava(new ProjectJSONJava()
+                        .setProjectJson(ProjectJSON.create()
+                            .setJava(ProjectJSONJava.create()
                                 .setVersion("1.8")))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
-                        .setJava(new ProjectJSONJava()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
+                        .setJava(ProjectJSONJava.create()
                             .setVersion("8"))
                         .toString());
 
@@ -2673,8 +2673,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                     .setVersion("8")))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
@@ -2688,7 +2688,7 @@ public interface QubBuildTests
                 runner.test("nothing gets compiled when project.json java version changes from 8 to 1.8", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
@@ -2696,16 +2696,16 @@ public interface QubBuildTests
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
-                            .setJava(new ProjectJSONJava()
+                        .setProjectJson(ProjectJSON.create()
+                            .setJava(ProjectJSONJava.create()
                                 .setVersion("8")))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
-                        .setJava(new ProjectJSONJava()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
+                        .setJava(ProjectJSONJava.create()
                             .setVersion("1.8"))
                         .toString());
 
@@ -2740,8 +2740,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                     .setVersion("1.8")))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
@@ -2755,20 +2755,20 @@ public interface QubBuildTests
                 runner.test("nothing gets compiled when project.json java dependency is added", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
-                            .setJava(new ProjectJSONJava()))
+                        .setProjectJson(ProjectJSON.create()
+                            .setJava(ProjectJSONJava.create()))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
                                 .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
-                        .setJava(new ProjectJSONJava()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("a", "b", "c"))))
                         .toString());
@@ -2804,8 +2804,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                     .setDependencies(Iterable.create(
                                         new ProjectSignature("a", "b", "c")))))
                             .setSourceFiles(Iterable.create(
@@ -2820,13 +2820,13 @@ public interface QubBuildTests
                 runner.test("everything gets compiled when project.json java dependency is removed", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
-                            .setJava(new ProjectJSONJava()
+                        .setProjectJson(ProjectJSON.create()
+                            .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     new ProjectSignature("a", "b", "c")))))
                         .setSourceFiles(Iterable.create(
@@ -2834,7 +2834,7 @@ public interface QubBuildTests
                             .setRelativePath("sources/A.java")
                             .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
 
                     clock.advance(Duration.minutes(1));
 
@@ -2875,7 +2875,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -2888,13 +2888,13 @@ public interface QubBuildTests
                 runner.test("everything gets compiled when project.json java dependency version is changed", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
-                        .setProjectJson(new ProjectJSON()
-                            .setJava(new ProjectJSONJava()
+                        .setProjectJson(ProjectJSON.create()
+                            .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     new ProjectSignature("a", "b", "c")))))
                         .setSourceFiles(Iterable.create(
@@ -2902,8 +2902,8 @@ public interface QubBuildTests
                             .setRelativePath("sources/A.java")
                             .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
                         .toString());
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
-                        .setJava(new ProjectJSONJava()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("a", "b", "d"))))
                         .toString());
@@ -2951,8 +2951,8 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON()
-                                .setJava(new ProjectJSONJava()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     new ProjectSignature("a", "b", "d")))))
                             .setSourceFiles(Iterable.create(
@@ -2967,7 +2967,7 @@ public interface QubBuildTests
                 runner.test("with multiple source files newer than their existing class files and with build.json file", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
@@ -3027,7 +3027,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -3044,9 +3044,9 @@ public interface QubBuildTests
                 runner.test("with deleted source file and --verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
@@ -3100,7 +3100,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -3113,9 +3113,9 @@ public interface QubBuildTests
                 runner.test("with new source file and --verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
@@ -3184,7 +3184,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                        .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                        .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                         .setSourceFiles(Iterable.create(
                             new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
@@ -3200,9 +3200,9 @@ public interface QubBuildTests
                 runner.test("with modified source file and --verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
                         .setSourceFiles(Iterable.create(
@@ -3263,7 +3263,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -3276,7 +3276,7 @@ public interface QubBuildTests
                 runner.test("with unmodified source file with issues and --verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
                     setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
@@ -3345,7 +3345,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                 .setRelativePath("sources/A.java")
@@ -3360,9 +3360,9 @@ public interface QubBuildTests
                 runner.test("with unmodified source file with deleted dependency and --verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
                     final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
                     final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source, depends on A");
@@ -3432,7 +3432,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/B.java")
@@ -3446,9 +3446,9 @@ public interface QubBuildTests
                 runner.test("with partial-name dependency match and -buildjson", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/AB.java", "AB.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on AB");
@@ -3499,7 +3499,7 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(outputs, "build.json"), "Wrong build.json file lastModified");
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -3519,9 +3519,9 @@ public interface QubBuildTests
                 runner.test("with multiple source files and -buildjson=false", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
 
@@ -3569,9 +3569,9 @@ public interface QubBuildTests
                 runner.test("with existing outputs folder and -buildjson=false", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     setFileContents(currentFolder, "sources/A.java", "A.java source");
                     setFileContents(currentFolder, "sources/B.java", "B.java source, depends on A");
 
@@ -3620,11 +3620,11 @@ public interface QubBuildTests
                 runner.test("with project.json dependency with publisher that doesn't exist", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
                         .setProject("fake-project")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("fake-qub", "qub-java", "1"))))
                         .toString());
@@ -3649,11 +3649,11 @@ public interface QubBuildTests
                 runner.test("with project.json dependency with project that doesn't exist", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON()
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create()
                         .setProject("fake-project")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("qub", "fake-qub-java", "1"))))
                         .toString());
@@ -3682,25 +3682,25 @@ public interface QubBuildTests
                 runner.test("with transitive dependency", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final ProjectJSON aProjectJSON = new ProjectJSON()
+                    final ProjectJSON aProjectJSON = ProjectJSON.create()
                         .setProject("a")
                         .setPublisher("me")
                         .setVersion("1")
-                        .setJava(new ProjectJSONJava());
-                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                        .setJava(ProjectJSONJava.create());
+                    final ProjectJSON bProjectJSON = ProjectJSON.create()
                         .setProject("b")
                         .setPublisher("me")
                         .setVersion("2")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "a", "1"))));
-                    final ProjectJSON cProjectJson = new ProjectJSON()
+                    final ProjectJSON cProjectJson = ProjectJSON.create()
                         .setProject("c")
                         .setPublisher("me")
                         .setVersion("3")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "b", "2"))));
                     setFileContents(currentFolder, "project.json", cProjectJson.toString());
@@ -3762,25 +3762,25 @@ public interface QubBuildTests
                 runner.test("with transitive dependency under versions folder", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final ProjectJSON aProjectJSON = new ProjectJSON()
+                    final ProjectJSON aProjectJSON = ProjectJSON.create()
                         .setPublisher("me")
                         .setProject("a")
                         .setVersion("1")
-                        .setJava(new ProjectJSONJava());
-                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                        .setJava(ProjectJSONJava.create());
+                    final ProjectJSON bProjectJSON = ProjectJSON.create()
                         .setPublisher("me")
                         .setProject("b")
                         .setVersion("2")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "a", "1"))));
-                    final ProjectJSON cProjectJson = new ProjectJSON()
+                    final ProjectJSON cProjectJson = ProjectJSON.create()
                         .setProject("c")
                         .setPublisher("me")
                         .setVersion("3")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "b", "2"))));
                     setFileContents(currentFolder, "project.json", cProjectJson.toString());
@@ -3842,30 +3842,30 @@ public interface QubBuildTests
                 runner.test("with multiple versions of same project dependency", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    final ProjectJSON a1ProjectJSON = new ProjectJSON()
+                    final ProjectJSON a1ProjectJSON = ProjectJSON.create()
                         .setProject("a")
                         .setPublisher("me")
                         .setVersion("1")
-                        .setJava(new ProjectJSONJava());
-                    final ProjectJSON a2ProjectJSON = new ProjectJSON()
+                        .setJava(ProjectJSONJava.create());
+                    final ProjectJSON a2ProjectJSON = ProjectJSON.create()
                         .setProject("a")
                         .setPublisher("me")
                         .setVersion("2")
-                        .setJava(new ProjectJSONJava());
-                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                        .setJava(ProjectJSONJava.create());
+                    final ProjectJSON bProjectJSON = ProjectJSON.create()
                         .setProject("b")
                         .setPublisher("me")
                         .setVersion("2")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "a", "2"))));
-                    final ProjectJSON cProjectJson = new ProjectJSON()
+                    final ProjectJSON cProjectJson = ProjectJSON.create()
                         .setProject("c")
                         .setPublisher("me")
                         .setVersion("3")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "a", "1"),
                                 new ProjectSignature("me", "b", "2"))));
@@ -3908,9 +3908,9 @@ public interface QubBuildTests
                 runner.test("with source file modified during build", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
-                    final InMemoryCharacterStream output = getInMemoryCharacterStream(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
                     final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
-                    setFileContents(currentFolder, "project.json", new ProjectJSON().setJava(new ProjectJSONJava()).toString());
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
                     currentFolder.createFolder("sources");
                     final File aJavaFile = setFileContents(currentFolder, "sources/A.java", "A.java source");
                     final Folder outputs = currentFolder.getFolder("outputs").await();
@@ -3956,7 +3956,7 @@ public interface QubBuildTests
                     test.assertEqual(Duration.seconds(61), getFileLastModified(aJavaFile).getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
-                            .setProjectJson(new ProjectJSON().setJava(new ProjectJSONJava()))
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
@@ -3975,9 +3975,9 @@ public interface QubBuildTests
         return new ManualClock(DateTime.createFromDurationSinceEpoch(Duration.zero), test.getMainAsyncRunner());
     }
 
-    static InMemoryCharacterStream getInMemoryCharacterStream(Test test)
+    static InMemoryCharacterToByteStream getInMemoryCharacterToByteStream(Test test)
     {
-        return new InMemoryCharacterStream();
+        return new InMemoryCharacterToByteStream();
     }
 
     static Folder getInMemoryCurrentFolder(Test test)
@@ -4040,7 +4040,7 @@ public interface QubBuildTests
         return file.getContentsAsString().await();
     }
 
-    static QubProcess createProcess(CharacterWriteStream output, Folder currentFolder, Clock clock, String... commandLineArguments)
+    static QubProcess createProcess(CharacterToByteWriteStream output, Folder currentFolder, Clock clock, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(currentFolder, "currentFolder");
@@ -4053,7 +4053,7 @@ public interface QubBuildTests
         return result;
     }
 
-    static QubProcess createProcess(CharacterWriteStream output, Folder currentFolder, String... commandLineArguments)
+    static QubProcess createProcess(CharacterToByteWriteStream output, Folder currentFolder, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(currentFolder, "currentFolder");
@@ -4066,13 +4066,13 @@ public interface QubBuildTests
         return result;
     }
 
-    static QubProcess createProcess(CharacterWriteStream output, String... commandLineArguments)
+    static QubProcess createProcess(CharacterToByteWriteStream output, String... commandLineArguments)
     {
         PreCondition.assertNotNull(output, "output");
         PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
 
         final QubProcess result = QubBuildTests.createProcess(commandLineArguments);
-        result.setOutputCharacterWriteStream(output);
+        result.setOutputWriteStream(output);
 
         return result;
     }

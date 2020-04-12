@@ -57,7 +57,7 @@ public class FakeJavacProcessRun extends FakeProcessRunDecorator<FakeJavacProces
 
             if (this.issues.any())
             {
-                final CharacterWriteStream errorStream = javacError.asCharacterWriteStream();
+                final CharacterWriteStream errorStream = CharacterWriteStream.create(javacError);
 
                 for (final JavaCompilerIssue issue : this.issues)
                 {

@@ -134,7 +134,7 @@ public class BuildJSON
             final JSONObject projectJsonObject = json.getObject(BuildJSON.projectJsonPropertyName)
                 .catchError()
                 .await();
-            final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.parse(projectJsonObject).await();
+            final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.create(projectJsonObject);
             final Iterable<BuildJSONSourceFile> buildJSONSourceFiles = json.getProperties()
                 .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
                 .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())

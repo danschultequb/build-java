@@ -2,7 +2,7 @@ package qub;
 
 public class QubBuildParameters
 {
-    private final CharacterWriteStream outputCharacterWriteStream;
+    private final CharacterWriteStream outputWriteStream;
     private final Folder folderToBuild;
     private final EnvironmentVariables environmentVariables;
     private final ProcessFactory processFactory;
@@ -10,14 +10,14 @@ public class QubBuildParameters
     private boolean buildJson;
     private VerboseCharacterWriteStream verbose;
 
-    public QubBuildParameters(CharacterWriteStream outputCharacterWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
+    public QubBuildParameters(CharacterWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
     {
-        PreCondition.assertNotNull(outputCharacterWriteStream, "outputCharacterWriteStream");
+        PreCondition.assertNotNull(outputWriteStream, "outputWriteStream");
         PreCondition.assertNotNull(folderToBuild, "folderToBuild");
         PreCondition.assertNotNull(environmentVariables, "environmentVariables");
         PreCondition.assertNotNull(processFactory, "processFactory");
 
-        this.outputCharacterWriteStream = outputCharacterWriteStream;
+        this.outputWriteStream = outputWriteStream;
         this.folderToBuild = folderToBuild;
         this.environmentVariables = environmentVariables;
         this.processFactory = processFactory;
@@ -31,9 +31,9 @@ public class QubBuildParameters
      * Get the CharacterWriteStream that output will be written to.
      * @return The CharacterWriteStream that output will be written to.
      */
-    public CharacterWriteStream getOutputCharacterWriteStream()
+    public CharacterWriteStream getOutputWriteStream()
     {
-        return this.outputCharacterWriteStream;
+        return this.outputWriteStream;
     }
 
     /**
@@ -151,6 +151,6 @@ public class QubBuildParameters
      */
     static VerboseCharacterWriteStream getVerboseDefault()
     {
-        return new VerboseCharacterWriteStream(false, new InMemoryCharacterStream());
+        return new VerboseCharacterWriteStream(false, new InMemoryCharacterToByteStream());
     }
 }

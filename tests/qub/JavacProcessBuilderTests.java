@@ -323,7 +323,7 @@ public interface JavacProcessBuilderTests
                     final JavacProcessBuilder builder = JavacProcessBuilder.get(test.getProcess()).await();
 
                     final Warnings warnings = null;
-                    final InMemoryCharacterStream stream = new InMemoryCharacterStream();
+                    final InMemoryCharacterToByteStream stream = new InMemoryCharacterToByteStream();
                     final VerboseCharacterWriteStream verbose = new VerboseCharacterWriteStream(true, stream);
                     test.assertThrows(() -> builder.compile(warnings, verbose).await(),
                         new PreConditionFailure("warnings cannot be null."));
@@ -355,7 +355,7 @@ public interface JavacProcessBuilderTests
                         javac.addSourceFile(aJavaFile);
 
                         final Warnings warnings = Warnings.Show;
-                        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
+                        final InMemoryCharacterToByteStream stream = new InMemoryCharacterToByteStream();
                         final VerboseCharacterWriteStream verbose = new VerboseCharacterWriteStream(true, stream);
 
                         final JavaCompilationResult result = javac.compile(warnings, verbose).await();
@@ -395,7 +395,7 @@ public interface JavacProcessBuilderTests
                         javac.addSourceFile(bJavaFile);
 
                         final Warnings warnings = Warnings.Show;
-                        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
+                        final InMemoryCharacterToByteStream stream = new InMemoryCharacterToByteStream();
                         final VerboseCharacterWriteStream verbose = new VerboseCharacterWriteStream(true, stream);
 
                         final JavaCompilationResult result = javac.compile(warnings, verbose).await();
@@ -436,7 +436,7 @@ public interface JavacProcessBuilderTests
                         javac.addSourceFile(cJavaFile);
 
                         final Warnings warnings = Warnings.Show;
-                        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
+                        final InMemoryCharacterToByteStream stream = new InMemoryCharacterToByteStream();
                         final VerboseCharacterWriteStream verbose = new VerboseCharacterWriteStream(true, stream);
 
                         final JavaCompilationResult result = javac.compile(warnings, verbose).await();
@@ -480,7 +480,7 @@ public interface JavacProcessBuilderTests
                         javac.addSourceFile(cJavaFile);
 
                         final Warnings warnings = Warnings.Show;
-                        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
+                        final InMemoryCharacterToByteStream stream = new InMemoryCharacterToByteStream();
                         final VerboseCharacterWriteStream verbose = new VerboseCharacterWriteStream(true, stream);
 
                         final JavaCompilationResult result = javac.compile(warnings, verbose).await();
@@ -528,7 +528,7 @@ public interface JavacProcessBuilderTests
                         javac.addSourceFile(cJavaFile);
 
                         final Warnings warnings = Warnings.Show;
-                        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
+                        final InMemoryCharacterToByteStream stream = new InMemoryCharacterToByteStream();
                         final VerboseCharacterWriteStream verbose = new VerboseCharacterWriteStream(true, stream);
 
                         final JavaCompilationResult result = javac.compile(warnings, verbose).await();
@@ -584,7 +584,7 @@ public interface JavacProcessBuilderTests
                         javac.addSourceFile(cJavaFile.getPath().relativeTo(rootFolder));
 
                         final Warnings warnings = Warnings.Show;
-                        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
+                        final InMemoryCharacterToByteStream stream = new InMemoryCharacterToByteStream();
                         final VerboseCharacterWriteStream verbose = new VerboseCharacterWriteStream(true, stream);
 
                         final JavaCompilationResult result = javac.compile(warnings, verbose).await();

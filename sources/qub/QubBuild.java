@@ -73,7 +73,7 @@ public interface QubBuild
         {
             profiler.await();
 
-            final CharacterWriteStream output = process.getOutputCharacterWriteStream();
+            final CharacterWriteStream output = process.getOutputWriteStream();
             final Folder folderToBuild = folderToBuildParameter.getValue().await();
             final EnvironmentVariables environmentVariables = process.getEnvironmentVariables();
             final ProcessFactory processFactory = process.getProcessFactory();
@@ -93,7 +93,7 @@ public interface QubBuild
     {
         PreCondition.assertNotNull(parameters, "parameters");
 
-        final CharacterWriteStream output = parameters.getOutputCharacterWriteStream();
+        final CharacterWriteStream output = parameters.getOutputWriteStream();
         final Folder folderToBuild = parameters.getFolderToBuild();
         final EnvironmentVariables environmentVariables = parameters.getEnvironmentVariables();
         final Warnings warnings = parameters.getWarnings();
@@ -181,7 +181,7 @@ public interface QubBuild
                         if (matchingDependencies.getCount() > 1)
                         {
                             errorDependencies.addAll(matchingDependencies);
-                            final InMemoryCharacterStream errorMessage = new InMemoryCharacterStream();
+                            final InMemoryCharacterToByteStream errorMessage = new InMemoryCharacterToByteStream();
                             final IndentedCharacterWriteStream indentedErrorMessage = new IndentedCharacterWriteStream(errorMessage)
                                 .setSingleIndent(" ");
                             indentedErrorMessage.writeLine("Found more than one required version for package " + dependency.toStringIgnoreVersion() + ":").await();
@@ -245,7 +245,7 @@ public interface QubBuild
             javac.addClasspath(classPaths);
 
             Function1<File,Boolean> sourceFileMatcher;
-            final Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFilePatterns();
+            final Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFiles();
             if (!Iterable.isNullOrEmpty(sourceFilePatterns))
             {
                 sourceFileMatcher = (File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folderToBuild)));
@@ -506,7 +506,7 @@ public interface QubBuild
             if (useBuildJson && updateBuildJsonFile)
             {
                 verbose.writeLine("Writing build.json file...").await();
-                try (final CharacterWriteStream writeStream = new BufferedByteWriteStream(buildJsonFile.getContentByteWriteStream().await()).asCharacterWriteStream())
+                try (final CharacterWriteStream writeStream = CharacterWriteStream.create(new BufferedByteWriteStream(buildJsonFile.getContentByteWriteStream().await())))
                 {
                     writeStream.write(updatedBuildJson.toString(JSONFormat.pretty)).await();
                 }

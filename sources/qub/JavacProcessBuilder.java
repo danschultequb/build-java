@@ -53,16 +53,16 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
 
         return Result.create(() ->
         {
-            final InMemoryByteStream stdout = new InMemoryByteStream();
+            final InMemoryCharacterToByteStream stdout = new InMemoryCharacterToByteStream();
             this.redirectOutput(stdout);
 
-            final InMemoryByteStream stderr = new InMemoryByteStream();
+            final InMemoryCharacterToByteStream stderr = new InMemoryCharacterToByteStream();
             this.redirectError(stderr);
 
             verbose.writeLine("Running " + this.getCommand() + "...").await();
             final Integer exitCode = this.run().await();
-            final String outputText = stdout.asCharacterReadStream().getText().await();
-            final String errorText = stderr.asCharacterReadStream().getText().await();
+            final String outputText = stdout.getText().await();
+            final String errorText = stderr.getText().await();
             final Iterable<JavaCompilerIssue> issues = JavacProcessBuilder.parseIssues(errorText, warnings);
 
             return new JavaCompilationResult(
