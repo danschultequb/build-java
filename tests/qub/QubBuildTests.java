@@ -975,7 +975,184 @@ public interface QubBuildTests
                     test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(parseFile));
                 });
 
-                runner.test("with one source file with one warning", (Test test) ->
+                runner.test("with one unmodified source file with one warning", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java bytecode");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))))
+                            .toString());
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
+                    {
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "No files need to be compiled.",
+                            "1 Unmodified Warning:",
+                            "sources/A.java (Line 1): Are you sure?"),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java bytecode", getFileContents(classFile));
+                    test.assertEqual(
+                        new BuildJSON()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(clock.getCurrentDateTime())
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))))
+                            .toString(JSONFormat.pretty),
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
+                });
+
+                runner.test("with one unmodified source file with one warning and verbose", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java bytecode");
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))))
+                            .toString());
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson", "--verbose"))
+                    {
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: /sources/A.java - Has warnings",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "No files need to be compiled.",
+                            "1 Unmodified Warning:",
+                            "sources/A.java (Line 1): Are you sure?",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file."),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java bytecode", getFileContents(classFile));
+                    test.assertEqual(
+                        new BuildJSON()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(clock.getCurrentDateTime())
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))))
+                            .toString(JSONFormat.pretty),
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
+                });
+
+                runner.test("with one modified source file with one warning", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", "{ \"java\": {} }");
+                    final File classFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    clock.advance(Duration.minutes(1));
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json",
+                        new BuildJSON()
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))))
+                            .toString());
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
+                    {
+                        process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(outputs)
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFilePathStrings("sources/A.java")
+                                .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Warning, "Are you still sure?"))
+                                .setFunctionAutomatically()));
+
+                        QubBuild.main(process);
+                        test.assertEqual(0, process.getExitCode());
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling 1 file...",
+                            "1 Warning:",
+                            "sources/A.java (Line 1): Are you still sure?"),
+                        Strings.getLines(output.getText().await()).skipLast());
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(classFile));
+                    test.assertEqual("A.java bytecode", getFileContents(classFile));
+                    test.assertEqual(
+                        new BuildJSON()
+                            .setProjectJson(ProjectJSON.create()
+                                .setJava(ProjectJSONJava.create()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(clock.getCurrentDateTime())
+                                    .addIssue(new JavaCompilerIssue("sources/A.java", 1, 20, Issue.Type.Warning, "Are you still sure?"))))
+                            .toString(JSONFormat.pretty),
+                        getFileContents(buildJsonFile), "Wrong build.json file contents");
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile));
+                });
+
+                runner.test("with one modified source file with one warning and verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
@@ -994,7 +1171,7 @@ public interface QubBuildTests
                             .toString());
                     final Folder outputs = currentFolder.getFolder("outputs").await();
 
-                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson"))
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "-buildjson", "--verbose"))
                     {
                         process.setProcessFactory(new FakeProcessFactory(test.getParallelAsyncRunner(), process.getCurrentFolderPath())
                             .add(new FakeJavacProcessRun()
@@ -1013,9 +1190,23 @@ public interface QubBuildTests
 
                     test.assertEqual(
                         Iterable.create(
+                            "VERBOSE: Parsing project.json...",
+                            "VERBOSE: Parsing outputs/build.json...",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: Updating outputs/build.json...",
+                            "VERBOSE: Setting project.json...",
+                            "VERBOSE: Setting source files...",
+                            "VERBOSE: Detecting java source files to compile...",
+                            "VERBOSE: Modified source files:",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                            "VERBOSE: Compilation finished.",
                             "1 Warning:",
-                            "sources/A.java (Line 1): Are you sure?"),
+                            "sources/A.java (Line 1): Are you sure?",
+                            "VERBOSE: Writing build.json file...",
+                            "VERBOSE: Done writing build.json file."),
                         Strings.getLines(output.getText().await()).skipLast());
 
                     test.assertEqual(
@@ -3273,7 +3464,7 @@ public interface QubBuildTests
                         "Wrong build.json file contents");
                 });
 
-                runner.test("with unmodified source file with issues and --verbose", (Test test) ->
+                runner.test("with unmodified source file with errors and --verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);
                     final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
@@ -3314,12 +3505,12 @@ public interface QubBuildTests
                             Iterable.create(
                                 "VERBOSE: Parsing project.json...",
                                 "VERBOSE: Parsing outputs/build.json...",
-                                "VERBOSE: /sources/A.java - Has issues",
+                                "VERBOSE: /sources/A.java - Has errors",
                                 "VERBOSE: Updating outputs/build.json...",
                                 "VERBOSE: Setting project.json...",
                                 "VERBOSE: Setting source files...",
                                 "VERBOSE: Detecting java source files to compile...",
-                                "VERBOSE: Source files that previously contained issues:",
+                                "VERBOSE: Source files that previously contained errors:",
                                 "VERBOSE: /sources/A.java",
                                 "Compiling 1 file...",
                                 "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",

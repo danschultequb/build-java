@@ -261,7 +261,8 @@ public interface QubBuild
             final List<File> deletedJavaSourceFiles = List.create();
             final List<File> modifiedJavaSourceFiles = List.create();
             final List<File> nonModifiedJavaSourceFiles = List.create();
-            final List<File> issuedJavaSourceFiles = List.create();
+            final List<File> javaSourceFilesWithErrors = List.create();
+            final List<JavaCompilerIssue> nonModifiedJavaSourceFileWarnings = List.create();
             final List<BuildJSONSourceFile> buildJsonSourceFiles = List.create();
             boolean compileEverything;
             final BuildJSON updatedBuildJson = new BuildJSON();
@@ -325,9 +326,20 @@ public interface QubBuild
                             }
                             else if (!Iterable.isNullOrEmpty(buildJsonSource.getIssues()))
                             {
-                                verbose.writeLine(javaSourceFile + " - Has issues").await();
+                                final Iterable<JavaCompilerIssue> sourceErrors = buildJsonSource.getIssues().where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error).toList();
+                                if (!Iterable.isNullOrEmpty(sourceErrors))
+                                {
+                                    verbose.writeLine(javaSourceFile + " - Has errors").await();
+                                    javaSourceFilesWithErrors.add(javaSourceFile);
+                                }
 
-                                issuedJavaSourceFiles.add(javaSourceFile);
+                                final Iterable<JavaCompilerIssue> sourceWarnings = buildJsonSource.getIssues().where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning).toList();
+                                if (!Iterable.isNullOrEmpty(sourceWarnings))
+                                {
+                                    verbose.writeLine(javaSourceFile + " - Has warnings").await();
+                                    nonModifiedJavaSourceFileWarnings.addAll(sourceWarnings);
+                                }
+
                                 buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
                             }
                             else
@@ -352,7 +364,7 @@ public interface QubBuild
                         writeFileList(verbose, deletedJavaSourceFiles, "Deleted source files").await();
                         for (final File deletedSourceFile : deletedJavaSourceFiles)
                         {
-                            getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
+                            QubBuild.getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
                                 .delete()
                                 .catchError(FileNotFoundException.class)
                                 .await();
@@ -376,14 +388,14 @@ public interface QubBuild
             }
             else
             {
-                writeFileList(verbose, newJavaSourceFiles, "Added source files").await();
+                QubBuild.writeFileList(verbose, newJavaSourceFiles, "Added source files").await();
                 javaSourceFilesToCompile.addAll(newJavaSourceFiles);
 
-                writeFileList(verbose, modifiedJavaSourceFiles, "Modified source files").await();
+                QubBuild.writeFileList(verbose, modifiedJavaSourceFiles, "Modified source files").await();
                 javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
 
-                writeFileList(verbose, issuedJavaSourceFiles, "Source files that previously contained issues").await();
-                javaSourceFilesToCompile.addAll(issuedJavaSourceFiles);
+                QubBuild.writeFileList(verbose, javaSourceFilesWithErrors, "Source files that previously contained errors").await();
+                javaSourceFilesToCompile.addAll(javaSourceFilesWithErrors);
 
                 final List<File> javaSourceFilesWithDeletedDependencies = List.create();
                 for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
@@ -455,6 +467,20 @@ public interface QubBuild
             if (!javaSourceFilesToCompile.any())
             {
                 output.writeLine("No files need to be compiled.").await();
+
+                if (nonModifiedJavaSourceFileWarnings.any())
+                {
+                    nonModifiedJavaSourceFileWarnings.sort((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
+
+                    final int unmodifiedWarningCount = nonModifiedJavaSourceFileWarnings.getCount();
+                    output.writeLine(unmodifiedWarningCount + " Unmodified Warning" + (unmodifiedWarningCount == 1 ? "" : "s") + ":").await();
+                    for (final JavaCompilerIssue warning : nonModifiedJavaSourceFileWarnings)
+                    {
+                        output.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
+                        final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
+                        sourceFile.addIssue(warning);
+                    }
+                }
             }
             else
             {
@@ -469,6 +495,24 @@ public interface QubBuild
                 exitCode = compilationResult.exitCode;
 
                 verbose.writeLine("Compilation finished.").await();
+
+                final List<JavaCompilerIssue> nonModifiedNonCompiledJavaSourceFileWarnings = nonModifiedJavaSourceFileWarnings
+                    .where((JavaCompilerIssue warning) -> !javaSourceFilesToCompile.contains((File fileToCompile) -> fileToCompile.relativeTo(folderToBuild).equals(Path.parse(warning.sourceFilePath))))
+                    .toList();
+                if (nonModifiedNonCompiledJavaSourceFileWarnings.any())
+                {
+                    nonModifiedNonCompiledJavaSourceFileWarnings.sort((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
+
+                    final int unmodifiedWarningCount = nonModifiedNonCompiledJavaSourceFileWarnings.getCount();
+                    output.writeLine(unmodifiedWarningCount + " Unmodified Warning" + (unmodifiedWarningCount == 1 ? "" : "s") + ":").await();
+                    for (final JavaCompilerIssue warning : nonModifiedNonCompiledJavaSourceFileWarnings)
+                    {
+                        output.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
+                        final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
+                        sourceFile.addIssue(warning);
+                    }
+                }
+
                 if (!Iterable.isNullOrEmpty(compilationResult.issues))
                 {
                     final Iterable<JavaCompilerIssue> sortedIssues = compilationResult.issues
