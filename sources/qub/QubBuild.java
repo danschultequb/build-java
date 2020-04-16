@@ -181,8 +181,8 @@ public interface QubBuild
                         if (matchingDependencies.getCount() > 1)
                         {
                             errorDependencies.addAll(matchingDependencies);
-                            final InMemoryCharacterToByteStream errorMessage = new InMemoryCharacterToByteStream();
-                            final IndentedCharacterWriteStream indentedErrorMessage = new IndentedCharacterWriteStream(errorMessage)
+                            final InMemoryCharacterToByteStream errorMessage = InMemoryCharacterToByteStream.create();
+                            final IndentedCharacterWriteStream indentedErrorMessage = IndentedCharacterWriteStream.create(errorMessage)
                                 .setSingleIndent(" ");
                             indentedErrorMessage.writeLine("Found more than one required version for package " + dependency.toStringIgnoreVersion() + ":").await();
                             int number = 0;

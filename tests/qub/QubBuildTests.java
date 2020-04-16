@@ -297,7 +297,7 @@ public interface QubBuildTests
 
                 runner.test("with --help argument", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
                     try (final QubProcess process = QubBuildTests.createProcess(output, "--help"))
                     {
                         test.assertNull(QubBuild.getParameters(process));
@@ -4168,7 +4168,7 @@ public interface QubBuildTests
 
     static InMemoryCharacterToByteStream getInMemoryCharacterToByteStream(Test test)
     {
-        return new InMemoryCharacterToByteStream();
+        return InMemoryCharacterToByteStream.create();
     }
 
     static Folder getInMemoryCurrentFolder(Test test)

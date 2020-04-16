@@ -151,6 +151,6 @@ public class QubBuildParameters
      */
     static VerboseCharacterWriteStream getVerboseDefault()
     {
-        return new VerboseCharacterWriteStream(false, new InMemoryCharacterToByteStream());
+        return new VerboseCharacterWriteStream(false, InMemoryCharacterToByteStream.create());
     }
 }
