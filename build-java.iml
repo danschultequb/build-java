@@ -13,22 +13,22 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/projectjson-java/versions/27/projectjson-java.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/28/projectjson-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/projectjson-java/versions/27/projectjson-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/versions/28/projectjson-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/json-java/versions/25/json-java.jar!/"/>
+          <root url="jar://C:/qub/qub/json-java/versions/28/json-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/json-java/versions/25/json-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/json-java/versions/28/json-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>

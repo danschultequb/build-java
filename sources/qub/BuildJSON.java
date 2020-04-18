@@ -104,9 +104,8 @@ public class BuildJSON
     {
         PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
 
-        return Result.createUsing(
-            () -> new BufferedByteReadStream(parseJSONFile.getContentByteReadStream().await()),
-            (ByteReadStream byteReadStream) -> BuildJSON.parse(byteReadStream).await());
+        return JSON.parseObject(parseJSONFile)
+            .then((JSONObject json) -> BuildJSON.parse(json).await());
     }
 
     public static Result<BuildJSON> parse(ByteReadStream readStream)
@@ -114,7 +113,8 @@ public class BuildJSON
         PreCondition.assertNotNull(readStream, "readStream");
         PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
 
-        return BuildJSON.parse(CharacterReadStream.create(readStream));
+        return JSON.parseObject(readStream)
+            .then((JSONObject json) -> BuildJSON.parse(json).await());
     }
 
     public static Result<BuildJSON> parse(CharacterReadStream readStream)
@@ -122,7 +122,8 @@ public class BuildJSON
         PreCondition.assertNotNull(readStream, "readStream");
         PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
 
-        return BuildJSON.parse(CharacterReadStreamIterator.create(readStream));
+        return JSON.parseObject(readStream)
+            .then((JSONObject json) -> BuildJSON.parse(json).await());
     }
 
     public static Result<BuildJSON> parse(Iterator<Character> characters)
@@ -130,7 +131,7 @@ public class BuildJSON
         PreCondition.assertNotNull(characters, "character");
 
         return JSON.parseObject(characters)
-            .then((JSONObject object) -> BuildJSON.parse(object).await());
+            .then((JSONObject json) -> BuildJSON.parse(json).await());
     }
 
     public static Result<BuildJSON> parse(JSONObject json)
