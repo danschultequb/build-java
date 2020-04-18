@@ -105,7 +105,7 @@ public class BuildJSON
         PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
 
         return Result.createUsing(
-            () -> parseJSONFile.getContentByteReadStream().await(),
+            () -> new BufferedByteReadStream(parseJSONFile.getContentByteReadStream().await()),
             (ByteReadStream byteReadStream) -> BuildJSON.parse(byteReadStream).await());
     }
 
@@ -114,7 +114,15 @@ public class BuildJSON
         PreCondition.assertNotNull(readStream, "readStream");
         PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
 
-        return BuildJSON.parse(readStream.asCharacterReadStream());
+        return BuildJSON.parse(CharacterReadStream.create(readStream));
+    }
+
+    public static Result<BuildJSON> parse(CharacterReadStream readStream)
+    {
+        PreCondition.assertNotNull(readStream, "readStream");
+        PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
+
+        return BuildJSON.parse(CharacterReadStreamIterator.create(readStream));
     }
 
     public static Result<BuildJSON> parse(Iterator<Character> characters)
