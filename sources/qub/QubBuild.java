@@ -550,7 +550,7 @@ public interface QubBuild
             if (useBuildJson && updateBuildJsonFile)
             {
                 verbose.writeLine("Writing build.json file...").await();
-                try (final CharacterWriteStream writeStream = CharacterWriteStream.create(new BufferedByteWriteStream(buildJsonFile.getContentByteWriteStream().await())))
+                try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentByteWriteStream().await())))
                 {
                     writeStream.write(updatedBuildJson.toString(JSONFormat.pretty)).await();
                 }
