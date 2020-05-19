@@ -502,7 +502,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -550,7 +550,7 @@ public interface QubBuildTests
                                 .addOutputFolder(bin)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/bin")
+                                .addClasspath("/bin/")
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -600,7 +600,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -649,7 +649,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -703,7 +703,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java", "tests/B.java")
                                 .setFunctionAutomatically()));
 
@@ -761,7 +761,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -873,7 +873,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -932,7 +932,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Error, "This doesn't look right to me."))
                                 .setFunctionAutomatically()));
@@ -1115,7 +1115,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Warning, "Are you still sure?"))
                                 .setFunctionAutomatically()));
@@ -1179,7 +1179,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Warning, "Are you sure?"))
                                 .setFunctionAutomatically()));
@@ -1201,7 +1201,7 @@ public interface QubBuildTests
                             "VERBOSE: Modified source files:",
                             "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "1 Warning:",
                             "sources/A.java (Line 1): Are you sure?",
@@ -1258,7 +1258,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("tests/ATests.java", "sources/A.java")
                                 .addCompilerIssues(
                                     new JavaCompilerIssue("sources\\A.java", 1, 5, Issue.Type.Error, "Are you sure?"),
@@ -1337,7 +1337,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
                                 .addCompilerIssues(
                                     new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
@@ -1434,7 +1434,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
                                 .addCompilerIssues(
                                     new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
@@ -1531,7 +1531,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
                                 .addCompilerIssues(
                                     new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
@@ -1623,7 +1623,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java", "tests/ATests.java", "tests/C.java", "sources/A.java")
                                 .addCompilerIssues(
                                     new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"),
@@ -1721,7 +1721,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -1799,7 +1799,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -1875,7 +1875,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java", "sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -1952,7 +1952,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -2028,7 +2028,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -2099,7 +2099,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -2186,7 +2186,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/C.java", "sources/B.java", "sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -2288,7 +2288,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/B.java", "sources/A.java")
                                 .addCompilerIssues(
                                     new JavaCompilerIssue("sources\\B.java", 1, 25, Issue.Type.Error, "Missing definition for C."))
@@ -2391,7 +2391,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFile("sources/C.java")
                                 .setFunctionAutomatically()));
 
@@ -2692,7 +2692,7 @@ public interface QubBuildTests
                                     .addJavaSourceVersion("1.8")
                                     .addJavaTargetVersion("1.8")
                                     .addBootClasspath("/java/jre1.8.0_192/lib/rt.jar")
-                                    .addClasspath("/outputs")
+                                    .addClasspath("/outputs/")
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
 
@@ -2773,7 +2773,7 @@ public interface QubBuildTests
                                     .addJavaSourceVersion("8")
                                     .addJavaTargetVersion("8")
                                     .addBootClasspath("/java/jre1.8.0_192/lib/rt.jar")
-                                    .addClasspath("/outputs")
+                                    .addClasspath("/outputs/")
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
                         QubBuild.main(process);
@@ -3042,7 +3042,7 @@ public interface QubBuildTests
                                     .addOutputFolder(outputs)
                                     .addXlintUnchecked()
                                     .addXlintDeprecation()
-                                    .addClasspath("/outputs")
+                                    .addClasspath("/outputs/")
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
                         QubBuild.main(process);
@@ -3117,7 +3117,7 @@ public interface QubBuildTests
                                     .addOutputFolder(outputs)
                                     .addXlintUnchecked()
                                     .addXlintDeprecation()
-                                    .addClasspath(Iterable.create("/outputs", "/qub/a/b/versions/d/b.jar"))
+                                    .addClasspath(Iterable.create("/outputs/", "/qub/a/b/versions/d/b.jar"))
                                     .addSourceFile("sources/A.java")
                                     .setFunctionAutomatically()));
 
@@ -3189,7 +3189,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -3332,7 +3332,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFile("sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -3353,7 +3353,7 @@ public interface QubBuildTests
                             "VERBOSE: Added source files:",
                             "VERBOSE: /sources/B.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
@@ -3415,7 +3415,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -3436,7 +3436,7 @@ public interface QubBuildTests
                             "VERBOSE: Modified source files:",
                             "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
@@ -3493,7 +3493,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFile("sources/A.java")
                                 .addCompilerIssues(
                                     new JavaCompilerIssue("sources\\A.java", 12, 2, Issue.Type.Error, "Are you sure?"))
@@ -3513,7 +3513,7 @@ public interface QubBuildTests
                                 "VERBOSE: Source files that previously contained errors:",
                                 "VERBOSE: /sources/A.java",
                                 "Compiling 1 file...",
-                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/A.java...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                                 "VERBOSE: Compilation finished.",
                                 "1 Error:",
                                 "sources/A.java (Line 12): Are you sure?",
@@ -3580,7 +3580,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFile("sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -3604,7 +3604,7 @@ public interface QubBuildTests
                             "VERBOSE: Source files with modified dependencies:",
                             "VERBOSE: /sources/B.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
@@ -3657,7 +3657,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java", "sources/AB.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -3728,7 +3728,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -3779,7 +3779,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java", "sources/B.java")
                                 .setFunctionAutomatically()));
 
@@ -3861,7 +3861,7 @@ public interface QubBuildTests
 
                         test.assertEqual(
                             Iterable.create(
-                                "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub)."),
+                                "ERROR: No project folder named \"fake-qub-java\" found in the \"qub\" publisher folder (/qub_home/qub/)."),
                             Strings.getLines(output.getText().await()).skipLast());
 
                         test.assertEqual(1, process.getExitCode());
@@ -3917,7 +3917,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/versions/2/b.jar", "/qub/me/a/versions/1/a.jar"))
+                                .addClasspath(Iterable.create("/outputs/", "/qub/me/b/versions/2/b.jar", "/qub/me/a/versions/1/a.jar"))
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -3932,7 +3932,7 @@ public interface QubBuildTests
                                 "VERBOSE: Detecting java source files to compile...",
                                 "VERBOSE: Compiling all source files.",
                                 "Compiling 1 file...",
-                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/versions/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/;/qub/me/b/versions/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
                                 "VERBOSE: Compilation finished.",
                                 "VERBOSE: Writing build.json file...",
                                 "VERBOSE: Done writing build.json file."),
@@ -3997,7 +3997,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/versions/2/b.jar", "/qub/me/a/versions/1/a.jar"))
+                                .addClasspath(Iterable.create("/outputs/", "/qub/me/b/versions/2/b.jar", "/qub/me/a/versions/1/a.jar"))
                                 .addSourceFile("sources/A.java")
                                 .setFunctionAutomatically()));
 
@@ -4012,7 +4012,7 @@ public interface QubBuildTests
                                 "VERBOSE: Detecting java source files to compile...",
                                 "VERBOSE: Compiling all source files.",
                                 "Compiling 1 file...",
-                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs;/qub/me/b/versions/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
+                                "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/;/qub/me/b/versions/2/b.jar;/qub/me/a/versions/1/a.jar sources/A.java...",
                                 "VERBOSE: Compilation finished.",
                                 "VERBOSE: Writing build.json file...",
                                 "VERBOSE: Done writing build.json file."),
@@ -4117,7 +4117,7 @@ public interface QubBuildTests
                                 .addOutputFolder(outputs)
                                 .addXlintUnchecked()
                                 .addXlintDeprecation()
-                                .addClasspath("/outputs")
+                                .addClasspath("/outputs/")
                                 .addSourceFilePathStrings("sources/A.java")
                                 .setFunction(() ->
                                 {
@@ -4202,7 +4202,7 @@ public interface QubBuildTests
     {
         final byte[] byteContents = Strings.isNullOrEmpty(contents)
             ? new byte[0]
-            : CharacterEncoding.UTF_8.encode(contents).await();
+            : CharacterEncoding.UTF_8.encodeCharacters(contents).await();
         file.setContents(byteContents).await();
     }
 

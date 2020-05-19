@@ -20,7 +20,7 @@ public interface JavacProcessBuilderTests
                     test.assertNotNull(builder);
                     test.assertEqual(Path.parse("javac"), builder.getExecutablePath());
                     test.assertEqual(Iterable.create(), builder.getArguments());
-                    test.assertEqual(test.getProcess().getCurrentFolderPath(), builder.getWorkingFolderPath());
+                    test.assertEqual(test.getProcess().getCurrentFolderPath().normalize().toString() + '/', builder.getWorkingFolderPath().toString());
                 });
             });
 
