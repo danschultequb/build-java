@@ -29,7 +29,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -77,7 +77,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -93,7 +93,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -109,7 +109,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -125,7 +125,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -141,7 +141,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -157,7 +157,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -173,7 +173,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -189,7 +189,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -205,7 +205,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -221,7 +221,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -237,7 +237,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -253,7 +253,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -269,7 +269,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
@@ -285,7 +285,7 @@ public interface QubBuildTests
                     {
                         final QubBuildParameters parameters = QubBuild.getParameters(process);
                         test.assertNotNull(parameters);
-                        test.assertEqual(process.getCurrentFolder().await(), parameters.getFolderToBuild());
+                        test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
                         test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);

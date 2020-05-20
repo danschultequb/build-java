@@ -20,7 +20,7 @@ public interface JavacProcessBuilderTests
                     test.assertNotNull(builder);
                     test.assertEqual(Path.parse("javac"), builder.getExecutablePath());
                     test.assertEqual(Iterable.create(), builder.getArguments());
-                    test.assertEqual(test.getProcess().getCurrentFolderPath().normalize().toString() + '/', builder.getWorkingFolderPath().toString());
+                    test.assertEqual(test.getProcess().getCurrentFolderPath(), builder.getWorkingFolderPath());
                 });
             });
 
@@ -59,7 +59,7 @@ public interface JavacProcessBuilderTests
                 {
                     final JavacProcessBuilder builder = JavacProcessBuilder.get(test.getProcess()).await();
 
-                    final Folder outputsFolder = test.getProcess().getCurrentFolder().await().getFolder("outputs").await();
+                    final Folder outputsFolder = test.getProcess().getCurrentFolder().getFolder("outputs").await();
                     test.assertSame(builder, builder.addOutputFolder(outputsFolder));
                     test.assertEqual(Iterable.create("-d", "outputs"), builder.getArguments());
                 });
@@ -68,11 +68,11 @@ public interface JavacProcessBuilderTests
                 {
                     final JavacProcessBuilder builder = JavacProcessBuilder.get(test.getProcess()).await();
 
-                    final Folder outputsFolder = test.getProcess().getCurrentFolder().await().getFolder("outputs").await();
+                    final Folder outputsFolder = test.getProcess().getCurrentFolder().getFolder("outputs").await();
                     test.assertSame(builder, builder.addOutputFolder(outputsFolder));
                     test.assertEqual(Iterable.create("-d", "outputs"), builder.getArguments());
 
-                    final Folder binFolder = test.getProcess().getCurrentFolder().await().getFolder("bin").await();
+                    final Folder binFolder = test.getProcess().getCurrentFolder().getFolder("bin").await();
                     test.assertSame(builder, builder.addOutputFolder(binFolder));
                     test.assertEqual(Iterable.create("-d", "outputs", "-d", "bin"), builder.getArguments());
                 });
@@ -343,7 +343,7 @@ public interface JavacProcessBuilderTests
                 runner.test("with Java file that doesn't exist", (Test test) ->
                 {
                     final JavacProcessBuilder javac = JavacProcessBuilder.get(test.getProcess()).await();
-                    final Folder currentFolder = test.getProcess().getCurrentFolder().await();
+                    final Folder currentFolder = test.getProcess().getCurrentFolder();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
@@ -384,7 +384,7 @@ public interface JavacProcessBuilderTests
                 runner.test("with empty Java file", (Test test) ->
                 {
                     final JavacProcessBuilder javac = JavacProcessBuilder.get(test.getProcess()).await();
-                    final Folder currentFolder = test.getProcess().getCurrentFolder().await();
+                    final Folder currentFolder = test.getProcess().getCurrentFolder();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
@@ -415,7 +415,7 @@ public interface JavacProcessBuilderTests
                 runner.test("with no errors", (Test test) ->
                 {
                     final JavacProcessBuilder javac = JavacProcessBuilder.get(test.getProcess()).await();
-                    final Folder currentFolder = test.getProcess().getCurrentFolder().await();
+                    final Folder currentFolder = test.getProcess().getCurrentFolder();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
@@ -459,7 +459,7 @@ public interface JavacProcessBuilderTests
                 runner.test("with \"error: class MyTestClass is public, should be declared in a file named MyTestClass.java\"", (Test test) ->
                 {
                     final JavacProcessBuilder javac = JavacProcessBuilder.get(test.getProcess()).await();
-                    final Folder currentFolder = test.getProcess().getCurrentFolder().await();
+                    final Folder currentFolder = test.getProcess().getCurrentFolder();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
@@ -515,7 +515,7 @@ public interface JavacProcessBuilderTests
                 runner.test("with \"error: class, interface, or enum expected\"", (Test test) ->
                 {
                     final JavacProcessBuilder javac = JavacProcessBuilder.get(test.getProcess()).await();
-                    final Folder currentFolder = test.getProcess().getCurrentFolder().await();
+                    final Folder currentFolder = test.getProcess().getCurrentFolder();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
@@ -563,7 +563,7 @@ public interface JavacProcessBuilderTests
                 runner.test("with \"error: ';' expected\" and \"error: reached end of file while parsing\"", (Test test) ->
                 {
                     final JavacProcessBuilder javac = JavacProcessBuilder.get(test.getProcess()).await();
-                    final Folder currentFolder = test.getProcess().getCurrentFolder().await();
+                    final Folder currentFolder = test.getProcess().getCurrentFolder();
                     final Folder rootFolder = currentFolder.createFolder("temp").await();
                     try
                     {
