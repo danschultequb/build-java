@@ -1,16 +1,15 @@
 {
   "publisher": "qub",
   "project": "build-java",
-  "version": "19",
+  "version": "23",
   "java": {
     "mainClass": "qub.QubBuild",
     "shortcutName": "qub-build",
-    "version": "1.8",
     "dependencies": [
       {
         "publisher": "qub",
         "project": "projectjson-java",
-        "version": "33"
+        "version": "38"
       }
     ]
   }
