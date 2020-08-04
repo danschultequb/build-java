@@ -3301,6 +3301,77 @@ public interface QubBuildTests
                         "Wrong build.json file contents");
                 });
 
+                runner.test("with deleted source file with anonymous classes and --verbose", (Test test) ->
+                {
+                    final ManualClock clock = getManualClock(test);
+                    final InMemoryCharacterToByteStream output = QubBuildTests.getInMemoryCharacterToByteStream(test);
+                    final Folder currentFolder = getInMemoryCurrentFolder(test, clock);
+                    setFileContents(currentFolder, "project.json", ProjectJSON.create().setJava(ProjectJSONJava.create()).toString());
+                    setFileContents(currentFolder, "sources/A.java", "A.java source");
+                    final File aClassFile = setFileContents(currentFolder, "outputs/A.class", "A.java source");
+                    final File bClassFile = setFileContents(currentFolder, "outputs/B.class", "B.java source");
+                    final File b1ClassFile = setFileContents(currentFolder, "outputs/B$1.class", "B.java source");
+                    final File buildJsonFile = setFileContents(currentFolder, "outputs/build.json", new BuildJSON()
+                        .setSourceFiles(Iterable.create(
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/A.java")
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero)),
+                            new BuildJSONSourceFile()
+                                .setRelativePath("sources/B.java")
+                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                        .toString());
+
+                    clock.advance(Duration.minutes(1));
+
+                    try (final QubProcess process = QubBuildTests.createProcess(output, currentFolder, "--verbose"))
+                    {
+                        QubBuild.main(process);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "VERBOSE: Parsing project.json...",
+                                "VERBOSE: Parsing outputs/build.json...",
+                                "VERBOSE: /sources/A.java - No changes or issues",
+                                "VERBOSE: Deleted source files:",
+                                "VERBOSE: /sources/B.java",
+                                "VERBOSE: Updating outputs/build.json...",
+                                "VERBOSE: Setting project.json...",
+                                "VERBOSE: Setting source files...",
+                                "VERBOSE: Detecting java source files to compile...",
+                                "No files need to be compiled.",
+                                "VERBOSE: Writing build.json file...",
+                                "VERBOSE: Done writing build.json file."),
+                            Strings.getLines(output.getText().await()).skipLast());
+
+                        test.assertEqual(0, process.getExitCode());
+                    }
+
+                    final Folder outputs = currentFolder.getFolder("outputs").await();
+                    test.assertEqual(
+                        Iterable.create(
+                            "/outputs/A.class",
+                            "/outputs/build.json"),
+                        outputs.getFilesAndFoldersRecursively().await().map(FileSystemEntry::toString));
+
+                    test.assertEqual(Duration.zero, getFileLastModified(aClassFile).getDurationSinceEpoch());
+                    test.assertEqual("A.java source", getFileContents(aClassFile));
+
+                    test.assertFalse(bClassFile.exists().await());
+                    test.assertFalse(b1ClassFile.exists().await());
+
+                    test.assertEqual(clock.getCurrentDateTime(), getFileLastModified(buildJsonFile), "Wrong build.json file lastModified");
+                    test.assertEqual(
+                        new BuildJSON()
+                            .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
+                            .setSourceFiles(Iterable.create(
+                                new BuildJSONSourceFile()
+                                    .setRelativePath("sources/A.java")
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                            .toString(JSONFormat.pretty),
+                        getFileContents(buildJsonFile),
+                        "Wrong build.json file contents");
+                });
+
                 runner.test("with new source file and --verbose", (Test test) ->
                 {
                     final ManualClock clock = getManualClock(test);

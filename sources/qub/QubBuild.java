@@ -364,10 +364,11 @@ public interface QubBuild
                         writeFileList(verbose, deletedJavaSourceFiles, "Deleted source files").await();
                         for (final File deletedSourceFile : deletedJavaSourceFiles)
                         {
-                            QubBuild.getClassFile(deletedSourceFile, folderToBuild, outputsFolder)
-                                .delete()
-                                .catchError(FileNotFoundException.class)
-                                .await();
+                            final Iterable<File> classFilesToDelete = QubBuild.getExistingClassFiles(deletedSourceFile, folderToBuild, outputsFolder);
+                            for (final File classFileToDelete : classFilesToDelete)
+                            {
+                                classFileToDelete.delete().await();
+                            }
                         }
                     }
                 }
@@ -454,7 +455,7 @@ public interface QubBuild
                 final List<File> javaSourceFilesWithMissingClassFiles = List.create();
                 for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
                 {
-                    final File classFile = getClassFile(nonModifiedJavaSourceFile, folderToBuild, outputsFolder);
+                    final File classFile = QubBuild.getClassFile(nonModifiedJavaSourceFile, folderToBuild, outputsFolder);
                     if (!classFile.exists().await() && !javaSourceFilesToCompile.contains(nonModifiedJavaSourceFile))
                     {
                         javaSourceFilesWithMissingClassFiles.add(nonModifiedJavaSourceFile);
@@ -656,6 +657,14 @@ public interface QubBuild
         });
     }
 
+    /**
+     * Get the class file that will be created when the provided source file is compiled. The returned class file may
+     * or may not already exist.
+     * @param sourceFile The source file that will create the returned class file when it is compiled.
+     * @param rootFolder The root project folder that contains the source folder and the output folder.
+     * @param outputFolder The output folder where compiled class files will be created in.
+     * @return The class file that will be created when the provided source file is compiled.
+     */
     static File getClassFile(File sourceFile, Folder rootFolder, Folder outputFolder)
     {
         final Path sourceFileRelativeToRootPath = sourceFile.relativeTo(rootFolder);
@@ -663,5 +672,29 @@ public interface QubBuild
         final Folder sourceFolder = rootFolder.getFolder(sourceFileRelativePathFirstSegment).await();
         final Path sourceFileRelativeToSourcePath = sourceFile.relativeTo(sourceFolder);
         return outputFolder.getFile(sourceFileRelativeToSourcePath.changeFileExtension(".class")).await();
+    }
+
+    /**
+     * Find the existing class files that are related to the provided source file.
+     * @param sourceFile The source file that was compiled into the resulting class files.
+     * @param rootFolder The root project folder that contains the source folder and the output folder.
+     * @param outputFolder The output folder where compiled class files will be created in.
+     * @return The existing class files that were created from the provided source file.
+     */
+    static Iterable<File> getExistingClassFiles(File sourceFile, Folder rootFolder, Folder outputFolder)
+    {
+        final File classFile = QubBuild.getClassFile(sourceFile, rootFolder, outputFolder);
+        final List<File> result = classFile.getParentFolder().await()
+            .getFiles().await()
+            .where((File file) -> file.getName().startsWith(classFile.getNameWithoutFileExtension() + "$"))
+            .toList();
+        if (classFile.exists().await())
+        {
+            result.add(classFile);
+        }
+
+        PostCondition.assertNotNull(result, "result");
+
+        return result;
     }
 }
