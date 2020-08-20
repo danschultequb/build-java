@@ -46,7 +46,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
      * @param verbose The stream that verbose logs should be written to.
      * @return The parsed result of running the javac process.
      */
-    public Result<JavaCompilationResult> compile(Warnings warnings, VerboseCharacterWriteStream verbose)
+    public Result<JavaCompilationResult> compile(Warnings warnings, CharacterWriteStream verbose)
     {
         PreCondition.assertNotNull(warnings, "warnings");
         PreCondition.assertNotNull(verbose, "verbose");

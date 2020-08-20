@@ -140,6 +140,18 @@ public interface JavacArguments<T>
 
     /**
      * Set the classpath argument of the javac process.
+     * @param classpathFolder The classpath argument of the javac process.
+     * @return This object for method chaining.
+     */
+    default T addClasspath(Folder classpathFolder)
+    {
+        PreCondition.assertNotNull(classpathFolder, "classpathFolder");
+
+        return this.addClasspath(classpathFolder.toString());
+    }
+
+    /**
+     * Set the classpath argument of the javac process.
      * @param classpath The classpath argument of the javac process.
      * @return This object for method chaining.
      */
@@ -287,6 +299,18 @@ public interface JavacArguments<T>
         PostCondition.assertNotNull(result, "result");
 
         return result;
+    }
+
+    /**
+     * Add source files to compile.
+     * @param sourceFiles The source files to compile.
+     * @return This object for method chaining.
+     */
+    default T addSourceFiles(File... sourceFiles)
+    {
+        PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
+
+        return this.addSourceFiles(Iterable.create(sourceFiles));
     }
 
     /**

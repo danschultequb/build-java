@@ -6,22 +6,24 @@ public class QubBuildParameters
     private final Folder folderToBuild;
     private final EnvironmentVariables environmentVariables;
     private final ProcessFactory processFactory;
+    private final Folder projectDataFolder;
     private Warnings warnings;
     private boolean buildJson;
     private VerboseCharacterWriteStream verbose;
 
-    public QubBuildParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory)
+    public QubBuildParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory, Folder projectDataFolder)
     {
         PreCondition.assertNotNull(outputWriteStream, "outputWriteStream");
         PreCondition.assertNotNull(folderToBuild, "folderToBuild");
         PreCondition.assertNotNull(environmentVariables, "environmentVariables");
         PreCondition.assertNotNull(processFactory, "processFactory");
+        PreCondition.assertNotNull(projectDataFolder, "projectDataFolder");
 
         this.outputWriteStream = outputWriteStream;
         this.folderToBuild = folderToBuild;
         this.environmentVariables = environmentVariables;
         this.processFactory = processFactory;
-
+        this.projectDataFolder = projectDataFolder;
         this.warnings = QubBuildParameters.getWarningsDefault();
         this.buildJson = QubBuildParameters.getBuildJsonDefault();
         this.verbose = QubBuildParameters.getVerboseDefault();
@@ -61,6 +63,15 @@ public class QubBuildParameters
     public ProcessFactory getProcessFactory()
     {
         return this.processFactory;
+    }
+
+    /**
+     * Get the project data folder for this application.
+     * @return The project data folder for this application.
+     */
+    public Folder getProjectDataFolder()
+    {
+        return this.projectDataFolder;
     }
 
     /**

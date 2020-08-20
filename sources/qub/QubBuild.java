@@ -80,7 +80,8 @@ public interface QubBuild
             final Warnings warnings = warningsParameter.getValue().await();
             final Boolean buildJson = buildJsonParameter.getValue().await();
             final VerboseCharacterWriteStream verbose = verboseParameter.getVerboseCharacterWriteStream().await();
-            result = new QubBuildParameters(output, folderToBuild, environmentVariables, processFactory)
+            final Folder projectDataFolder = process.getQubProjectDataFolder().await();
+            result = new QubBuildParameters(output, folderToBuild, environmentVariables, processFactory, projectDataFolder)
                 .setWarnings(warnings)
                 .setBuildJson(buildJson)
                 .setVerbose(verbose);
@@ -93,12 +94,22 @@ public interface QubBuild
     {
         PreCondition.assertNotNull(parameters, "parameters");
 
-        final CharacterWriteStream output = parameters.getOutputWriteStream();
         final Folder folderToBuild = parameters.getFolderToBuild();
         final EnvironmentVariables environmentVariables = parameters.getEnvironmentVariables();
         final Warnings warnings = parameters.getWarnings();
         final boolean useBuildJson = parameters.getBuildJson();
-        final VerboseCharacterWriteStream verbose = parameters.getVerbose();
+        final Folder projectDataFolder = parameters.getProjectDataFolder();
+
+        final Folder logsFolder = projectDataFolder.getFolder("logs").await();
+        final int logFileCount = logsFolder.getFiles()
+            .catchError(NotFoundException.class, () -> Iterable.create())
+            .await()
+            .getCount();
+        final String logFileName = (logFileCount + 1) + ".log";
+        final CharacterWriteStream logStream = logsFolder.getFile(logFileName).await()
+            .getContentCharacterWriteStream().await();
+        final CharacterWriteStream output = CharacterWriteStreamList.create(parameters.getOutputWriteStream(), logStream);
+        final CharacterWriteStream verbose = CharacterWriteStreamList.create(parameters.getVerbose(), new VerboseCharacterWriteStream(true, logStream));
 
         int exitCode = 0;
         try
@@ -561,9 +572,7 @@ public interface QubBuild
         catch (Throwable error)
         {
             final Throwable unwrappedError = Exceptions.unwrap(error);
-            if (unwrappedError instanceof PreConditionFailure ||
-                unwrappedError instanceof PostConditionFailure ||
-                unwrappedError instanceof NullPointerException)
+            if (Types.instanceOf(unwrappedError, Iterable.create(PreConditionFailure.class, PostConditionFailure.class, NullPointerException.class)))
             {
                 throw error;
             }
@@ -571,15 +580,19 @@ public interface QubBuild
             output.writeLine("ERROR: " + message).await();
             ++exitCode;
         }
+        finally
+        {
+            logStream.dispose().await();
+        }
 
         return exitCode;
     }
 
-    static Result<Void> writeFileList(VerboseCharacterWriteStream verbose, Iterable<File> files, String description)
+    static Result<Void> writeFileList(CharacterWriteStream verbose, Iterable<File> files, String description)
     {
         return Result.create(() ->
         {
-            if (verbose.isVerbose() && !Iterable.isNullOrEmpty(files))
+            if (!Iterable.isNullOrEmpty(files))
             {
                 verbose.writeLine(description + ":").await();
                 for (final File file : files)
