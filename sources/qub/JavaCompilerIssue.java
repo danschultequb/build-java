@@ -33,6 +33,11 @@ public class JavaCompilerIssue
      */
     public final String message;
 
+    public JavaCompilerIssue(Path sourceFilePath, int lineNumber, int columnNumber, Issue.Type type, String message)
+    {
+        this(sourceFilePath.toString(), lineNumber, columnNumber, type, message);
+    }
+
     public JavaCompilerIssue(String sourceFilePath, int lineNumber, int columnNumber, Issue.Type type, String message)
     {
         this.sourceFilePath = sourceFilePath;

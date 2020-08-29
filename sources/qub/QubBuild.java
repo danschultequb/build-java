@@ -60,7 +60,7 @@ public interface QubBuild
 
         final CommandLineParameters parameters = process.createCommandLineParameters()
             .setApplicationName("qub-build")
-            .setApplicationDescription("Used to compile and package source code projects.");
+            .setApplicationDescription("Used to compile source code projects.");
         final CommandLineParameter<Folder> folderToBuildParameter = QubBuild.addFolderToBuildParameter(parameters, process);
         final CommandLineParameter<Warnings> warningsParameter = QubBuild.addWarningsParameter(parameters);
         final CommandLineParameterBoolean buildJsonParameter = QubBuild.addBuildJsonParameter(parameters);
@@ -125,6 +125,7 @@ public interface QubBuild
 
             verbose.writeLine("Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...").await();
             final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile).await();
+
             final ProjectJSONJava projectJsonJava = projectJson.getJava();
             if (projectJsonJava == null)
             {
