@@ -1,32 +1,32 @@
 package qub;
 
-public class QubBuildParameters
+public class QubBuildCompileParameters
 {
     private final CharacterToByteWriteStream outputWriteStream;
     private final Folder folderToBuild;
     private final EnvironmentVariables environmentVariables;
     private final ProcessFactory processFactory;
-    private final Folder projectDataFolder;
+    private final Folder qubBuildDataFolder;
     private Warnings warnings;
     private boolean buildJson;
     private VerboseCharacterWriteStream verbose;
 
-    public QubBuildParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory, Folder projectDataFolder)
+    public QubBuildCompileParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory, Folder qubBuildDataFolder)
     {
         PreCondition.assertNotNull(outputWriteStream, "outputWriteStream");
         PreCondition.assertNotNull(folderToBuild, "folderToBuild");
         PreCondition.assertNotNull(environmentVariables, "environmentVariables");
         PreCondition.assertNotNull(processFactory, "processFactory");
-        PreCondition.assertNotNull(projectDataFolder, "projectDataFolder");
+        PreCondition.assertNotNull(qubBuildDataFolder, "qubBuildDataFolder");
 
         this.outputWriteStream = outputWriteStream;
         this.folderToBuild = folderToBuild;
         this.environmentVariables = environmentVariables;
         this.processFactory = processFactory;
-        this.projectDataFolder = projectDataFolder;
-        this.warnings = QubBuildParameters.getWarningsDefault();
-        this.buildJson = QubBuildParameters.getBuildJsonDefault();
-        this.verbose = QubBuildParameters.getVerboseDefault();
+        this.qubBuildDataFolder = qubBuildDataFolder;
+        this.warnings = QubBuildCompileParameters.getWarningsDefault();
+        this.buildJson = QubBuildCompileParameters.getBuildJsonDefault();
+        this.verbose = QubBuildCompileParameters.getVerboseDefault();
     }
 
     /**
@@ -66,12 +66,12 @@ public class QubBuildParameters
     }
 
     /**
-     * Get the project data folder for this application.
-     * @return The project data folder for this application.
+     * Get the qub-build data folder for this application.
+     * @return The qub-build data folder for this application.
      */
-    public Folder getProjectDataFolder()
+    public Folder getQubBuildDataFolder()
     {
-        return this.projectDataFolder;
+        return this.qubBuildDataFolder;
     }
 
     /**
@@ -88,7 +88,7 @@ public class QubBuildParameters
      * @param warnings How warnings should be treated at build time.
      * @return This object for method chaining.
      */
-    public QubBuildParameters setWarnings(Warnings warnings)
+    public QubBuildCompileParameters setWarnings(Warnings warnings)
     {
         PreCondition.assertNotNull(warnings, "warnings");
 
@@ -110,7 +110,7 @@ public class QubBuildParameters
      * @param buildJson Whether or not to use a build.json file.
      * @return This object for method chaining.
      */
-    public QubBuildParameters setBuildJson(boolean buildJson)
+    public QubBuildCompileParameters setBuildJson(boolean buildJson)
     {
         this.buildJson = buildJson;
         return this;
@@ -130,7 +130,7 @@ public class QubBuildParameters
      * @param verbose The VerboseCharacterWriteStream where verbose logs will be written to.
      * @return This object for method chaining.
      */
-    public QubBuildParameters setVerbose(VerboseCharacterWriteStream verbose)
+    public QubBuildCompileParameters setVerbose(VerboseCharacterWriteStream verbose)
     {
         PreCondition.assertNotNull(verbose, "verbose");
 

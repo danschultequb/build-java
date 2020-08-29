@@ -156,7 +156,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
         return Result.create(() ->
         {
             File result;
-            if (QubBuild.isJava8(javaVersion))
+            if (QubBuildCompile.isJava8(javaVersion))
             {
                 final Folder javaFolder = javaHomeFolder.getParentFolder().await();
                 final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().await();
@@ -171,7 +171,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
                     result = jre18Folder.getFile("lib/rt.jar").await();
                 }
             }
-            else if (QubBuild.isJava11(javaVersion))
+            else if (QubBuildCompile.isJava11(javaVersion))
             {
                 result = null;
             }

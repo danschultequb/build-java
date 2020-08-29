@@ -370,7 +370,7 @@ public interface JavacProcessBuilderTests
                                 "use --help for a list of possible options"),
                             Strings.getLines(result.error));
                         test.assertEqual(Iterable.create(), result.issues);
-                        test.assertFalse(QubBuild.getClassFile(aJavaFile, rootFolder, outputsFolder).exists().await());
+                        test.assertFalse(QubBuildCompile.getClassFile(aJavaFile, rootFolder, outputsFolder).exists().await());
                         test.assertEqual(
                             Iterable.create("VERBOSE: Running " + rootFolder + ": javac -d outputs sources/A.java..."),
                             Strings.getLines(stream.getText().await()));
@@ -404,7 +404,7 @@ public interface JavacProcessBuilderTests
                         test.assertEqual("", result.output);
                         test.assertEqual("", result.error);
                         test.assertEqual(Iterable.create(), result.issues);
-                        test.assertFalse(QubBuild.getClassFile(bJavaFile, rootFolder, outputsFolder).exists().await());
+                        test.assertFalse(QubBuildCompile.getClassFile(bJavaFile, rootFolder, outputsFolder).exists().await());
                     }
                     finally
                     {
@@ -445,7 +445,7 @@ public interface JavacProcessBuilderTests
                         test.assertEqual("", result.output);
                         test.assertEqual("", result.error);
                         test.assertEqual(Iterable.create(), result.issues);
-                        test.assertTrue(QubBuild.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
+                        test.assertTrue(QubBuildCompile.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
                         test.assertEqual(
                             Iterable.create("VERBOSE: Running " + rootFolder + ": javac -d outputs sources/C.java..."),
                             Strings.getLines(stream.getText().await()));
@@ -501,7 +501,7 @@ public interface JavacProcessBuilderTests
                                     1, 8,
                                     "class MyTestClass is public, should be declared in a file named MyTestClass.java")),
                             result.issues);
-                        test.assertFalse(QubBuild.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
+                        test.assertFalse(QubBuildCompile.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
                         test.assertEqual(
                             Iterable.create("VERBOSE: Running " + rootFolder + ": javac -d outputs sources/C.java..."),
                             Strings.getLines(stream.getText().await()));
@@ -548,7 +548,7 @@ public interface JavacProcessBuilderTests
                                 1, 1,
                                 "class, interface, or enum expected")),
                             result.issues);
-                        test.assertFalse(QubBuild.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
+                        test.assertFalse(QubBuildCompile.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
                         test.assertEqual(
                             Iterable.create(
                                 "VERBOSE: Running " + rootFolder + ": javac -d outputs sources/C.java..."),
@@ -612,7 +612,7 @@ public interface JavacProcessBuilderTests
                                     7, 4,
                                     "reached end of file while parsing")),
                             result.issues);
-                        test.assertFalse(QubBuild.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
+                        test.assertFalse(QubBuildCompile.getClassFile(cJavaFile, rootFolder, outputsFolder).exists().await());
                         test.assertEqual(
                             Iterable.create(
                                 "VERBOSE: Running " + rootFolder + ": javac -d outputs sources/C.java..."),
