@@ -38,11 +38,34 @@ public interface QubBuildTests
                             "Usage: qub-build [--action=]<action-name> [--help]",
                             "  Used to compile source code projects.",
                             "  --action(a): The name of the action to invoke.",
-                            "  --help(?): Show the help message for this application.",
+                            "  --help(?):   Show the help message for this application.",
                             "",
                             "Actions:",
                             "  compile (default): Compile source code files.",
-                            "  logs: Show the logs folder."),
+                            "  logs:              Show the logs folder."),
+                        Strings.getLines(output.getText().await()));
+                });
+
+                runner.test("with compile -?", (Test test) ->
+                {
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    try (final QubProcess process = QubProcess.create("compile", "-?"))
+                    {
+                        process.setOutputWriteStream(output);
+
+                        QubBuild.run(process);
+                    }
+
+                    test.assertEqual(
+                        Iterable.create(
+                            "Usage: qub-build [--action=]<action-name> [--help]",
+                            "  Used to compile source code projects.",
+                            "  --action(a): The name of the action to invoke.",
+                            "  --help(?):   Show the help message for this application.",
+                            "",
+                            "Actions:",
+                            "  compile (default): Compile source code files.",
+                            "  logs:              Show the logs folder."),
                         Strings.getLines(output.getText().await()));
                 });
             });
