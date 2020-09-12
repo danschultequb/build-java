@@ -546,14 +546,14 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aClassFile = outputsFolder.getFile("A.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
@@ -616,14 +616,14 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aClassFile = outputsFolder.getFile("A.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create().setOutputFolder("bin")))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
@@ -687,14 +687,14 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aClassFile = outputsFolder.getFile("A.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
@@ -761,20 +761,20 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aClassFile = outputsFolder.getFile("A.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     final File bClassFile = outputsFolder.getFile("B.class").await();
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, bClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, bClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero)),
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero)),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
@@ -840,20 +840,20 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aClassFile = outputsFolder.getFile("A.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     final File bClassFile = outputsFolder.getFile("B.class").await();
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, bClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, bClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero)),
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero)),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
@@ -878,7 +878,7 @@ public interface QubBuildCompileTests
                     final File aClassFile = outputsFolder.getFile("A.class").await();
                     aClassFile.setContentsAsString("A.java bytecode").await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -927,7 +927,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
@@ -957,10 +957,10 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
 
@@ -990,14 +990,14 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -1030,7 +1030,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
@@ -1117,7 +1117,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
@@ -1169,7 +1169,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create()
@@ -1219,7 +1219,7 @@ public interface QubBuildCompileTests
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 1, 20, Issue.Type.Warning, "Are you sure?"))))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
 
@@ -1253,7 +1253,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(Duration.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
+                    test.assertEqual(Duration2.zero, aClassFile.getLastModified().await().getDurationSinceEpoch());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create()
@@ -1261,7 +1261,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath("sources/A.java")
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 1, 20, Issue.Type.Warning, "Are you sure?"))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
@@ -1296,7 +1296,7 @@ public interface QubBuildCompileTests
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 1, 20, Issue.Type.Warning, "Are you sure?"))))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
@@ -1391,7 +1391,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
@@ -1457,7 +1457,7 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aTestsClassFile = outputsFolder.getFile("ATests.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual("ATests.java bytecode", aTestsClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aTestsClassFile.getLastModified().await());
                     test.assertEqual(
@@ -1467,11 +1467,11 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 1, 5, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aTestsJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
@@ -1506,7 +1506,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
@@ -1588,7 +1588,7 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aTestsClassFile = outputsFolder.getFile("ATests.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual("ATests.java bytecode", aTestsClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aTestsClassFile.getLastModified().await());
                     test.assertEqual(
@@ -1598,19 +1598,19 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 12, 2, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(bJavaFile.relativeTo(currentFolder), 1, 5, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aTestsJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this.")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(cJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .setIssues(Iterable.create(
                                         new JavaCompilerIssue(cJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."),
                                         new JavaCompilerIssue(cJavaFile.relativeTo(currentFolder), 20, 7, Issue.Type.Error, "Can't be this.")))
@@ -1648,7 +1648,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
@@ -1731,7 +1731,7 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aTestsClassFile = outputsFolder.getFile("ATests.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual("ATests.java bytecode", aTestsClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aTestsClassFile.getLastModified().await());
                     test.assertEqual(
@@ -1741,19 +1741,19 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 12, 2, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(bJavaFile.relativeTo(currentFolder), 1, 5, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aTestsJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this.")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(cJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .setIssues(Iterable.create(
                                         new JavaCompilerIssue(cJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."),
                                         new JavaCompilerIssue(cJavaFile.relativeTo(currentFolder), 20, 7, Issue.Type.Error, "Can't be this.")))
@@ -1791,7 +1791,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
@@ -1868,7 +1868,7 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aTestsClassFile = outputsFolder.getFile("ATests.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual("ATests.java bytecode", aTestsClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aTestsClassFile.getLastModified().await());
                     test.assertEqual(
@@ -1878,18 +1878,18 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 12, 2, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(bJavaFile.relativeTo(currentFolder), 1, 5, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aTestsJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1))),
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1))),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(cJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(cJavaFile.relativeTo(currentFolder), 20, 7, Issue.Type.Error, "Can't be this."))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
@@ -1924,7 +1924,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
@@ -2005,7 +2005,7 @@ public interface QubBuildCompileTests
                         "Wrong files in outputs folder");
                     final File aTestsClassFile = outputsFolder.getFile("ATests.class").await();
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual("ATests.java bytecode", aTestsClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aTestsClassFile.getLastModified().await());
                     test.assertEqual(
@@ -2015,19 +2015,19 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 12, 2, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(bJavaFile.relativeTo(currentFolder), 1, 5, Issue.Type.Error, "Are you sure?")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aTestsJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .addIssue(new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Error, "Can't be this.")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(cJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)))
                                     .setIssues(Iterable.create(
                                         new JavaCompilerIssue(cJavaFile.relativeTo(currentFolder), 20, 7, Issue.Type.Error, "Can't be this."),
                                         new JavaCompilerIssue(cJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Error, "Can't be this.")))
@@ -2070,7 +2070,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
                     bJavaFile.setContentsAsString("B.java source").await();
@@ -2173,7 +2173,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
@@ -2224,7 +2224,7 @@ public interface QubBuildCompileTests
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aClassFile.getLastModified().await());
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), bClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), bClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
@@ -2234,7 +2234,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime()),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -2274,7 +2274,7 @@ public interface QubBuildCompileTests
                                     .setDependencies(Iterable.create(aJavaFile.relativeTo(currentFolder)))))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
@@ -2335,7 +2335,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime()),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(aJavaFile.relativeTo(currentFolder)))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
@@ -2376,7 +2376,7 @@ public interface QubBuildCompileTests
                                     .setDependencies(Iterable.create(aJavaFile.relativeTo(currentFolder)))))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     bJavaFile.setContentsAsString("B.java source, depends on A").await();
 
@@ -2425,7 +2425,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), bClassFile.getLastModified().await());
                     test.assertEqual(
@@ -2434,7 +2434,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero)),
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero)),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
                                     .setLastModified(clock.getCurrentDateTime())
@@ -2478,7 +2478,7 @@ public interface QubBuildCompileTests
                                     .setDependencies(Iterable.create(aJavaFile.relativeTo(currentFolder)))))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -2533,7 +2533,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(aJavaFile.relativeTo(currentFolder)))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
@@ -2567,7 +2567,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
@@ -2619,7 +2619,7 @@ public interface QubBuildCompileTests
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aClassFile.getLastModified().await());
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), bClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), bClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
@@ -2629,7 +2629,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime()),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -2686,7 +2686,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     cJavaFile.setContentsAsString("C.java source").await();
 
@@ -2745,25 +2745,25 @@ public interface QubBuildCompileTests
                     test.assertEqual("C.java bytecode", cClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), cClassFile.getLastModified().await());
                     test.assertEqual("N.java bytecode", nClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), nClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), nClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(bJavaFile.relativeTo(currentFolder))),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(cJavaFile.relativeTo(currentFolder))),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(cJavaFile.relativeTo(currentFolder))
                                     .setLastModified(clock.getCurrentDateTime()),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(nJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -2820,7 +2820,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -2880,25 +2880,25 @@ public interface QubBuildCompileTests
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), aClassFile.getLastModified().await());
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), bClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), bClassFile.getLastModified().await());
                     test.assertEqual("N.java bytecode", nClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), nClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), nClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(bJavaFile.relativeTo(currentFolder))),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(cJavaFile.relativeTo(currentFolder)))
                                     .addIssue(new JavaCompilerIssue(bJavaFile.relativeTo(currentFolder), 1, 25, Issue.Type.Error, "Missing definition for C.")),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(nJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -2955,7 +2955,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -3005,31 +3005,31 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), bClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), bClassFile.getLastModified().await());
                     test.assertEqual("C.java bytecode", cClassFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), cClassFile.getLastModified().await());
                     test.assertEqual("N.java bytecode", nClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), nClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), nClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(bJavaFile.relativeTo(currentFolder))),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))
                                     .setDependencies(Iterable.create(cJavaFile.relativeTo(currentFolder))),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(cJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero)),
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero)),
                                 new BuildJSONSourceFile()
                                     .setRelativePath(nJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -3054,7 +3054,7 @@ public interface QubBuildCompileTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, environmentVariables);
 
@@ -3131,7 +3131,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3207,7 +3207,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3283,7 +3283,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3382,7 +3382,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3481,7 +3481,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3564,7 +3564,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3647,7 +3647,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3698,7 +3698,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
 
@@ -3728,7 +3728,7 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), aClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(
@@ -3739,7 +3739,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -3779,7 +3779,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -3831,7 +3831,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -3877,7 +3877,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -3931,7 +3931,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -3974,7 +3974,7 @@ public interface QubBuildCompileTests
                                     .setLastModified(clock.getCurrentDateTime())))
                             .toString());
 
-                    clock.advance(Duration.seconds(1));
+                    clock.advance(Duration2.seconds(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -4016,14 +4016,14 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("B.java bytecode", bClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.zero), bClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.zero), bClassFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(bJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -4124,7 +4124,7 @@ public interface QubBuildCompileTests
                         ProjectJSON.create()
                             .setProject(cProjectVersionFolder.getProjectName().await())
                             .setPublisher(cProjectVersionFolder.getPublisherName().await())
-                            .setVersion(cProjectVersionFolder.getVersion())
+                            .setVersion(cProjectVersionFolder.getVersion().await())
                             .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     bProjectVersionFolder.getProjectSignature().await())))
@@ -4142,7 +4142,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -4200,7 +4200,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -4224,7 +4224,7 @@ public interface QubBuildCompileTests
                         ProjectJSON.create()
                             .setProject(cProjectVersionFolder.getProjectName().await())
                             .setPublisher(cProjectVersionFolder.getPublisherName().await())
-                            .setVersion(cProjectVersionFolder.getVersion())
+                            .setVersion(cProjectVersionFolder.getVersion().await())
                             .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     bProjectVersionFolder.getProjectSignature().await())))
@@ -4237,7 +4237,7 @@ public interface QubBuildCompileTests
                         ProjectJSON.create()
                             .setProject(eProjectVersionFolder.getProjectName().await())
                             .setPublisher(eProjectVersionFolder.getPublisherName().await())
-                            .setVersion(eProjectVersionFolder.getVersion())
+                            .setVersion(eProjectVersionFolder.getVersion().await())
                             .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     cProjectVersionFolder.getProjectSignature().await())))
@@ -4255,7 +4255,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -4314,7 +4314,7 @@ public interface QubBuildCompileTests
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         buildJsonFile.getContentsAsString().await());
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
@@ -4341,7 +4341,7 @@ public interface QubBuildCompileTests
                         ProjectJSON.create()
                             .setProject(cProjectVersionFolder.getProjectName().await())
                             .setPublisher(cProjectVersionFolder.getPublisherName().await())
-                            .setVersion(cProjectVersionFolder.getVersion())
+                            .setVersion(cProjectVersionFolder.getVersion().await())
                             .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     b1ProjectVersionFolder.getProjectSignature().await())))
@@ -4354,7 +4354,7 @@ public interface QubBuildCompileTests
                         ProjectJSON.create()
                             .setProject(eProjectVersionFolder.getProjectName().await())
                             .setPublisher(eProjectVersionFolder.getPublisherName().await())
-                            .setVersion(eProjectVersionFolder.getVersion())
+                            .setVersion(eProjectVersionFolder.getVersion().await())
                             .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     cProjectVersionFolder.getProjectSignature().await(),
@@ -4373,7 +4373,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
                         new FakeJavacProcessRun()
@@ -4447,11 +4447,11 @@ public interface QubBuildCompileTests
                             .setFunction(() ->
                             {
                                 aClassFile.setContentsAsString("A.java bytecode").await();
-                                clock.advance(Duration.seconds(1));
+                                clock.advance(Duration2.seconds(1));
                                 aJavaFile.setContentsAsString("A.java source 2").await();
                             }));
 
-                    clock.advance(Duration.minutes(1));
+                    clock.advance(Duration2.minutes(1));
 
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
@@ -4483,16 +4483,16 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getOutputsFolderFilePathStrings(outputsFolder),
                         "Wrong files in outputs folder");
                     test.assertEqual("A.java bytecode", aClassFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.minutes(1)), aClassFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.minutes(1)), aClassFile.getLastModified().await());
                     test.assertEqual("A.java source 2", aJavaFile.getContentsAsString().await());
-                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration.seconds(61)), aJavaFile.getLastModified().await());
+                    test.assertEqual(DateTime.createFromDurationSinceEpoch(Duration2.seconds(61)), aJavaFile.getLastModified().await());
                     test.assertEqual(
                         new BuildJSON()
                             .setProjectJson(ProjectJSON.create().setJava(ProjectJSONJava.create()))
                             .setSourceFiles(Iterable.create(
                                 new BuildJSONSourceFile()
                                     .setRelativePath(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.zero))))
+                                    .setLastModified(DateTime.createFromDurationSinceEpoch(Duration2.zero))))
                             .toString(JSONFormat.pretty),
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
@@ -4621,7 +4621,7 @@ public interface QubBuildCompileTests
     {
         PreCondition.assertNotNull(test, "test");
 
-        return new ManualClock(DateTime.createFromDurationSinceEpoch(Duration.zero), test.getMainAsyncRunner());
+        return new ManualClock(DateTime.createFromDurationSinceEpoch(Duration2.zero), test.getMainAsyncRunner());
     }
 
     static InMemoryCharacterToByteStream getInMemoryCharacterToByteStream(Test test)

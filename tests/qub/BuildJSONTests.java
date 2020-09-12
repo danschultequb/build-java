@@ -34,11 +34,11 @@ public interface BuildJSONTests
                     final BuildJSON buildJson = new BuildJSON();
                     buildJson.setSourceFiles(Iterable.create(
                         new BuildJSONSourceFile()
-                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))));
+                            .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5)))));
                     test.assertEqual(
                         Iterable.create(
                             new BuildJSONSourceFile()
-                                .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(5)))),
+                                .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5)))),
                         buildJson.getSourceFiles());
                 });
             });
@@ -74,7 +74,7 @@ public interface BuildJSONTests
                     buildJson.setSourceFiles(Iterable.create(
                         new BuildJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
-                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(10)))));
+                            .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(10)))));
                     test.assertThrows(() -> buildJson.getSourceFile(Path.parse("sources/B.java")).await(),
                         new NotFoundException("No source file found in the BuildJSON object with the path \"sources/B.java\"."));
                 });
@@ -85,11 +85,11 @@ public interface BuildJSONTests
                     buildJson.setSourceFiles(Iterable.create(
                         new BuildJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
-                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(10)))));
+                            .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(10)))));
                     test.assertEqual(
                         new BuildJSONSourceFile()
                             .setRelativePath(Path.parse("sources/A.java"))
-                            .setLastModified(DateTime.createFromDurationSinceEpoch(Duration.milliseconds(10))),
+                            .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(10))),
                         buildJson.getSourceFile(Path.parse("sources/A.java")).await());
                 });
             });
