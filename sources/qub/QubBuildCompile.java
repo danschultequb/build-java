@@ -85,7 +85,7 @@ public interface QubBuildCompile
             .getCount();
         final String logFileName = (logFileCount + 1) + ".log";
         final CharacterWriteStream logStream = qubBuildLogsFolder.getFile(logFileName).await()
-            .getContentCharacterWriteStream().await();
+            .getContentsCharacterWriteStream().await();
         final CharacterWriteStream output = CharacterWriteStreamList.create(parameters.getOutputWriteStream(), logStream);
         final CharacterWriteStream verbose = CharacterWriteStreamList.create(parameters.getVerbose(), new VerboseCharacterWriteStream(true, logStream));
 
@@ -541,7 +541,7 @@ public interface QubBuildCompile
             if (useBuildJson && updateBuildJsonFile)
             {
                 verbose.writeLine("Writing build.json file...").await();
-                try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentByteWriteStream().await())))
+                try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentsByteWriteStream().await())))
                 {
                     writeStream.write(updatedBuildJson.toString(JSONFormat.pretty)).await();
                 }

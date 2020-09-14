@@ -177,56 +177,56 @@ public interface BuildJSONSourceFileTests
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     null,
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     "Hello",
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("b"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(6))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(6))),
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5)))
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5)))
                         .setDependencies(Iterable.create()),
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5)))
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5)))
                         .addIssue(new JavaCompilerIssue("a.java", 1, 2, Issue.Type.Warning, "Help!")),
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                                .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     true);
             });
 
@@ -243,41 +243,41 @@ public interface BuildJSONSourceFileTests
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     null,
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("b"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(6))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(6))),
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5)))
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5)))
                         .setDependencies(Iterable.create()),
                     false);
                 equalsTest.run(
                     new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                        .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     new BuildJSONSourceFile()
                                 .setRelativePath(Path.parse("a"))
-                                .setLastModified(DateTime.epoch.plus(Duration2.milliseconds(5))),
+                                .setLastModified(DateTime.epoch.plus(Duration.milliseconds(5))),
                     true);
             });
 
@@ -293,7 +293,7 @@ public interface BuildJSONSourceFileTests
                 {
                     final BuildJSONSourceFile parseJsonSourceFile = new BuildJSONSourceFile()
                         .setRelativePath(Path.parse("a"))
-                        .setLastModified(DateTime.epoch.plus(Duration2.nanoseconds(20)))
+                        .setLastModified(DateTime.epoch.plus(Duration.nanoseconds(20)))
                         .setDependencies(Iterable.create(Path.parse("b"), Path.parse("c")));
                     test.assertEqual(
                         "\"a\":{\"lastModified\":\"1970-01-01T00:00:00.000000020Z\",\"dependencies\":[\"b\",\"c\"]}",
