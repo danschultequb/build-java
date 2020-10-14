@@ -4,47 +4,113 @@ public class BuildJSON
 {
     private static final String projectJsonPropertyName = "project.json";
 
-    private ProjectJSON projectJson;
-    private Iterable<BuildJSONSourceFile> sourceFiles;
-    private Map<Path,BuildJSONSourceFile> pathMap;
+    private final JSONObject json;
+
+    private BuildJSON(JSONObject json)
+    {
+        PreCondition.assertNotNull(json, "json");
+
+        this.json = json;
+    }
+
+    public static BuildJSON create()
+    {
+        return new BuildJSON(JSONObject.create());
+    }
+
+    public static Result<BuildJSON> parse(File parseJSONFile)
+    {
+        PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
+
+        return Result.create(() ->
+        {
+            return BuildJSON.parse(JSON.parseObject(parseJSONFile).await()).await();
+        });
+    }
+
+    public static Result<BuildJSON> parse(ByteReadStream readStream)
+    {
+        PreCondition.assertNotNull(readStream, "readStream");
+        PreCondition.assertNotDisposed(readStream, "readStream");
+
+        return Result.create(() ->
+        {
+            return BuildJSON.parse(JSON.parseObject(readStream).await()).await();
+        });
+    }
+
+    public static Result<BuildJSON> parse(CharacterReadStream readStream)
+    {
+        PreCondition.assertNotNull(readStream, "readStream");
+        PreCondition.assertNotDisposed(readStream, "readStream");
+
+        return Result.create(() ->
+        {
+            return BuildJSON.parse(JSON.parseObject(readStream).await()).await();
+        });
+    }
+
+    public static Result<BuildJSON> parse(Iterator<Character> characters)
+    {
+        PreCondition.assertNotNull(characters, "character");
+
+        return Result.create(() ->
+        {
+            return BuildJSON.parse(JSON.parseObject(characters).await()).await();
+        });
+    }
+
+    public static Result<BuildJSON> parse(JSONObject json)
+    {
+        PreCondition.assertNotNull(json, "json");
+
+        return Result.create(() ->
+        {
+            return new BuildJSON(json);
+        });
+    }
 
     public BuildJSON setProjectJson(ProjectJSON projectJson)
     {
-        this.projectJson = projectJson;
+        this.json.setObjectOrNull(BuildJSON.projectJsonPropertyName, projectJson == null ? null : projectJson.toJson());
         return this;
     }
 
     public ProjectJSON getProjectJson()
     {
-        return projectJson;
+        final JSONObject projectJson = this.json.getObject(BuildJSON.projectJsonPropertyName)
+            .catchError()
+            .await();
+        return projectJson == null ? null : ProjectJSON.create(projectJson);
     }
 
     public BuildJSON setSourceFiles(Iterable<BuildJSONSourceFile> sourceFiles)
     {
-        this.sourceFiles = sourceFiles;
-        if (sourceFiles == null)
+        PreCondition.assertNotNull(sourceFiles, "sourceFiles");
+
+        final Iterable<String> propertyNames = this.json.getPropertyNames()
+            .where((String propertyName) -> !propertyName.equalsIgnoreCase("project.json"))
+            .toList();
+        for (final String propertyName : propertyNames)
         {
-            this.pathMap = null;
+            this.json.remove(propertyName);
         }
-        else
+        if (!Iterable.isNullOrEmpty(sourceFiles))
         {
-            final MutableMap<Path,BuildJSONSourceFile> pathMap = Map.create();
-            for (final BuildJSONSourceFile source : sourceFiles)
+            for (final BuildJSONSourceFile sourceFile : sourceFiles)
             {
-                final Path sourcePath = source.getRelativePath();
-                if (sourcePath != null)
-                {
-                    pathMap.set(sourcePath, source);
-                }
+                this.json.set(sourceFile.toJsonProperty());
             }
-            this.pathMap = pathMap;
         }
         return this;
     }
 
     public Iterable<BuildJSONSourceFile> getSourceFiles()
     {
-        return sourceFiles;
+        return json.getProperties()
+            .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
+            .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())
+            .toList();
     }
 
     /**
@@ -60,13 +126,17 @@ public class BuildJSON
 
         return Result.create(() ->
         {
-            if (this.pathMap == null)
+            BuildJSONSourceFile result = null;
+            final Iterable<BuildJSONSourceFile> sourceFiles = this.getSourceFiles();
+            if (!Iterable.isNullOrEmpty(sourceFiles))
+            {
+                result = sourceFiles.first((BuildJSONSourceFile sourceFile) -> sourceFile.getRelativePath().equals(relativePath));
+            }
+            if (result == null)
             {
                 throw new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + ".");
             }
-            return this.pathMap.get(relativePath)
-                .convertError(NotFoundException.class, () -> new NotFoundException("No source file found in the BuildJSON object with the path " + Strings.escapeAndQuote(relativePath.toString()) + "."))
-                .await();
+            return result;
         });
     }
 
@@ -98,59 +168,5 @@ public class BuildJSON
         PreCondition.assertNotNull(format, "format");
 
         return this.toJson().toString(format);
-    }
-
-    public static Result<BuildJSON> parse(File parseJSONFile)
-    {
-        PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
-
-        return JSON.parseObject(parseJSONFile)
-            .then((JSONObject json) -> BuildJSON.parse(json).await());
-    }
-
-    public static Result<BuildJSON> parse(ByteReadStream readStream)
-    {
-        PreCondition.assertNotNull(readStream, "readStream");
-        PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
-
-        return JSON.parseObject(readStream)
-            .then((JSONObject json) -> BuildJSON.parse(json).await());
-    }
-
-    public static Result<BuildJSON> parse(CharacterReadStream readStream)
-    {
-        PreCondition.assertNotNull(readStream, "readStream");
-        PreCondition.assertFalse(readStream.isDisposed(), "readStream.isDisposed()");
-
-        return JSON.parseObject(readStream)
-            .then((JSONObject json) -> BuildJSON.parse(json).await());
-    }
-
-    public static Result<BuildJSON> parse(Iterator<Character> characters)
-    {
-        PreCondition.assertNotNull(characters, "character");
-
-        return JSON.parseObject(characters)
-            .then((JSONObject json) -> BuildJSON.parse(json).await());
-    }
-
-    public static Result<BuildJSON> parse(JSONObject json)
-    {
-        PreCondition.assertNotNull(json, "json");
-
-        return Result.create(() ->
-        {
-            final JSONObject projectJsonObject = json.getObject(BuildJSON.projectJsonPropertyName)
-                .catchError()
-                .await();
-            final ProjectJSON projectJson = projectJsonObject == null ? null : ProjectJSON.create(projectJsonObject);
-            final Iterable<BuildJSONSourceFile> buildJSONSourceFiles = json.getProperties()
-                .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
-                .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())
-                .toList();
-            return new BuildJSON()
-                .setProjectJson(projectJson)
-                .setSourceFiles(buildJSONSourceFiles);
-        });
     }
 }

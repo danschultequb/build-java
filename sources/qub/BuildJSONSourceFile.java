@@ -9,14 +9,45 @@ public class BuildJSONSourceFile
     private static final String dependenciesPropertyName = "dependencies";
     private static final String issuesPropertyName = "issues";
 
-    private Path relativePath;
-    private DateTime lastModified;
-    private Iterable<Path> dependencies;
-    private List<JavaCompilerIssue> issues;
+    private final JSONProperty jsonProperty;
 
-    public BuildJSONSourceFile()
+    private BuildJSONSourceFile(JSONProperty jsonProperty)
     {
-        this.issues = List.create();
+        PreCondition.assertNotNull(jsonProperty, "jsonProperty");
+        PreCondition.assertInstanceOf(jsonProperty.getValue(), JSONObject.class, "jsonProperty.getValue()");
+
+        this.jsonProperty = jsonProperty;
+    }
+
+    public static BuildJSONSourceFile create(String sourceFileRelativePath)
+    {
+        PreCondition.assertNotNullAndNotEmpty(sourceFileRelativePath, "sourceFileRelativePath");
+
+        return BuildJSONSourceFile.create(Path.parse(sourceFileRelativePath));
+    }
+
+    public static BuildJSONSourceFile create(Path sourceFileRelativePath)
+    {
+        PreCondition.assertNotNull(sourceFileRelativePath, "sourceFileRelativePath");
+        PreCondition.assertFalse(sourceFileRelativePath.isRooted(), "sourceFileRelativePath.isRooted()");
+
+        final JSONProperty json = JSONProperty.create(sourceFileRelativePath.toString(), JSONObject.create());
+        return new BuildJSONSourceFile(json);
+    }
+
+    /**
+     * Parse a BuildJSONSourceFile from the provided JSONProperty.
+     * @param sourceFileProperty The JSONProperty to parse a JSONSourceFile from.
+     * @return The parsed BuildJSONSourceFile.
+     */
+    public static Result<BuildJSONSourceFile> parse(JSONProperty sourceFileProperty)
+    {
+        PreCondition.assertNotNull(sourceFileProperty, "sourceFileProperty");
+
+        return Result.create(() ->
+        {
+            return new BuildJSONSourceFile(sourceFileProperty);
+        });
     }
 
     /**
@@ -25,27 +56,12 @@ public class BuildJSONSourceFile
      */
     public Path getRelativePath()
     {
-        return relativePath;
+        return Path.parse(this.jsonProperty.getName());
     }
 
-    public BuildJSONSourceFile setRelativePath(String relativePath)
+    private JSONObject getPropertyValue()
     {
-        PreCondition.assertNotNullAndNotEmpty(relativePath, "relativePath");
-
-        return this.setRelativePath(Path.parse(relativePath));
-    }
-
-    /**
-     * Set the path to the source file from the project root folder.
-     * @param relativePath The path to the source file from the project root folder.
-     */
-    public BuildJSONSourceFile setRelativePath(Path relativePath)
-    {
-        PreCondition.assertNotNull(relativePath, "relativePath");
-        PreCondition.assertFalse(relativePath.isRooted(), "relativePath.isRooted()");
-
-        this.relativePath = relativePath;
-        return this;
+        return this.jsonProperty.getObjectValue().await();
     }
 
     /**
@@ -54,7 +70,12 @@ public class BuildJSONSourceFile
      */
     public DateTime getLastModified()
     {
-        return lastModified;
+        final String lastModifiedString = this.getPropertyValue().getString(BuildJSONSourceFile.lastModifiedPropertyName)
+            .catchError()
+            .await();
+        return Strings.isNullOrEmpty(lastModifiedString)
+            ? null
+            : DateTime.parse(lastModifiedString).catchError().await();
     }
 
     /**
@@ -63,7 +84,9 @@ public class BuildJSONSourceFile
      */
     public BuildJSONSourceFile setLastModified(DateTime lastModified)
     {
-        this.lastModified = lastModified;
+        PreCondition.assertNotNull(lastModified, "lastModified");
+
+        this.getPropertyValue().setString(BuildJSONSourceFile.lastModifiedPropertyName, lastModified.toString());
         return this;
     }
 
@@ -73,7 +96,22 @@ public class BuildJSONSourceFile
      */
     public Iterable<Path> getDependencies()
     {
-        return dependencies;
+        final JSONArray dependenciesArray = this.getPropertyValue().getArray(BuildJSONSourceFile.dependenciesPropertyName)
+            .catchError()
+            .await();
+        List<Path> result = null;
+        if (dependenciesArray != null)
+        {
+            result = List.create();
+            for (final JSONSegment dependencySegment : dependenciesArray)
+            {
+                final JSONString dependency = (JSONString)dependencySegment;
+                final String dependencyPathString = dependency.getValue();
+                final Path dependencyPath = Path.parse(dependencyPathString);
+                result.add(dependencyPath);
+            }
+        }
+        return result;
     }
 
     /**
@@ -82,7 +120,10 @@ public class BuildJSONSourceFile
      */
     public BuildJSONSourceFile setDependencies(Iterable<Path> dependencies)
     {
-        this.dependencies = dependencies;
+        PreCondition.assertNotNull(dependencies, "dependencies");
+
+        this.getPropertyValue().setArray(BuildJSONSourceFile.dependenciesPropertyName,
+            JSONArray.create(dependencies.map(Path::toString).map(JSONString::get)));
         return this;
     }
 
@@ -95,7 +136,17 @@ public class BuildJSONSourceFile
     {
         PreCondition.assertNotNull(issue, "issue");
 
-        this.issues.add(issue);
+        final JSONObject propertyValue = this.getPropertyValue();
+        JSONArray issuesArray = propertyValue.getArray(BuildJSONSourceFile.issuesPropertyName)
+            .catchError()
+            .await();
+        if (issuesArray == null)
+        {
+            issuesArray = JSONArray.create();
+            propertyValue.setArray(BuildJSONSourceFile.issuesPropertyName, issuesArray);
+        }
+        issuesArray.add(issue.toJson());
+
         return this;
     }
 
@@ -103,7 +154,8 @@ public class BuildJSONSourceFile
     {
         PreCondition.assertNotNull(issues, "issues");
 
-        this.issues = List.create(issues);
+        final JSONObject propertyValue = this.getPropertyValue();
+        propertyValue.setArray(BuildJSONSourceFile.issuesPropertyName, JSONArray.create(issues.map(JavaCompilerIssue::toJson)));
 
         return this;
     }
@@ -114,7 +166,16 @@ public class BuildJSONSourceFile
      */
     public Iterable<JavaCompilerIssue> getIssues()
     {
-        final Iterable<JavaCompilerIssue> result = this.issues;
+        final JSONObject propertyValue = this.getPropertyValue();
+        final JSONArray issuesArray = propertyValue.getArray(BuildJSONSourceFile.issuesPropertyName)
+            .catchError()
+            .await();
+        final Iterable<JavaCompilerIssue> result = issuesArray == null
+            ? Iterable.create()
+            : issuesArray
+                .instanceOf(JSONObject.class)
+                .map((JSONObject issueJson) -> JavaCompilerIssue.parse(issueJson).await())
+                .toList();
 
         PostCondition.assertNotNull(result, "result");
 
@@ -130,10 +191,10 @@ public class BuildJSONSourceFile
     public boolean equals(BuildJSONSourceFile rhs)
     {
         return rhs != null &&
-            Comparer.equal(relativePath, rhs.relativePath) &&
-            Comparer.equal(lastModified, rhs.lastModified) &&
-            Comparer.equal(dependencies, rhs.dependencies) &&
-            Comparer.equal(issues, rhs.issues);
+            Comparer.equal(this.getRelativePath().toString(), rhs.getRelativePath().toString()) &&
+            Comparer.equal(this.getLastModified(), rhs.getLastModified()) &&
+            Comparer.equal(this.getDependencies(), rhs.getDependencies()) &&
+            Comparer.equal(this.getIssues(), rhs.getIssues());
     }
 
     @Override
@@ -146,7 +207,7 @@ public class BuildJSONSourceFile
     {
         PreCondition.assertNotNull(format, "format");
 
-        return Strings.escapeAndQuote(this.relativePath) + ":" + format.getAfterPropertySeparator() + this.toJson().toString(format);
+        return Strings.escapeAndQuote(this.getRelativePath()) + ":" + format.getAfterPropertySeparator() + this.toJson().toString(format);
     }
 
     /**
@@ -157,14 +218,19 @@ public class BuildJSONSourceFile
     {
         final JSONObject result = JSONObject.create();
 
+        final DateTime lastModified = this.getLastModified();
         if (lastModified != null)
         {
             result.setString(BuildJSONSourceFile.lastModifiedPropertyName, lastModified.toString());
         }
+
+        final Iterable<Path> dependencies = this.getDependencies();
         if (!Iterable.isNullOrEmpty(dependencies))
         {
             result.set(BuildJSONSourceFile.dependenciesPropertyName, JSONArray.create(dependencies.map(Path::toString).map(JSONString::get)));
         }
+
+        final Iterable<JavaCompilerIssue> issues = this.getIssues();
         if (!Iterable.isNullOrEmpty(issues))
         {
             result.set(BuildJSONSourceFile.issuesPropertyName, JSONArray.create(issues.map(JavaCompilerIssue::toJson)));
@@ -177,51 +243,7 @@ public class BuildJSONSourceFile
 
     public JSONProperty toJsonProperty()
     {
-        return JSONProperty.create(this.getRelativePath().toString(), this.toJson());
-    }
-
-    /**
-     * Parse a BuildJSONSourceFile from the provided JSONProperty.
-     * @param sourceFileProperty The JSONProperty to parse a JSONSourceFile from.
-     * @return The parsed BuildJSONSourceFile.
-     */
-    public static Result<BuildJSONSourceFile> parse(JSONProperty sourceFileProperty)
-    {
-        PreCondition.assertNotNull(sourceFileProperty, "sourceFileProperty");
-
-        return Result.create(() ->
-        {
-            final Path relativePath = Path.parse(sourceFileProperty.getName());
-            final JSONObject sourceFileObject = sourceFileProperty.getObjectValue().await();
-            final DateTime lastModified = sourceFileObject.getString(BuildJSONSourceFile.lastModifiedPropertyName)
-                .then((String lastModifiedString) -> DateTime.parse(lastModifiedString).await())
-                .catchError()
-                .await();
-            final JSONArray dependenciesArray = sourceFileObject.getArray(BuildJSONSourceFile.dependenciesPropertyName)
-                .catchError()
-                .await();
-            final Iterable<Path> dependencies = dependenciesArray == null
-                ? Iterable.create()
-                : dependenciesArray
-                    .instanceOf(JSONString.class)
-                    .map(JSONString::getValue)
-                    .map(Path::parse)
-                    .toList();
-            final JSONArray issuesArray = sourceFileObject.getArray(BuildJSONSourceFile.issuesPropertyName)
-                .catchError()
-                .await();
-            final Iterable<JavaCompilerIssue> issues = issuesArray == null
-                ? Iterable.create()
-                : issuesArray
-                    .instanceOf(JSONObject.class)
-                    .map((JSONObject issueJson) -> JavaCompilerIssue.parse(issueJson).await())
-                    .toList();
-            return new BuildJSONSourceFile()
-                .setRelativePath(relativePath)
-                .setLastModified(lastModified)
-                .setDependencies(dependencies)
-                .setIssues(issues);
-        });
+        return this.jsonProperty;
     }
 
     /**
@@ -257,8 +279,8 @@ public class BuildJSONSourceFile
         PreCondition.assertNotNull(sourceFile, "sourceFile");
         PreCondition.assertNotNull(rootFolder, "rootFolder");
 
-        final BuildJSONSourceFile result = new BuildJSONSourceFile();
-        result.setRelativePath(sourceFile.relativeTo(rootFolder));
+        final Path sourceFileRelativePath = sourceFile.relativeTo(rootFolder);
+        final BuildJSONSourceFile result = BuildJSONSourceFile.create(sourceFileRelativePath);
         result.setLastModified(sourceFile.getLastModified().await());
 
         final String sourceFileContents = sourceFile.getContentsAsString().await();
@@ -277,7 +299,10 @@ public class BuildJSONSourceFile
                 }
             }
         }
-        result.setDependencies(sourceFileDependencyPaths);
+        if (sourceFileDependencyPaths.any())
+        {
+            result.setDependencies(sourceFileDependencyPaths);
+        }
 
         PostCondition.assertNotNull(result, "result");
 

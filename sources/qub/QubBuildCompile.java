@@ -255,7 +255,7 @@ public interface QubBuildCompile
             final List<JavaCompilerIssue> nonModifiedJavaSourceFileWarnings = List.create();
             final List<BuildJSONSourceFile> buildJsonSourceFiles = List.create();
             boolean compileEverything;
-            final BuildJSON updatedBuildJson = new BuildJSON();
+            final BuildJSON updatedBuildJson = BuildJSON.create();
             boolean updateBuildJsonFile = false;
             if (!useBuildJson)
             {
