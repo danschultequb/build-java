@@ -3,6 +3,7 @@ package qub;
 public class BuildJSON
 {
     private static final String projectJsonPropertyName = "project.json";
+    private static final String sourceFilesPropertyName = "sourceFiles";
 
     private final JSONObject json;
 
@@ -88,26 +89,25 @@ public class BuildJSON
     {
         PreCondition.assertNotNull(sourceFiles, "sourceFiles");
 
-        final Iterable<String> propertyNames = this.json.getPropertyNames()
-            .where((String propertyName) -> !propertyName.equalsIgnoreCase("project.json"))
-            .toList();
-        for (final String propertyName : propertyNames)
-        {
-            this.json.remove(propertyName);
-        }
+        final JSONObject sourceFilesJson = JSONObject.create();
         if (!Iterable.isNullOrEmpty(sourceFiles))
         {
             for (final BuildJSONSourceFile sourceFile : sourceFiles)
             {
-                this.json.set(sourceFile.toJsonProperty());
+                sourceFilesJson.set(sourceFile.toJsonProperty());
             }
         }
+        this.json.setObject(BuildJSON.sourceFilesPropertyName, sourceFilesJson);
+
         return this;
     }
 
     public Iterable<BuildJSONSourceFile> getSourceFiles()
     {
-        return json.getProperties()
+        final JSONObject sourceFilesJson = json.getObject(BuildJSON.sourceFilesPropertyName)
+            .catchError(() -> JSONObject.create())
+            .await();
+        return sourceFilesJson.getProperties()
             .where(property -> !property.getName().equals(BuildJSON.projectJsonPropertyName))
             .map((JSONProperty property) -> BuildJSONSourceFile.parse(property).await())
             .toList();
@@ -120,9 +120,24 @@ public class BuildJSON
      *                     folder.
      * @return The BuildJSONSourceFile that is associated with the provided relative path.
      */
+    public Result<BuildJSONSourceFile> getSourceFile(String relativePath)
+    {
+        PreCondition.assertNotNullAndNotEmpty(relativePath, "relativePath");
+
+        return this.getSourceFile(Path.parse(relativePath));
+    }
+
+    /**
+     * Get the BuildJSONSourceFile that matches the provided relative path. The path should be
+     * relative to the project folder.
+     * @param relativePath The path to the source file. This should be relative to the project
+     *                     folder.
+     * @return The BuildJSONSourceFile that is associated with the provided relative path.
+     */
     public Result<BuildJSONSourceFile> getSourceFile(Path relativePath)
     {
         PreCondition.assertNotNull(relativePath, "relativePath");
+        PreCondition.assertFalse(relativePath.isRooted(), "relativePath.isRooted()");
 
         return Result.create(() ->
         {
@@ -142,19 +157,7 @@ public class BuildJSON
 
     public JSONObject toJson()
     {
-        final JSONObject result = JSONObject.create();
-
-        final ProjectJSON projectJson = this.getProjectJson();
-        if (projectJson != null)
-        {
-            result.set(BuildJSON.projectJsonPropertyName, projectJson.toJson());
-        }
-
-        result.setAll(this.getSourceFiles().map(BuildJSONSourceFile::toJsonProperty));
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
+        return this.json;
     }
 
     @Override
