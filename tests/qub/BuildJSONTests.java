@@ -11,7 +11,55 @@ public interface BuildJSONTests
                 final BuildJSON buildJson = BuildJSON.create();
                 test.assertNotNull(buildJson);
                 test.assertNull(buildJson.getProjectJson());
+                test.assertNull(buildJson.getJavacVersion());
                 test.assertEqual(Iterable.create(), buildJson.getSourceFiles());
+            });
+
+            runner.testGroup("setJavacVersion(String)", () ->
+            {
+                runner.test("with null", (Test test) ->
+                {
+                    final BuildJSON buildJson = BuildJSON.create();
+                    test.assertThrows(() -> buildJson.setJavacVersion((String)null),
+                        new PreConditionFailure("javacVersion cannot be null."));
+                    test.assertNull(buildJson.getJavacVersion());
+                });
+
+                runner.test("with empty", (Test test) ->
+                {
+                    final BuildJSON buildJson = BuildJSON.create();
+                    test.assertThrows(() -> buildJson.setJavacVersion(""),
+                        new PreConditionFailure("javacVersion cannot be empty."));
+                    test.assertNull(buildJson.getJavacVersion());
+                });
+
+                runner.test("with non-empty", (Test test) ->
+                {
+                    final BuildJSON buildJson = BuildJSON.create();
+                    final BuildJSON setJavacVersionResult = buildJson.setJavacVersion("hello");
+                    test.assertSame(buildJson, setJavacVersionResult);
+                    test.assertEqual(VersionNumber.parse("hello").await(), buildJson.getJavacVersion());
+                });
+            });
+
+            runner.testGroup("setJavacVersion(VersionNumber)", () ->
+            {
+                runner.test("with null", (Test test) ->
+                {
+                    final BuildJSON buildJson = BuildJSON.create();
+                    test.assertThrows(() -> buildJson.setJavacVersion((VersionNumber)null),
+                        new PreConditionFailure("javacVersion cannot be null."));
+                    test.assertNull(buildJson.getJavacVersion());
+                });
+
+                runner.test("with non-null", (Test test) ->
+                {
+                    final BuildJSON buildJson = BuildJSON.create();
+                    final VersionNumber version = VersionNumber.parse("1.2.3").await();
+                    final BuildJSON setJavacVersionResult = buildJson.setJavacVersion(version);
+                    test.assertSame(buildJson, setJavacVersionResult);
+                    test.assertEqual(version, buildJson.getJavacVersion());
+                });
             });
 
             runner.testGroup("setSourceFiles()", () ->

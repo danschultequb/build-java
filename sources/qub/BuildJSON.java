@@ -3,6 +3,7 @@ package qub;
 public class BuildJSON
 {
     private static final String projectJsonPropertyName = "project.json";
+    private static final String javacVersionPropertyName = "javacVersion";
     private static final String sourceFilesPropertyName = "sourceFiles";
 
     private final JSONObject json;
@@ -83,6 +84,29 @@ public class BuildJSON
             .catchError()
             .await();
         return projectJson == null ? null : ProjectJSON.create(projectJson);
+    }
+
+    public BuildJSON setJavacVersion(String javacVersion)
+    {
+        PreCondition.assertNotNullAndNotEmpty(javacVersion, "javacVersion");
+
+        this.json.setString(BuildJSON.javacVersionPropertyName, javacVersion);
+        return this;
+    }
+
+    public BuildJSON setJavacVersion(VersionNumber javacVersion)
+    {
+        PreCondition.assertNotNull(javacVersion, "javacVersion");
+
+        return this.setJavacVersion(javacVersion.toString());
+    }
+
+    public VersionNumber getJavacVersion()
+    {
+        return this.json.getString(BuildJSON.javacVersionPropertyName)
+            .then((String javacVersionString) -> VersionNumber.parse(javacVersionString).await())
+            .catchError()
+            .await();
     }
 
     public BuildJSON setSourceFiles(Iterable<BuildJSONSourceFile> sourceFiles)

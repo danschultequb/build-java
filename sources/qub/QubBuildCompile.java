@@ -267,6 +267,12 @@ public interface QubBuildCompile
             }
             else
             {
+                verbose.writeLine("Getting javac version...").await();
+
+                final JavacProcessBuilder javacVersionProcessBuilder = JavacProcessBuilder.get(parameters.getProcessFactory()).await();
+                final VersionNumber javacVersion = javacVersionProcessBuilder.getVersion(verbose).await();
+                updatedBuildJson.setJavacVersion(javacVersion);
+
                 if (!outputsFolder.exists().await())
                 {
                     compileEverything = true;
@@ -281,7 +287,7 @@ public interface QubBuildCompile
                         .catchError(FileNotFoundException.class)
                         .await();
 
-                    if (buildJson == null)
+                    if (buildJson == null || !javacVersion.equals(buildJson.getJavacVersion()))
                     {
                         compileEverything = true;
                         newJavaSourceFiles.addAll(javaSourceFiles);
@@ -291,7 +297,7 @@ public interface QubBuildCompile
                     {
                         final ProjectJSON buildJsonProjectJson = buildJson.getProjectJson();
                         updateBuildJsonFile = !Comparer.equal(buildJsonProjectJson, projectJson);
-                        compileEverything = shouldCompileEverything(buildJson.getProjectJson(), projectJson);
+                        compileEverything = QubBuildCompile.shouldCompileEverything(buildJson.getProjectJson(), projectJson);
 
                         for (final File javaSourceFile : javaSourceFiles)
                         {

@@ -2,6 +2,8 @@ package qub;
 
 public interface JavacArguments<T>
 {
+    String versionArgument = "--version";
+
     /**
      * Get the path to the folder that this ProcessBuilder will run the executable in.
      * @return The path to the folder that this ProcessBuilder will run the executable in.
@@ -331,5 +333,14 @@ public interface JavacArguments<T>
         PostCondition.assertNotNull(result, "result");
 
         return result;
+    }
+
+    /**
+     * Add the --version argument to the new process.
+     * @return This object for method chaining.
+     */
+    default T addVersion()
+    {
+        return this.addArguments(JavacArguments.versionArgument);
     }
 }

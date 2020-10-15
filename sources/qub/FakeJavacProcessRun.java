@@ -25,11 +25,23 @@ public class FakeJavacProcessRun extends FakeProcessRunDecorator<FakeJavacProces
         return super.setWorkingFolder(workingFolder);
     }
 
+    public FakeJavacProcessRun setVersionFunctionAutomatically(String javacVersionOutput)
+    {
+        PreCondition.assertNotNull(javacVersionOutput, "javacVersionOutput");
+
+        return this.setFunction((ByteWriteStream javacOutput) ->
+        {
+            final CharacterWriteStream outputStream = CharacterWriteStream.create(javacOutput);
+            outputStream.write(javacVersionOutput).await();
+            return 0;
+        });
+    }
+
     /**
      * Automatically set the function based on the values that have been provided.
      * @return This object for method chaining.
      */
-    public FakeJavacProcessRun setFunctionAutomatically()
+    public FakeJavacProcessRun setCompileFunctionAutomatically()
     {
         PreCondition.assertNotNull(this.fileSystem, "this.fileSystem");
 

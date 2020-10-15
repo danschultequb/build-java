@@ -41,6 +41,42 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
     }
 
     /**
+     * Get the version of javac that this process builder runs.
+     * @return The version of javac that this process builder runs.
+     */
+    public Result<VersionNumber> getVersion(CharacterWriteStream verbose)
+    {
+        PreCondition.assertNotNull(verbose, "verbose");
+
+        return Result.create(() ->
+        {
+            final InMemoryCharacterToByteStream stdout = InMemoryCharacterToByteStream.create();
+            this.redirectOutput(stdout);
+
+            if (!this.getArguments().contains(JavacArguments.versionArgument))
+            {
+                this.addArgument(JavacArguments.versionArgument);
+            }
+
+            verbose.writeLine("Running " + this.getCommand() + "...").await();
+            this.run().await();
+            final String outputText = stdout.getText().await();
+
+            final String versionPrefix = "javac ";
+            if (!outputText.startsWith(versionPrefix))
+            {
+                throw new ParseException("Expected the output text to start with " + Strings.escapeAndQuote(versionPrefix) + ", but found " + Strings.escapeAndQuote(outputText) + " instead.");
+            }
+            final String versionString = outputText.substring("javac ".length()).trim();
+            final VersionNumber result = VersionNumber.parse(versionString).await();
+
+            PostCondition.assertNotNull(result, "result");
+
+            return result;
+        });
+    }
+
+    /**
      * Run the javac process that this builder has constructed.
      * @param warnings How compilation warnings should be handled.
      * @param verbose The stream that verbose logs should be written to.

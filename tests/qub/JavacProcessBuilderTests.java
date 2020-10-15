@@ -624,6 +624,26 @@ public interface JavacProcessBuilderTests
                     }
                 });
             });
+
+            runner.testGroup("getVersion(CharacterWriteStream)", () ->
+            {
+                runner.test("with null verbose", (Test test) ->
+                {
+                    final InMemoryCharacterStream verbose = null;
+                    final JavacProcessBuilder javacProcessBuilder = JavacProcessBuilder.get(test.getProcess()).await();
+
+                    test.assertThrows(() -> javacProcessBuilder.getVersion(verbose),
+                        new PreConditionFailure("verbose cannot be null."));
+                });
+                runner.test("with no javac arguments", (Test test) ->
+                {
+                    final InMemoryCharacterStream verbose = InMemoryCharacterStream.create();
+                    final JavacProcessBuilder javacProcessBuilder = JavacProcessBuilder.get(test.getProcess()).await();
+
+                    final VersionNumber result = javacProcessBuilder.getVersion(verbose).await();
+                    test.assertEqual(VersionNumber.parse("14.0.1").await(), result);
+                });
+            });
         });
     }
 }
