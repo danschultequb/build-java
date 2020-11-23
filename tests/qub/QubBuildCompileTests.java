@@ -342,6 +342,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: The file at \"/current/folder/project.json\" doesn't exist."),
@@ -361,6 +362,7 @@ public interface QubBuildCompileTests
                         .setVerbose(new VerboseCharacterWriteStream(true, output));
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
@@ -383,6 +385,7 @@ public interface QubBuildCompileTests
                         .setContentsAsString("").await();
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: Missing object left curly bracket ('{')."),
@@ -404,6 +407,7 @@ public interface QubBuildCompileTests
                         .setContentsAsString("[]").await();
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: Expected object left curly bracket ('{')."),
@@ -427,6 +431,7 @@ public interface QubBuildCompileTests
                         .await();
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: No language specified in project.json. Nothing to compile."),
@@ -452,6 +457,7 @@ public interface QubBuildCompileTests
                         .await();
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: No java source files found in /current/folder/."),
@@ -478,6 +484,7 @@ public interface QubBuildCompileTests
                     currentFolder.createFolder("sources").await();
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: No java source files found in /current/folder/."),
@@ -523,6 +530,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -599,6 +607,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -675,6 +684,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -754,6 +764,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 2 files..."),
@@ -839,6 +850,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 2 files..."),
@@ -925,6 +937,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -1005,6 +1018,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -1094,6 +1108,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -1188,6 +1203,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file...",
@@ -1285,6 +1301,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled.",
@@ -1382,6 +1399,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file...",
@@ -1488,6 +1506,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 2 files...",
@@ -1614,6 +1633,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 4 files...",
@@ -1760,6 +1780,7 @@ public interface QubBuildCompileTests
                         .setWarnings(Warnings.Show);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 4 files...",
@@ -1906,6 +1927,7 @@ public interface QubBuildCompileTests
                         .setWarnings(Warnings.Hide);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 4 files...",
@@ -2042,6 +2064,7 @@ public interface QubBuildCompileTests
                         .setWarnings(Warnings.Error);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 4 files...",
@@ -2178,6 +2201,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 2 files..."),
@@ -2284,6 +2308,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -2389,6 +2414,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 2 files..."),
@@ -2495,6 +2521,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -2599,6 +2626,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -2697,6 +2725,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -2817,6 +2846,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 3 files..."),
@@ -2951,6 +2981,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 2 files...",
@@ -3085,6 +3116,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -3174,6 +3206,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, environmentVariables);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: A QUB_HOME folder path environment variable must be specified."),
@@ -3227,6 +3260,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -3312,6 +3346,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -3397,6 +3432,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -3500,6 +3536,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -3605,6 +3642,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -3699,6 +3737,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -3791,6 +3830,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -3881,6 +3921,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -3979,6 +4020,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -4083,6 +4125,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -4185,6 +4228,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "No files need to be compiled."),
@@ -4252,6 +4296,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: No publisher folder named \"a\" found in the Qub folder (/qub/)."),
@@ -4291,6 +4336,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: No project folder named \"b\" found in the \"a\" publisher folder (/qub/a/)."),
@@ -4362,6 +4408,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -4482,6 +4529,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -4606,6 +4654,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "ERROR: Found more than one required version for package a/b:",
@@ -4674,6 +4723,7 @@ public interface QubBuildCompileTests
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
 
                     final int exitCode = QubBuildCompile.run(parameters);
+                    test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
                             "Compiling 1 file..."),
@@ -4729,7 +4779,7 @@ public interface QubBuildCompileTests
     {
         PreCondition.assertNotNull(clock, "clock");
 
-        final InMemoryFileSystem fileSystem = new InMemoryFileSystem(clock);
+        final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(clock);
         fileSystem.createRoot("/").await();
         return fileSystem;
     }
@@ -4854,7 +4904,7 @@ public interface QubBuildCompileTests
         PreCondition.assertNotNull(test, "test");
         PreCondition.assertNotNull(clock, "clock");
 
-        final InMemoryFileSystem fileSystem = new InMemoryFileSystem(clock);
+        final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(clock);
         fileSystem.createRoot("/").await();
         return fileSystem.getFolder("/").await();
     }

@@ -78,16 +78,9 @@ public interface QubBuildCompile
         final boolean useBuildJson = parameters.getBuildJson();
         final Folder qubBuildDataFolder = parameters.getQubBuildDataFolder();
 
-        final Folder qubBuildLogsFolder = QubBuild.getLogsFolder(qubBuildDataFolder);
-        final int logFileCount = qubBuildLogsFolder.getFiles()
-            .catchError(NotFoundException.class, () -> Iterable.create())
-            .await()
-            .getCount();
-        final String logFileName = (logFileCount + 1) + ".log";
-        final CharacterWriteStream logStream = qubBuildLogsFolder.getFile(logFileName).await()
-            .getContentsCharacterWriteStream().await();
-        final CharacterWriteStream output = CharacterWriteStreamList.create(parameters.getOutputWriteStream(), logStream);
-        final CharacterWriteStream verbose = CharacterWriteStreamList.create(parameters.getVerbose(), new VerboseCharacterWriteStream(true, logStream));
+        final LogCharacterWriteStreams logStreams = CommandLineLogsAction.addLogStream(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose());
+        final CharacterWriteStream output = logStreams.get(0);
+        final CharacterWriteStream verbose = logStreams.get(1);
 
         int exitCode = 0;
         try
@@ -110,12 +103,7 @@ public interface QubBuildCompile
                 throw new NotFoundException("No language specified in project.json. Nothing to compile.");
             }
 
-            String outputFolderName = projectJsonJava.getOutputFolder();
-            if (Strings.isNullOrEmpty(outputFolderName))
-            {
-                outputFolderName = "outputs";
-            }
-            final Folder outputsFolder = folderToBuild.getFolder(outputFolderName).await();
+            final Folder outputsFolder = QubBuild.getJavaOutputsFolder(folderToBuild, projectJsonJava).await();
             javac.addOutputFolder(outputsFolder);
             javac.addXlintUnchecked();
             javac.addXlintDeprecation();
@@ -234,18 +222,12 @@ public interface QubBuildCompile
             }
             javac.addClasspath(classPaths);
 
-            Function1<File,Boolean> sourceFileMatcher;
-            final Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFiles();
-            if (!Iterable.isNullOrEmpty(sourceFilePatterns))
+            final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(folderToBuild, projectJsonJava).await();
+            if (!javaSourceFiles.any())
             {
-                sourceFileMatcher = (File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(folderToBuild)));
-            }
-            else
-            {
-                sourceFileMatcher = (File file) -> ".java".equalsIgnoreCase(file.getFileExtension());
+                throw new NotFoundException("No java source files found in " + folderToBuild + ".");
             }
 
-            final Iterable<File> javaSourceFiles = getJavaSourceFiles(folderToBuild, sourceFileMatcher).await();
             final File buildJsonFile = outputsFolder.getFile("build.json").await();
             final List<File> newJavaSourceFiles = List.create();
             final List<File> deletedJavaSourceFiles = List.create();
@@ -567,7 +549,7 @@ public interface QubBuildCompile
         }
         finally
         {
-            logStream.dispose().await();
+            logStreams.dispose().await();
         }
 
         return exitCode;
@@ -629,30 +611,6 @@ public interface QubBuildCompile
     static boolean isJava11(String javaVersion)
     {
         return Strings.isOneOf(javaVersion, Iterable.create("11", "11.0"));
-    }
-
-    /**
-     * Get all of the Java source files found in the provided folder.
-     * @param folder The folder to look for Java source files in.
-     * @return All of the Java source files found in the provided folder.
-     */
-    static Result<Iterable<File>> getJavaSourceFiles(Folder folder, Function1<File,Boolean> sourceFileMatcher)
-    {
-        PreCondition.assertNotNull(folder, "folder");
-        PreCondition.assertNotNull(sourceFileMatcher, "sourceFileMatcher");
-
-        return Result.create(() ->
-        {
-            final Iterable<File> files = folder.getFilesRecursively().await();
-            final Iterable<File> javaSourceFiles = files
-                .where(sourceFileMatcher)
-                .toList();
-            if (!javaSourceFiles.any())
-            {
-                throw new NotFoundException("No java source files found in " + folder + ".");
-            }
-            return javaSourceFiles;
-        });
     }
 
     /**

@@ -203,7 +203,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
                 }
                 else
                 {
-                    final Folder jre18Folder = jre18Folders.maximum((Folder lhs, Folder rhs) -> Comparison.from(lhs.getName().compareTo(rhs.getName())));
+                    final Folder jre18Folder = jre18Folders.maximum((Folder lhs, Folder rhs) -> Comparison.create(lhs.getName().compareTo(rhs.getName())));
                     result = jre18Folder.getFile("lib/rt.jar").await();
                 }
             }

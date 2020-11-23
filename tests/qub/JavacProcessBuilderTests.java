@@ -264,7 +264,7 @@ public interface JavacProcessBuilderTests
                 runner.test("with non-null", (Test test) ->
                 {
                     final JavacProcessBuilder builder = JavacProcessBuilder.get(test.getProcess()).await();
-                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
                     final File bootClasspath = fileSystem.getFile("/folder/file").await();
 
                     test.assertSame(builder, builder.addBootClasspath(bootClasspath));
