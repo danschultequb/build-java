@@ -79,8 +79,8 @@ public interface QubBuildCompile
         final Folder qubBuildDataFolder = parameters.getQubBuildDataFolder();
 
         final LogCharacterWriteStreams logStreams = CommandLineLogsAction.addLogStream(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose());
-        final CharacterWriteStream output = logStreams.get(0);
-        final CharacterWriteStream verbose = logStreams.get(1);
+        final CharacterWriteStream output = logStreams.getCombinedStream(0);
+        final CharacterWriteStream verbose = logStreams.getCombinedStream(1);
 
         int exitCode = 0;
         try
@@ -549,7 +549,7 @@ public interface QubBuildCompile
         }
         finally
         {
-            logStreams.dispose().await();
+            logStreams.getLogStream().dispose().await();
         }
 
         return exitCode;
