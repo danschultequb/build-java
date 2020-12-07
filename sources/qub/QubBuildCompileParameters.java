@@ -9,7 +9,7 @@ public class QubBuildCompileParameters
     private final Folder qubBuildDataFolder;
     private Warnings warnings;
     private boolean buildJson;
-    private VerboseCharacterWriteStream verbose;
+    private VerboseCharacterToByteWriteStream verbose;
 
     public QubBuildCompileParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory, Folder qubBuildDataFolder)
     {
@@ -120,7 +120,7 @@ public class QubBuildCompileParameters
      * Get the VerboseCharacterWriteStream where verbose logs will be written to.
      * @return The VerboseCharacterWriteStream where verbose logs will be written to.
      */
-    public VerboseCharacterWriteStream getVerbose()
+    public VerboseCharacterToByteWriteStream getVerbose()
     {
         return this.verbose;
     }
@@ -130,7 +130,7 @@ public class QubBuildCompileParameters
      * @param verbose The VerboseCharacterWriteStream where verbose logs will be written to.
      * @return This object for method chaining.
      */
-    public QubBuildCompileParameters setVerbose(VerboseCharacterWriteStream verbose)
+    public QubBuildCompileParameters setVerbose(VerboseCharacterToByteWriteStream verbose)
     {
         PreCondition.assertNotNull(verbose, "verbose");
 
@@ -160,8 +160,8 @@ public class QubBuildCompileParameters
      * Get the default value for the --verbose parameter.
      * @return The default value for the --verbose parameter.
      */
-    static VerboseCharacterWriteStream getVerboseDefault()
+    static VerboseCharacterToByteWriteStream getVerboseDefault()
     {
-        return new VerboseCharacterWriteStream(false, InMemoryCharacterToByteStream.create());
+        return VerboseCharacterToByteWriteStream.create(InMemoryCharacterToByteStream.create()).setIsVerbose(false);
     }
 }

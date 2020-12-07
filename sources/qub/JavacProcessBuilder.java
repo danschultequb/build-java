@@ -18,7 +18,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
      * @param process The Process to get the JavacProcessBuilder from.
      * @return The JavacProcessBuilder.
      */
-    public static Result<JavacProcessBuilder> get(Process process)
+    public static Result<JavacProcessBuilder> get(DesktopProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 
@@ -44,14 +44,26 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
      * Get the version of javac that this process builder runs.
      * @return The version of javac that this process builder runs.
      */
-    public Result<VersionNumber> getVersion(CharacterWriteStream verbose)
+    public Result<VersionNumber> getVersion(CharacterToByteWriteStream verbose)
     {
         PreCondition.assertNotNull(verbose, "verbose");
 
         return Result.create(() ->
         {
+            final SpinMutex verboseMutex = new SpinMutex();
             final InMemoryCharacterToByteStream stdout = InMemoryCharacterToByteStream.create();
-            this.redirectOutput(stdout);
+            this.redirectOutputLines((String outputLine) ->
+            {
+                stdout.write(outputLine).await();
+                verboseMutex.criticalSection(() -> verbose.write(outputLine).await()).await();
+            });
+
+            final InMemoryCharacterToByteStream stderr = InMemoryCharacterToByteStream.create();
+            this.redirectErrorLines((String errorLine) ->
+            {
+                stderr.write(errorLine).await();
+                verboseMutex.criticalSection(() -> verbose.write(errorLine).await()).await();
+            });
 
             if (!this.getArguments().contains(JavacArguments.versionArgument))
             {
@@ -82,18 +94,27 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
      * @param verbose The stream that verbose logs should be written to.
      * @return The parsed result of running the javac process.
      */
-    public Result<JavaCompilationResult> compile(Warnings warnings, CharacterWriteStream verbose)
+    public Result<JavaCompilationResult> compile(Warnings warnings, CharacterToByteWriteStream verbose)
     {
         PreCondition.assertNotNull(warnings, "warnings");
         PreCondition.assertNotNull(verbose, "verbose");
 
         return Result.create(() ->
         {
+            final SpinMutex verboseMutex = new SpinMutex();
             final InMemoryCharacterToByteStream stdout = InMemoryCharacterToByteStream.create();
-            this.redirectOutput(stdout);
+            this.redirectOutputLines((String outputLine) ->
+            {
+                stdout.write(outputLine).await();
+                verboseMutex.criticalSection(() -> verbose.write(outputLine).await()).await();
+            });
 
             final InMemoryCharacterToByteStream stderr = InMemoryCharacterToByteStream.create();
-            this.redirectError(stderr);
+            this.redirectErrorLines((String errorLine) ->
+            {
+                stderr.write(errorLine).await();
+                verboseMutex.criticalSection(() -> verbose.write(errorLine).await()).await();
+            });
 
             verbose.writeLine("Running " + this.getCommand() + "...").await();
             final Integer exitCode = this.run().await();

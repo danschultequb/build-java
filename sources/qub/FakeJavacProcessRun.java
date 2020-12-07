@@ -33,6 +33,10 @@ public class FakeJavacProcessRun extends FakeProcessRunDecorator<FakeJavacProces
         {
             final CharacterWriteStream outputStream = CharacterWriteStream.create(javacOutput);
             outputStream.write(javacVersionOutput).await();
+            if (!javacVersionOutput.endsWith("\n"))
+            {
+                outputStream.writeLine().await();
+            }
             return 0;
         });
     }

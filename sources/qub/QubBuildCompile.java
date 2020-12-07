@@ -5,7 +5,7 @@ public interface QubBuildCompile
     String actionName = "compile";
     String actionDescription = "Compile source code files.";
 
-    static CommandLineParameter<Folder> addFolderToBuildParameter(CommandLineParameters parameters, QubProcess process)
+    static CommandLineParameter<Folder> addFolderToBuildParameter(CommandLineParameters parameters, DesktopProcess process)
     {
         PreCondition.assertNotNull(parameters, "parameters");
         PreCondition.assertNotNull(process, "process");
@@ -32,7 +32,7 @@ public interface QubBuildCompile
             .setDescription("Whether or not to read and write a build.json file. Defaults to true.");
     }
 
-    static QubBuildCompileParameters getParameters(QubProcess process)
+    static QubBuildCompileParameters getParameters(DesktopProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 
@@ -57,7 +57,7 @@ public interface QubBuildCompile
             final ProcessFactory processFactory = process.getProcessFactory();
             final Warnings warnings = warningsParameter.getValue().await();
             final Boolean buildJson = buildJsonParameter.getValue().await();
-            final VerboseCharacterWriteStream verbose = verboseParameter.getVerboseCharacterWriteStream().await();
+            final VerboseCharacterToByteWriteStream verbose = verboseParameter.getVerboseCharacterToByteWriteStream().await();
             final Folder projectDataFolder = process.getQubProjectDataFolder().await();
             result = new QubBuildCompileParameters(output, folderToBuild, environmentVariables, processFactory, projectDataFolder)
                 .setWarnings(warnings)
@@ -78,9 +78,9 @@ public interface QubBuildCompile
         final boolean useBuildJson = parameters.getBuildJson();
         final Folder qubBuildDataFolder = parameters.getQubBuildDataFolder();
 
-        final LogCharacterWriteStreams logStreams = CommandLineLogsAction.addLogStream(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose());
-        final CharacterWriteStream output = logStreams.getCombinedStream(0);
-        final CharacterWriteStream verbose = logStreams.getCombinedStream(1);
+        final LogStreams logStreams = CommandLineLogsAction.addLogStream(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose());
+        final CharacterWriteStream output = logStreams.getOutput();
+        final VerboseCharacterToByteWriteStream verbose = logStreams.getVerbose();
 
         int exitCode = 0;
         try

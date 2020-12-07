@@ -7,14 +7,14 @@ public interface QubBuild
 
     static void main(String[] args)
     {
-        QubProcess.run(args, QubBuild::run);
+        DesktopProcess.run(args, QubBuild::run);
     }
 
-    static void run(QubProcess process)
+    static void run(DesktopProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 
-        final CommandLineActions<QubProcess> actions = process.<QubProcess>createCommandLineActions()
+        final CommandLineActions actions = process.createCommandLineActions()
             .setApplicationName(QubBuild.applicationName)
             .setApplicationDescription(QubBuild.applicationDescription);
 
@@ -22,7 +22,7 @@ public interface QubBuild
             .setDescription(QubBuildCompile.actionDescription)
             .setDefaultAction();
 
-        CommandLineLogsAction.add(actions);
+        CommandLineLogsAction.addAction(actions);
 
         actions.run(process);
     }
@@ -108,19 +108,6 @@ public interface QubBuild
             return outputsFolder.getFilesRecursively().await()
                 .where((File file) -> ".class".equalsIgnoreCase(file.getFileExtension()))
                 .toList();
-        });
-    }
-
-    static Result<File> getJavaSourceFile(Folder outputsFolder, File classFile, Iterable<File> sourceFiles)
-    {
-        PreCondition.assertNotNull(outputsFolder, "outputsFolder");
-        PreCondition.assertNotNull(classFile, "classFile");
-        PreCondition.assertNotNullAndNotEmpty(sourceFiles, "sourceFiles");
-
-        return Result.create(() ->
-        {
-            final Indexable<String> classFileSegments = classFile.getPath().getSegments();
-
         });
     }
 }

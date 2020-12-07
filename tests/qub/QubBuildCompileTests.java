@@ -6,7 +6,7 @@ public interface QubBuildCompileTests
     {
         runner.testGroup(QubBuildCompile.class, () ->
         {
-            runner.testGroup("getParameters(QubProcess)", () ->
+            runner.testGroup("getParameters(FakeDesktopProcess)", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
@@ -16,14 +16,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with no arguments", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess())
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create())
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -32,14 +35,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with positional folder to build argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("/folder/to/build/"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("/folder/to/build/"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -48,14 +54,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with named folder to build argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--folder=/folder/to/build/"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--folder=/folder/to/build/"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -64,14 +73,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --warnings argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--warnings"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--warnings"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -80,14 +92,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --warnings= argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--warnings="))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--warnings="))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -96,14 +111,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --warnings=Show argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--warnings=Show"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--warnings=Show"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -112,14 +130,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --warnings=error argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--warnings=error"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--warnings=error"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Error, parameters.getWarnings());
@@ -128,14 +149,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --warnings=HIDE argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--warnings=HIDE"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--warnings=HIDE"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Hide, parameters.getWarnings());
@@ -144,14 +168,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --warnings=spam argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--warnings=spam"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--warnings=spam"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -160,14 +187,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --buildjson argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--buildjson"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--buildjson"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -176,14 +206,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --buildjson= argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--buildjson="))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--buildjson="))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -192,14 +225,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --buildjson=false argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--buildjson=false"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--buildjson=false"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertFalse(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -208,14 +244,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --buildjson=true argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--buildjson=true"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--buildjson=true"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -224,14 +263,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --verbose argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--verbose"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--verbose"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -240,14 +282,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --verbose= argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--verbose="))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--verbose="))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -256,14 +301,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --verbose=false argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--verbose=false"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--verbose=false"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertFalse(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -272,14 +320,17 @@ public interface QubBuildCompileTests
 
                 runner.test("with --verbose=true argument", (Test test) ->
                 {
-                    try (final QubProcess process = QubBuildCompileTests.createProcess("--verbose=true"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--verbose=true"))
                     {
+                        process.getTypeLoader()
+                            .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+
                         final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
                         test.assertSame(process.getOutputWriteStream(), parameters.getOutputWriteStream());
-                        test.assertTrue(parameters.getProcessFactory() instanceof RealProcessFactory);
+                        test.assertNotNull(parameters.getProcessFactory());
                         test.assertTrue(parameters.getBuildJson());
                         test.assertTrue(parameters.getVerbose().isVerbose());
                         test.assertEqual(Warnings.Show, parameters.getWarnings());
@@ -288,42 +339,40 @@ public interface QubBuildCompileTests
 
                 runner.test("with --help argument", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
-                    try (final QubProcess process = QubBuildCompileTests.createProcess(output, "--help"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("--help"))
                     {
                         test.assertNull(QubBuildCompile.getParameters(process));
+                        test.assertEqual(
+                            Iterable.create(
+                                "Usage: qub-build compile [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
+                                "  Compile source code files.",
+                                "  --folder:     The folder to build. The current folder will be used if this isn't defined.",
+                                "  --warnings:   How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
+                                "  --buildjson:  Whether or not to read and write a build.json file. Defaults to true.",
+                                "  --verbose(v): Whether or not to show verbose logs.",
+                                "  --profiler:   Whether or not this application should pause before it is run to allow a profiler to be attached.",
+                                "  --help(?):    Show the help message for this application."),
+                            Strings.getLines(process.getOutputWriteStream().getText().await()));
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Usage: qub-build compile [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
-                            "  Compile source code files.",
-                            "  --folder:     The folder to build. The current folder will be used if this isn't defined.",
-                            "  --warnings:   How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
-                            "  --buildjson:  Whether or not to read and write a build.json file. Defaults to true.",
-                            "  --verbose(v): Whether or not to show verbose logs.",
-                            "  --profiler:   Whether or not this application should pause before it is run to allow a profiler to be attached.",
-                            "  --help(?):    Show the help message for this application."),
-                        Strings.getLines(output.getText().await()));
                 });
 
                 runner.test("with -? command line argument", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getInMemoryCharacterToByteStream(test);
-                    try (final QubProcess process = QubBuildCompileTests.createProcess(output, "-?"))
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create("-?"))
                     {
                         test.assertNull(QubBuildCompile.getParameters(process));
+                        test.assertEqual(
+                            Iterable.create(
+                                "Usage: qub-build compile [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
+                                "  Compile source code files.",
+                                "  --folder:     The folder to build. The current folder will be used if this isn't defined.",
+                                "  --warnings:   How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
+                                "  --buildjson:  Whether or not to read and write a build.json file. Defaults to true.",
+                                "  --verbose(v): Whether or not to show verbose logs.",
+                                "  --profiler:   Whether or not this application should pause before it is run to allow a profiler to be attached.",
+                                "  --help(?):    Show the help message for this application."),
+                            Strings.getLines(process.getOutputWriteStream().getText().await()));
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Usage: qub-build compile [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
-                            "  Compile source code files.",
-                            "  --folder:     The folder to build. The current folder will be used if this isn't defined.",
-                            "  --warnings:   How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
-                            "  --buildjson:  Whether or not to read and write a build.json file. Defaults to true.",
-                            "  --verbose(v): Whether or not to show verbose logs.",
-                            "  --profiler:   Whether or not this application should pause before it is run to allow a profiler to be attached.",
-                            "  --help(?):    Show the help message for this application."),
-                        Strings.getLines(output.getText().await()));
                 });
             });
 
@@ -359,7 +408,7 @@ public interface QubBuildCompileTests
                     final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
                     final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
                     final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder)
-                        .setVerbose(new VerboseCharacterWriteStream(true, output));
+                        .setVerbose(VerboseCharacterToByteWriteStream.create(output));
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -540,6 +589,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -617,6 +667,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating bin/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -694,6 +745,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -774,6 +826,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -860,6 +913,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -947,6 +1001,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -1028,6 +1083,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -1118,6 +1174,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -1215,6 +1272,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -1226,6 +1284,9 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/A.java",
                             "Compiling 1 file...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: sources\\A.java:1: error: This doesn't look right to me.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:                    ^",
                             "VERBOSE: Compilation finished.",
                             "1 Error:",
                             "sources/A.java (Line 1): This doesn't look right to me.",
@@ -1313,6 +1374,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Has warnings",
                             "VERBOSE: Updating outputs/build.json...",
@@ -1411,6 +1473,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -1422,6 +1485,9 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/A.java",
                             "Compiling 1 file...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: sources/A.java:1: warning: Are you still sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:                    ^",
                             "VERBOSE: Compilation finished.",
                             "1 Warning:",
                             "sources/A.java (Line 1): Are you still sure?",
@@ -1520,6 +1586,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -1534,6 +1601,12 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/A.java",
                             "Compiling 2 files...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ tests/ATests.java sources/A.java...",
+                            "VERBOSE: sources/A.java:1: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:     ^",
+                            "VERBOSE: tests/ATests.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
                             "VERBOSE: Compilation finished.",
                             "1 Warning:",
                             "tests/ATests.java (Line 10): Can't be this.",
@@ -1650,6 +1723,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -1668,6 +1742,21 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/A.java",
                             "Compiling 4 files...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: sources/A.java:12: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:  ^",
+                            "VERBOSE: sources/B.java:1: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:     ^",
+                            "VERBOSE: tests/C.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/C.java:20: error: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/ATests.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
                             "VERBOSE: Compilation finished.",
                             "2 Warnings:",
                             "tests/ATests.java (Line 10): Can't be this.",
@@ -1797,6 +1886,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -1815,6 +1905,21 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/A.java",
                             "Compiling 4 files...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: sources/A.java:12: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:  ^",
+                            "VERBOSE: sources/B.java:1: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:     ^",
+                            "VERBOSE: tests/C.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/C.java:20: error: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/ATests.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
                             "VERBOSE: Compilation finished.",
                             "2 Warnings:",
                             "tests/ATests.java (Line 10): Can't be this.",
@@ -1941,6 +2046,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -1959,6 +2065,21 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/A.java",
                             "Compiling 4 files...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: sources/A.java:12: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:  ^",
+                            "VERBOSE: sources/B.java:1: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:     ^",
+                            "VERBOSE: tests/C.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/C.java:20: error: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/ATests.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
                             "VERBOSE: Compilation finished.",
                             "3 Errors:",
                             "sources/A.java (Line 12): Are you sure?",
@@ -2080,6 +2201,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -2098,6 +2220,21 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/A.java",
                             "Compiling 4 files...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: sources/A.java:12: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:  ^",
+                            "VERBOSE: sources/B.java:1: error: Are you sure?",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:     ^",
+                            "VERBOSE: tests/C.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/C.java:20: error: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
+                            "VERBOSE: tests/ATests.java:10: warning: Can't be this.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:       ^",
                             "VERBOSE: Compilation finished.",
                             "5 Errors:",
                             "sources/A.java (Line 12): Are you sure?",
@@ -2211,6 +2348,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -2318,6 +2456,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -2424,6 +2563,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
                             "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
@@ -2531,6 +2671,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: /current/folder/sources/B.java - Last modified: 1970-01-01T00:00:01Z",
@@ -2636,6 +2777,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/B.java - No changes or issues",
                             "VERBOSE: Deleted source files:",
@@ -2735,6 +2877,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - New file",
                             "VERBOSE: /current/folder/sources/B.java - No changes or issues",
@@ -2856,6 +2999,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: /current/folder/sources/B.java - No changes or issues",
@@ -2993,6 +3137,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: /current/folder/sources/B.java - No changes or issues",
@@ -3009,6 +3154,9 @@ public interface QubBuildCompileTests
                             "VERBOSE: /current/folder/sources/B.java",
                             "Compiling 2 files...",
                             "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java sources/A.java...",
+                            "VERBOSE: sources/B.java:1: error: Missing definition for C.",
+                            "VERBOSE: Fake code line",
+                            "VERBOSE:                         ^",
                             "VERBOSE: Compilation finished.",
                             "1 Error:",
                             "sources/B.java (Line 1): Missing definition for C.",
@@ -3126,6 +3274,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: /current/folder/sources/B.java - No changes or issues",
@@ -3270,6 +3419,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -3356,6 +3506,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -3442,6 +3593,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -3546,6 +3698,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -3652,6 +3805,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -3747,6 +3901,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -3840,6 +3995,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -3931,6 +4087,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -4030,6 +4187,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -4135,6 +4293,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
@@ -4215,7 +4374,7 @@ public interface QubBuildCompileTests
                         new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1"),
+                            .setVersionFunctionAutomatically("javac 14.0.1\n"),
                         new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
@@ -4238,6 +4397,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: /current/folder/sources/B.java - No changes or issues",
                             "VERBOSE: Deleted source files:",
@@ -4418,6 +4578,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -4539,6 +4700,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -4733,6 +4895,7 @@ public interface QubBuildCompileTests
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
                             "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -4850,7 +5013,7 @@ public interface QubBuildCompileTests
 
     static QubBuildCompileParameters getParameters(Test test, CharacterToByteWriteStream output, Folder currentFolder, Iterable<FakeProcessRun> fakeProcessRuns, EnvironmentVariables environmentVariables)
     {
-        final FakeProcessFactory processFactory = new FakeProcessFactory(test.getParallelAsyncRunner(), currentFolder);
+        final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder);
         for (final FakeProcessRun fakeProcessRun : fakeProcessRuns)
         {
             processFactory.add(fakeProcessRun);
@@ -4891,29 +5054,12 @@ public interface QubBuildCompileTests
     {
         PreCondition.assertNotNull(test, "test");
 
-        return new ManualClock(DateTime.createFromDurationSinceEpoch(Duration.zero), test.getMainAsyncRunner());
+        return ManualClock.create(DateTime.epoch, test.getMainAsyncRunner());
     }
 
     static InMemoryCharacterToByteStream getInMemoryCharacterToByteStream(Test test)
     {
         return InMemoryCharacterToByteStream.create();
-    }
-
-    static Folder getInMemoryCurrentFolder(Test test, Clock clock)
-    {
-        PreCondition.assertNotNull(test, "test");
-        PreCondition.assertNotNull(clock, "clock");
-
-        final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(clock);
-        fileSystem.createRoot("/").await();
-        return fileSystem.getFolder("/").await();
-    }
-
-    static File setFileContents(Folder folder, String relativeFilePath, String contents)
-    {
-        final File file = folder.getFile(relativeFilePath).await();
-        setFileContents(file, contents);
-        return file;
     }
 
     static void setFileContents(File file, String contents)
@@ -4924,16 +5070,6 @@ public interface QubBuildCompileTests
         file.setContents(byteContents).await();
     }
 
-    static String getFileContents(Folder folder, String relativeFilePath)
-    {
-        return getFileContents(folder.getFile(relativeFilePath));
-    }
-
-    static DateTime getFileLastModified(File file)
-    {
-        return file.getLastModified().await();
-    }
-
     static String getFileContents(Result<File> file)
     {
         return getFileContents(file.await());
@@ -4942,37 +5078,5 @@ public interface QubBuildCompileTests
     static String getFileContents(File file)
     {
         return file.getContentsAsString().await();
-    }
-
-    static QubProcess createProcess(CharacterToByteWriteStream output, Folder currentFolder, String... commandLineArguments)
-    {
-        PreCondition.assertNotNull(output, "output");
-        PreCondition.assertNotNull(currentFolder, "currentFolder");
-        PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
-
-        final QubProcess result = QubBuildCompileTests.createProcess(output, commandLineArguments);
-        result.setFileSystem(currentFolder.getFileSystem());
-        result.setCurrentFolderPath(currentFolder.getPath());
-
-        return result;
-    }
-
-    static QubProcess createProcess(CharacterToByteWriteStream output, String... commandLineArguments)
-    {
-        PreCondition.assertNotNull(output, "output");
-        PreCondition.assertNotNull(commandLineArguments, "commandLineArguments");
-
-        final QubProcess result = QubBuildCompileTests.createProcess(commandLineArguments);
-        result.setOutputWriteStream(output);
-
-        return result;
-    }
-
-    static QubProcess createProcess(String... commandLineArguments)
-    {
-        final QubProcess result = QubProcess.create(commandLineArguments);
-        result.setLineSeparator("\n");
-
-        return result;
     }
 }
