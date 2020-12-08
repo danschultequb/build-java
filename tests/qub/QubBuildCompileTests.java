@@ -3335,7 +3335,7 @@ public interface QubBuildCompileTests
                 {
                     final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
                     final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create();
                     final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -3640,7 +3640,7 @@ public interface QubBuildCompileTests
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
                     final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = new EnvironmentVariables()
+                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
                         .set("JAVA_HOME", jdk11Folder.toString())
                         .set("QUB_HOME", "/qub/");
 
@@ -3747,7 +3747,7 @@ public interface QubBuildCompileTests
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
                     final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = new EnvironmentVariables()
+                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
                         .set("JAVA_HOME", jdk11Folder.toString())
                         .set("QUB_HOME", "/qub/");
 
@@ -3854,7 +3854,7 @@ public interface QubBuildCompileTests
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
                     final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = new EnvironmentVariables()
+                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
                         .set("JAVA_HOME", jdk11Folder.toString())
                         .set("QUB_HOME", "/qub/");
 
@@ -3948,7 +3948,7 @@ public interface QubBuildCompileTests
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
                     final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = new EnvironmentVariables()
+                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
                         .set("JAVA_HOME", jdk11Folder.toString())
                         .set("QUB_HOME", "/qub/");
 
@@ -4996,7 +4996,7 @@ public interface QubBuildCompileTests
 
     static EnvironmentVariables getEnvironmentVariables()
     {
-        return new EnvironmentVariables().set("QUB_HOME", "/qub/");
+        return EnvironmentVariables.create().set("QUB_HOME", "/qub/");
     }
 
     static QubBuildCompileParameters getParameters(Test test, CharacterToByteWriteStream output, Folder currentFolder, EnvironmentVariables environmentVariables)
