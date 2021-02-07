@@ -78,7 +78,7 @@ public interface QubBuildCompile
         final boolean useBuildJson = parameters.getBuildJson();
         final Folder qubBuildDataFolder = parameters.getQubBuildDataFolder();
 
-        final LogStreams logStreams = CommandLineLogsAction.addLogStream(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose());
+        final LogStreams logStreams = CommandLineLogsAction.addLogStreamFromDataFolder(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose());
         final CharacterWriteStream output = logStreams.getOutput();
         final VerboseCharacterToByteWriteStream verbose = logStreams.getVerbose();
 
