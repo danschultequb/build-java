@@ -11,20 +11,42 @@ public interface QubBuildCompile
             .setDefaultAction();
     }
 
+    static CommandLineParameter<Folder> addFolderToBuildParameter(CommandLineParameters parameters, DesktopProcess process)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+        PreCondition.assertNotNull(process, "process");
+
+        return parameters.addPositionalFolder("folder", process)
+            .setValueName("<folder-path-to-build>")
+            .setDescription("The folder to build. The current folder will be used if this isn't defined.");
+    }
+
+    static CommandLineParameter<Warnings> addWarningsParameter(CommandLineParameters parameters)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+
+        return parameters.addEnum("warnings", QubBuildCompileParameters.getWarningsDefault())
+            .setValueName("<show|error|hide>")
+            .setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
+    }
+
+    static CommandLineParameterBoolean addBuildJsonParameter(CommandLineParameters parameters)
+    {
+        PreCondition.assertNotNull(parameters, "parameters");
+
+        return parameters.addBoolean("buildjson", QubBuildCompileParameters.getBuildJsonDefault())
+            .setDescription("Whether or not to read and write a build.json file. Defaults to true.");
+    }
+
     static QubBuildCompileParameters getParameters(DesktopProcess process, CommandLineAction action)
     {
         PreCondition.assertNotNull(process, "process");
         PreCondition.assertNotNull(action, "action");
 
         final CommandLineParameters parameters = action.createCommandLineParameters(process);
-        final CommandLineParameter<Folder> folderToBuildParameter = parameters.addPositionalFolder("folder", process)
-            .setValueName("<folder-path-to-build>")
-            .setDescription("The folder to build. The current folder will be used if this isn't defined.");
-        final CommandLineParameter<Warnings> warningsParameter = parameters.addEnum("warnings", QubBuildCompileParameters.getWarningsDefault())
-            .setValueName("<show|error|hide>")
-            .setDescription("How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".");
-        final CommandLineParameterBoolean buildJsonParameter = parameters.addBoolean("buildjson", QubBuildCompileParameters.getBuildJsonDefault())
-            .setDescription("Whether or not to read and write a build.json file. Defaults to true.");
+        final CommandLineParameter<Folder> folderToBuildParameter = QubBuildCompile.addFolderToBuildParameter(parameters, process);
+        final CommandLineParameter<Warnings> warningsParameter = QubBuildCompile.addWarningsParameter(parameters);
+        final CommandLineParameterBoolean buildJsonParameter = QubBuildCompile.addBuildJsonParameter(parameters);
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
         final CommandLineParameterProfiler profiler = parameters.addProfiler(process, QubBuild.class);
         final CommandLineParameterHelp help = parameters.addHelp();
