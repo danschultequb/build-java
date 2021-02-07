@@ -86,52 +86,6 @@ public interface QubBuildTests
                 });
             });
 
-            runner.testGroup("getActionFullName(String)", () ->
-            {
-                final Action2<String,Throwable> getActionFullNameErrorTest = (String actionName, Throwable expected) ->
-                {
-                    runner.test("with " + Strings.escapeAndQuote(actionName), (Test test) ->
-                    {
-                        test.assertThrows(() -> QubBuild.getActionFullName(actionName), expected);
-                    });
-                };
-
-                getActionFullNameErrorTest.run(null, new PreConditionFailure("actionName cannot be null."));
-                getActionFullNameErrorTest.run("", new PreConditionFailure("actionName cannot be empty."));
-
-                final Action1<String> getActionFullNameTest = (String actionName) ->
-                {
-                    runner.test("with " + Strings.escapeAndQuote(actionName), (Test test) ->
-                    {
-                        test.assertEqual("qub-build " + actionName, QubBuild.getActionFullName(actionName));
-                    });
-                };
-
-                getActionFullNameTest.run("hello");
-                getActionFullNameTest.run("compile");
-                getActionFullNameTest.run("logs");
-            });
-
-            runner.testGroup("getLogsFolder(Folder)", () ->
-            {
-                runner.test("with null", (Test test) ->
-                {
-                    test.assertThrows(() -> QubBuild.getLogsFolder(null),
-                        new PreConditionFailure("qubBuildDataFolder cannot be null."));
-                });
-
-                runner.test("with non-null", (Test test) ->
-                {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
-                    fileSystem.createRoot("/").await();
-                    final Folder folder = fileSystem.getFolder("/parent/folder/").await();
-                    final Folder logsFolder = QubBuild.getLogsFolder(folder);
-                    test.assertNotNull(logsFolder);
-                    test.assertEqual("/parent/folder/logs/", logsFolder.toString());
-                    test.assertFalse(logsFolder.exists().await());
-                });
-            });
-
             runner.testGroup("getJavaSourceFiles(Folder,ProjectJSONJava)", () ->
             {
                 runner.test("with null projectFolder", (Test test) ->

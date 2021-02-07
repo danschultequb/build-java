@@ -2,9 +2,6 @@ package qub;
 
 public interface QubBuild
 {
-    String applicationName = "qub-build";
-    String applicationDescription = "Used to compile source code projects.";
-
     static void main(String[] args)
     {
         DesktopProcess.run(args, QubBuild::run);
@@ -14,31 +11,12 @@ public interface QubBuild
     {
         PreCondition.assertNotNull(process, "process");
 
-        final CommandLineActions actions = process.createCommandLineActions()
-            .setApplicationName(QubBuild.applicationName)
-            .setApplicationDescription(QubBuild.applicationDescription);
-
-        actions.addAction(QubBuildCompile.actionName, QubBuildCompile::getParameters, QubBuildCompile::run)
-            .setDescription(QubBuildCompile.actionDescription)
-            .setDefaultAction();
-
-        CommandLineLogsAction.addAction(actions);
-
-        actions.run(process);
-    }
-
-    static String getActionFullName(String actionName)
-    {
-        PreCondition.assertNotNullAndNotEmpty(actionName, "actionName");
-
-        return QubBuild.applicationName + " " + actionName;
-    }
-
-    static Folder getLogsFolder(Folder qubBuildDataFolder)
-    {
-        PreCondition.assertNotNull(qubBuildDataFolder, "qubBuildDataFolder");
-
-        return qubBuildDataFolder.getFolder("logs").await();
+        process.createCommandLineActions()
+            .setApplicationName("qub-build")
+            .setApplicationDescription("Used to compile source code projects.")
+            .addAction(QubBuildCompile::addAction)
+            .addAction(CommandLineLogsAction::addAction)
+            .run();
     }
 
     /**

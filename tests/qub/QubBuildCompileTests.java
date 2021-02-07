@@ -6,12 +6,24 @@ public interface QubBuildCompileTests
     {
         runner.testGroup(QubBuildCompile.class, () ->
         {
-            runner.testGroup("getParameters(FakeDesktopProcess)", () ->
+            runner.testGroup("getParameters(DesktopProcess)", () ->
             {
-                runner.test("with null", (Test test) ->
+                runner.test("with null process", (Test test) ->
                 {
-                    test.assertThrows(() -> QubBuildCompile.getParameters(null),
+                    final DesktopProcess process = null;
+                    final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
+                    test.assertThrows(() -> QubBuildCompile.getParameters(process, action),
                         new PreConditionFailure("process cannot be null."));
+                });
+
+                runner.test("with null action", (Test test) ->
+                {
+                    try (final FakeDesktopProcess process = FakeDesktopProcess.create())
+                    {
+                        final CommandLineAction action = null;
+                        test.assertThrows(() -> QubBuildCompile.getParameters(process, action),
+                            new PreConditionFailure("action cannot be null."));
+                    }
                 });
 
                 runner.test("with no arguments", (Test test) ->
@@ -20,8 +32,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -39,8 +52,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -58,8 +72,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual("/folder/to/build/", parameters.getFolderToBuild().toString());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -77,8 +92,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -96,8 +112,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -115,8 +132,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -134,8 +152,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -153,8 +172,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -172,8 +192,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -191,8 +212,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -210,8 +232,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -229,8 +252,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -248,8 +272,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -267,8 +292,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -286,8 +312,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -305,8 +332,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -324,8 +352,9 @@ public interface QubBuildCompileTests
                     {
                         process.getTypeLoader()
                             .addTypeContainer("fake.MainClassFullName", "/qub/fake/main-java/versions/7/main-java.jar");
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {});
 
-                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process);
+                        final QubBuildCompileParameters parameters = QubBuildCompile.getParameters(process, action);
                         test.assertNotNull(parameters);
                         test.assertEqual(process.getCurrentFolder(), parameters.getFolderToBuild());
                         test.assertSame(process.getEnvironmentVariables(), parameters.getEnvironmentVariables());
@@ -341,10 +370,12 @@ public interface QubBuildCompileTests
                 {
                     try (final FakeDesktopProcess process = FakeDesktopProcess.create("--help"))
                     {
-                        test.assertNull(QubBuildCompile.getParameters(process));
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {})
+                            .setDescription("Compile source code files.");
+                        test.assertNull(QubBuildCompile.getParameters(process, action));
                         test.assertEqual(
                             Iterable.create(
-                                "Usage: qub-build compile [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
+                                "Usage: fake-action-name [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
                                 "  Compile source code files.",
                                 "  --folder:     The folder to build. The current folder will be used if this isn't defined.",
                                 "  --warnings:   How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
@@ -360,10 +391,12 @@ public interface QubBuildCompileTests
                 {
                     try (final FakeDesktopProcess process = FakeDesktopProcess.create("-?"))
                     {
-                        test.assertNull(QubBuildCompile.getParameters(process));
+                        final CommandLineAction action = CommandLineAction.create("fake-action-name", (DesktopProcess actionProcess) -> {})
+                            .setDescription("Compile source code files.");
+                        test.assertNull(QubBuildCompile.getParameters(process, action));
                         test.assertEqual(
                             Iterable.create(
-                                "Usage: qub-build compile [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
+                                "Usage: fake-action-name [[--folder=]<folder-path-to-build>] [--warnings=<show|error|hide>] [--buildjson] [--verbose] [--profiler] [--help]",
                                 "  Compile source code files.",
                                 "  --folder:     The folder to build. The current folder will be used if this isn't defined.",
                                 "  --warnings:   How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
