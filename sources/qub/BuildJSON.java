@@ -1,18 +1,14 @@
 package qub;
 
-public class BuildJSON
+public class BuildJSON extends JSONObjectWrapperBase
 {
     private static final String projectJsonPropertyName = "project.json";
     private static final String javacVersionPropertyName = "javacVersion";
     private static final String sourceFilesPropertyName = "sourceFiles";
 
-    private final JSONObject json;
-
     private BuildJSON(JSONObject json)
     {
-        PreCondition.assertNotNull(json, "json");
-
-        this.json = json;
+        super(json);
     }
 
     public static BuildJSON create()
@@ -177,23 +173,5 @@ public class BuildJSON
             }
             return result;
         });
-    }
-
-    public JSONObject toJson()
-    {
-        return this.json;
-    }
-
-    @Override
-    public String toString()
-    {
-        return this.toString(JSONFormat.consise);
-    }
-
-    public String toString(JSONFormat format)
-    {
-        PreCondition.assertNotNull(format, "format");
-
-        return this.toJson().toString(format);
     }
 }
