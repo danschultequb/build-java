@@ -6,23 +6,26 @@ public class QubBuildCompileParameters
     private final Folder folderToBuild;
     private final EnvironmentVariables environmentVariables;
     private final ProcessFactory processFactory;
+    private final QubFolder qubFolder;
     private final Folder qubBuildDataFolder;
     private Warnings warnings;
     private boolean buildJson;
     private VerboseCharacterToByteWriteStream verbose;
 
-    public QubBuildCompileParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory, Folder qubBuildDataFolder)
+    public QubBuildCompileParameters(CharacterToByteWriteStream outputWriteStream, Folder folderToBuild, EnvironmentVariables environmentVariables, ProcessFactory processFactory, QubFolder qubFolder, Folder qubBuildDataFolder)
     {
         PreCondition.assertNotNull(outputWriteStream, "outputWriteStream");
         PreCondition.assertNotNull(folderToBuild, "folderToBuild");
         PreCondition.assertNotNull(environmentVariables, "environmentVariables");
         PreCondition.assertNotNull(processFactory, "processFactory");
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
         PreCondition.assertNotNull(qubBuildDataFolder, "qubBuildDataFolder");
 
         this.outputWriteStream = outputWriteStream;
         this.folderToBuild = folderToBuild;
         this.environmentVariables = environmentVariables;
         this.processFactory = processFactory;
+        this.qubFolder = qubFolder;
         this.qubBuildDataFolder = qubBuildDataFolder;
         this.warnings = QubBuildCompileParameters.getWarningsDefault();
         this.buildJson = QubBuildCompileParameters.getBuildJsonDefault();
@@ -63,6 +66,15 @@ public class QubBuildCompileParameters
     public ProcessFactory getProcessFactory()
     {
         return this.processFactory;
+    }
+
+    /**
+     * Get the Qub folder for this application.
+     * @return The Qub folder for this application.
+     */
+    public QubFolder getQubFolder()
+    {
+        return this.qubFolder;
     }
 
     /**

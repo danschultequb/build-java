@@ -417,30 +417,36 @@ public interface QubBuildCompileTests
                         new PreConditionFailure("parameters cannot be null."));
                 });
 
-                runner.test("with no project.json file in the folder to build", (Test test) ->
+                runner.test("with no project.json file in the folder to build",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
+
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
                     test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
-                            "ERROR: The file at \"/current/folder/project.json\" doesn't exist."),
-                        QubBuildCompileTests.getOutputLines(output));
+                            "ERROR: The file at \"/project.json\" doesn't exist."),
+                        Strings.getLines(output.getText().await()));
+                    test.assertEqual(
+                        Iterable.create(),
+                        Strings.getLines(process.getErrorWriteStream().getText().await()));
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
-                            "ERROR: The file at \"/current/folder/project.json\" doesn't exist."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                            "ERROR: The file at \"/project.json\" doesn't exist."),
+                        QubBuildCompileTests.getLogFileContentLines(process));
                 });
 
-                runner.test("with no project.json file in the folder to build with verbose logs", (Test test) ->
+                runner.test("with no project.json file in the folder to build with verbose logs",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder)
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process)
                         .setVerbose(VerboseCharacterToByteWriteStream.create(output));
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
@@ -448,20 +454,22 @@ public interface QubBuildCompileTests
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
-                            "ERROR: The file at \"/current/folder/project.json\" doesn't exist."),
+                            "ERROR: The file at \"/project.json\" doesn't exist."),
                         QubBuildCompileTests.getOutputLines(output));
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
-                            "ERROR: The file at \"/current/folder/project.json\" doesn't exist."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                            "ERROR: The file at \"/project.json\" doesn't exist."),
+                        QubBuildCompileTests.getLogFileContentLines(process));
                 });
 
-                runner.test("with empty project.json", (Test test) ->
+                runner.test("with empty project.json",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     QubBuildCompileTests.getProjectJsonFile(currentFolder)
                         .setContentsAsString("").await();
@@ -476,14 +484,16 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "ERROR: Missing object left curly bracket ('{')."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                 });
 
-                runner.test("with empty array project.json", (Test test) ->
+                runner.test("with empty array project.json",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     QubBuildCompileTests.getProjectJsonFile(currentFolder)
                         .setContentsAsString("[]").await();
@@ -498,14 +508,16 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "ERROR: Expected object left curly bracket ('{')."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                 });
 
-                runner.test("with empty object project.json", (Test test) ->
+                runner.test("with empty object project.json",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     QubBuildCompileTests.getProjectJsonFile(currentFolder)
                         .setContentsAsString(
@@ -522,14 +534,16 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "ERROR: No language specified in project.json. Nothing to compile."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                 });
 
-                runner.test("with empty object java property and no sources folder", (Test test) ->
+                runner.test("with empty object java property and no sources folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     QubBuildCompileTests.getProjectJsonFile(currentFolder)
                         .setContentsAsString(
@@ -542,20 +556,22 @@ public interface QubBuildCompileTests
                     test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
-                            "ERROR: No java source files found in /current/folder/."),
+                            "ERROR: No java source files found in /."),
                         QubBuildCompileTests.getOutputLines(output));
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
-                            "ERROR: No java source files found in /current/folder/."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                            "ERROR: No java source files found in /."),
+                        QubBuildCompileTests.getLogFileContentLines(process));
                 });
 
-                runner.test("with empty object java property and empty sources folder", (Test test) ->
+                runner.test("with empty object java property and empty sources folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(test);
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     QubBuildCompileTests.getProjectJsonFile(currentFolder)
                         .setContentsAsString(
@@ -569,20 +585,21 @@ public interface QubBuildCompileTests
                     test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
-                            "ERROR: No java source files found in /current/folder/."),
+                            "ERROR: No java source files found in /."),
                         QubBuildCompileTests.getOutputLines(output));
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
-                            "ERROR: No java source files found in /current/folder/."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                            "ERROR: No java source files found in /."),
+                        QubBuildCompileTests.getLogFileContentLines(process));
                 });
 
-                runner.test("with non-empty \"sources\" folder and no \"outputs\" folder", (Test test) ->
+                runner.test("with non-empty \"sources\" folder and no \"outputs\" folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -595,12 +612,12 @@ public interface QubBuildCompileTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -609,7 +626,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -621,7 +638,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -629,11 +646,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -655,11 +672,12 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
 
-                runner.test("with non-empty \"sources\" folder and custom \"outputs\" folder", (Test test) ->
+                runner.test("with non-empty \"sources\" folder and custom \"outputs\" folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = currentFolder.getFolder("bin").await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -673,12 +691,12 @@ public interface QubBuildCompileTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -687,7 +705,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -699,7 +717,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating bin/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -707,11 +725,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d bin -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/bin/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d bin -Xlint:unchecked -Xlint:deprecation -classpath /bin/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -733,11 +751,12 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
 
-                runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder", (Test test) ->
+                runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -751,12 +770,12 @@ public interface QubBuildCompileTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -765,7 +784,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -777,7 +796,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Updating outputs/build.json...",
@@ -786,11 +805,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -812,11 +831,12 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
 
-                runner.test("with multiple source files and with existing and empty \"outputs\" folder", (Test test) ->
+                runner.test("with multiple source files and with existing and empty \"outputs\" folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -832,12 +852,12 @@ public interface QubBuildCompileTests
                     final File bJavaFile = sourcesFolder.getFile("B.java").await();
                     bJavaFile.setContentsAsString("B.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -846,7 +866,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(aJavaFile, bJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -858,7 +878,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Updating outputs/build.json...",
@@ -867,11 +887,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 2 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -899,11 +919,12 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
 
-                runner.test("with multiple source folders", (Test test) ->
+                runner.test("with multiple source folders",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
                     final Folder testsFolder = QubBuildCompileTests.getTestsFolder(currentFolder);
@@ -919,12 +940,12 @@ public interface QubBuildCompileTests
                     final File bJavaFile = testsFolder.getFile("B.java").await();
                     bJavaFile.setContentsAsString("B.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -933,7 +954,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(aJavaFile, bJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -945,7 +966,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -953,11 +974,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 2 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java tests/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java tests/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -985,11 +1006,13 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
 
-                runner.test("with source file with same age as existing class file but no build.json file", (Test test) ->
+                runner.test("with source file with same age as existing class file but no build.json file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -1007,12 +1030,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -1021,7 +1044,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -1033,7 +1056,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
                             "VERBOSE: Updating outputs/build.json...",
@@ -1042,11 +1065,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -1067,11 +1090,13 @@ public interface QubBuildCompileTests
                         QubBuildCompileTests.getBuildJSONFileContent(outputsFolder));
                 });
 
-                runner.test("with source file with same age as existing class file and with build.json file", (Test test) ->
+                runner.test("with source file with same age as existing class file and with build.json file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -1097,13 +1122,13 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -1115,10 +1140,10 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -1126,7 +1151,7 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -1149,11 +1174,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with source file newer than existing class file and with build.json file", (Test test) ->
+                runner.test("with source file newer than existing class file and with build.json file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -1180,12 +1207,12 @@ public interface QubBuildCompileTests
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -1194,7 +1221,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -1206,23 +1233,23 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -1244,11 +1271,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one source file with one error", (Test test) ->
+                runner.test("with one source file with one error",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -1275,12 +1304,12 @@ public interface QubBuildCompileTests
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -1290,7 +1319,7 @@ public interface QubBuildCompileTests
                             .addCompilerIssues(new JavaCompilerIssue("sources\\A.java", 1, 20, Issue.Type.Error, "This doesn't look right to me."))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -1304,19 +1333,19 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: sources\\A.java:1: error: This doesn't look right to me.",
                             "VERBOSE: Fake code line",
                             "VERBOSE:                    ^",
@@ -1325,7 +1354,7 @@ public interface QubBuildCompileTests
                             "sources/A.java (Line 1): This doesn't look right to me.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -1355,11 +1384,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one unmodified source file with one warning", (Test test) ->
+                runner.test("with one unmodified source file with one warning",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -1386,13 +1417,13 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -1406,10 +1437,10 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Has warnings",
+                            "VERBOSE: /sources/A.java - Has warnings",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -1419,7 +1450,7 @@ public interface QubBuildCompileTests
                             "sources/A.java (Line 1): Are you sure?",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -1444,11 +1475,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one modified source file with one warning", (Test test) ->
+                runner.test("with one modified source file with one warning",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -1476,12 +1509,12 @@ public interface QubBuildCompileTests
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -1491,7 +1524,7 @@ public interface QubBuildCompileTests
                             .addCompilerIssues(new JavaCompilerIssue(aJavaFile.relativeTo(currentFolder), 1, 20, Issue.Type.Warning, "Are you still sure?"))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -1505,19 +1538,19 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: sources/A.java:1: warning: Are you still sure?",
                             "VERBOSE: Fake code line",
                             "VERBOSE:                    ^",
@@ -1526,7 +1559,7 @@ public interface QubBuildCompileTests
                             "sources/A.java (Line 1): Are you still sure?",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -1550,11 +1583,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with two source files with one error and one warning", (Test test) ->
+                runner.test("with two source files with one error and one warning",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder testsFolder = QubBuildCompileTests.getTestsFolder(currentFolder);
                     outputsFolder.create().await();
@@ -1585,12 +1620,12 @@ public interface QubBuildCompileTests
                     final File aTestsJavaFile = testsFolder.getFile("ATests.java").await();
                     aTestsJavaFile.setContentsAsString("ATests.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -1602,7 +1637,7 @@ public interface QubBuildCompileTests
                                     new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -1618,22 +1653,22 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/tests/ATests.java - New file",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /tests/ATests.java - New file",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Added source files:",
-                            "VERBOSE: /current/folder/tests/ATests.java",
+                            "VERBOSE: /tests/ATests.java",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 2 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ tests/ATests.java sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ tests/ATests.java sources/A.java...",
                             "VERBOSE: sources/A.java:1: error: Are you sure?",
                             "VERBOSE: Fake code line",
                             "VERBOSE:     ^",
@@ -1647,7 +1682,7 @@ public interface QubBuildCompileTests
                             "sources/A.java (Line 1): Are you sure?",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -1678,11 +1713,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with multiple source files with errors and warnings", (Test test) ->
+                runner.test("with multiple source files with errors and warnings",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder testsFolder = QubBuildCompileTests.getTestsFolder(currentFolder);
                     outputsFolder.create().await();
@@ -1716,12 +1753,12 @@ public interface QubBuildCompileTests
                     final File cJavaFile = testsFolder.getFile("C.java").await();
                     cJavaFile.setContentsAsString("C.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -1736,7 +1773,7 @@ public interface QubBuildCompileTests
                                     new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -1755,26 +1792,26 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/B.java - New file",
-                            "VERBOSE: /current/folder/tests/ATests.java - New file",
-                            "VERBOSE: /current/folder/tests/C.java - New file",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/B.java - New file",
+                            "VERBOSE: /tests/ATests.java - New file",
+                            "VERBOSE: /tests/C.java - New file",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Added source files:",
-                            "VERBOSE: /current/folder/sources/B.java",
-                            "VERBOSE: /current/folder/tests/ATests.java",
-                            "VERBOSE: /current/folder/tests/C.java",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: /tests/ATests.java",
+                            "VERBOSE: /tests/C.java",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 4 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
                             "VERBOSE: sources/A.java:12: error: Are you sure?",
                             "VERBOSE: Fake code line",
                             "VERBOSE:  ^",
@@ -1800,7 +1837,7 @@ public interface QubBuildCompileTests
                             "tests/C.java (Line 20): Can't be this.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -1840,11 +1877,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with multiple source files with errors and warnings and -warnings=show", (Test test) ->
+                runner.test("with multiple source files with errors and warnings and -warnings=show",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder testsFolder = QubBuildCompileTests.getTestsFolder(currentFolder);
                     outputsFolder.create().await();
@@ -1878,12 +1917,12 @@ public interface QubBuildCompileTests
                     final File cJavaFile = testsFolder.getFile("C.java").await();
                     cJavaFile.setContentsAsString("C.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -1898,7 +1937,7 @@ public interface QubBuildCompileTests
                                     new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns)
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process)
                         .setWarnings(Warnings.Show);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
@@ -1918,26 +1957,26 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/B.java - New file",
-                            "VERBOSE: /current/folder/tests/ATests.java - New file",
-                            "VERBOSE: /current/folder/tests/C.java - New file",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/B.java - New file",
+                            "VERBOSE: /tests/ATests.java - New file",
+                            "VERBOSE: /tests/C.java - New file",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Added source files:",
-                            "VERBOSE: /current/folder/sources/B.java",
-                            "VERBOSE: /current/folder/tests/ATests.java",
-                            "VERBOSE: /current/folder/tests/C.java",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: /tests/ATests.java",
+                            "VERBOSE: /tests/C.java",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 4 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
                             "VERBOSE: sources/A.java:12: error: Are you sure?",
                             "VERBOSE: Fake code line",
                             "VERBOSE:  ^",
@@ -1963,7 +2002,7 @@ public interface QubBuildCompileTests
                             "tests/C.java (Line 20): Can't be this.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2003,11 +2042,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with multiple source files with errors and warnings and -warnings=hide", (Test test) ->
+                runner.test("with multiple source files with errors and warnings and -warnings=hide",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder testsFolder = QubBuildCompileTests.getTestsFolder(currentFolder);
                     outputsFolder.create().await();
@@ -2041,12 +2082,12 @@ public interface QubBuildCompileTests
                     final File cJavaFile = testsFolder.getFile("C.java").await();
                     cJavaFile.setContentsAsString("C.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2061,7 +2102,7 @@ public interface QubBuildCompileTests
                                     new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns)
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process)
                         .setWarnings(Warnings.Hide);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
@@ -2078,26 +2119,26 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/B.java - New file",
-                            "VERBOSE: /current/folder/tests/ATests.java - New file",
-                            "VERBOSE: /current/folder/tests/C.java - New file",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/B.java - New file",
+                            "VERBOSE: /tests/ATests.java - New file",
+                            "VERBOSE: /tests/C.java - New file",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Added source files:",
-                            "VERBOSE: /current/folder/sources/B.java",
-                            "VERBOSE: /current/folder/tests/ATests.java",
-                            "VERBOSE: /current/folder/tests/C.java",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: /tests/ATests.java",
+                            "VERBOSE: /tests/C.java",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 4 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
                             "VERBOSE: sources/A.java:12: error: Are you sure?",
                             "VERBOSE: Fake code line",
                             "VERBOSE:  ^",
@@ -2120,7 +2161,7 @@ public interface QubBuildCompileTests
                             "tests/C.java (Line 20): Can't be this.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2156,11 +2197,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with multiple source files with errors and warnings and -warnings=error", (Test test) ->
+                runner.test("with multiple source files with errors and warnings and -warnings=error",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder testsFolder = QubBuildCompileTests.getTestsFolder(currentFolder);
                     outputsFolder.create().await();
@@ -2194,12 +2237,12 @@ public interface QubBuildCompileTests
                     final File cJavaFile = testsFolder.getFile("C.java").await();
                     cJavaFile.setContentsAsString("C.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2214,7 +2257,7 @@ public interface QubBuildCompileTests
                                     new JavaCompilerIssue(aTestsJavaFile.relativeTo(currentFolder), 10, 7, Issue.Type.Warning, "Can't be this."))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns)
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process)
                         .setWarnings(Warnings.Error);
 
                     test.assertEqual(3, QubBuildCompile.run(parameters));
@@ -2233,26 +2276,26 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/B.java - New file",
-                            "VERBOSE: /current/folder/tests/ATests.java - New file",
-                            "VERBOSE: /current/folder/tests/C.java - New file",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/B.java - New file",
+                            "VERBOSE: /tests/ATests.java - New file",
+                            "VERBOSE: /tests/C.java - New file",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Added source files:",
-                            "VERBOSE: /current/folder/sources/B.java",
-                            "VERBOSE: /current/folder/tests/ATests.java",
-                            "VERBOSE: /current/folder/tests/C.java",
+                            "VERBOSE: /sources/B.java",
+                            "VERBOSE: /tests/ATests.java",
+                            "VERBOSE: /tests/C.java",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 4 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java tests/ATests.java tests/C.java sources/A.java...",
                             "VERBOSE: sources/A.java:12: error: Are you sure?",
                             "VERBOSE: Fake code line",
                             "VERBOSE:  ^",
@@ -2277,7 +2320,7 @@ public interface QubBuildCompileTests
                             "tests/C.java (Line 10): Can't be this.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2317,11 +2360,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with two source files newer than their existing class files", (Test test) ->
+                runner.test("with two source files newer than their existing class files",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -2354,12 +2399,12 @@ public interface QubBuildCompileTests
                     aJavaFile.setContentsAsString("A.java source").await();
                     bJavaFile.setContentsAsString("B.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2368,7 +2413,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(aJavaFile, bJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -2380,26 +2425,26 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/B.java - Last modified: 1970-01-01T00:00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/B.java - Last modified: 1970-01-01T00:00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
-                            "VERBOSE: /current/folder/sources/B.java",
+                            "VERBOSE: /sources/A.java",
+                            "VERBOSE: /sources/B.java",
                             "Compiling 2 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2426,11 +2471,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one modified source file and one unmodified and independent source file", (Test test) ->
+                runner.test("with one modified source file and one unmodified and independent source file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -2462,12 +2509,12 @@ public interface QubBuildCompileTests
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2476,7 +2523,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -2488,24 +2535,24 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/B.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2532,11 +2579,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one modified source file and one unmodified and dependent source file", (Test test) ->
+                runner.test("with one modified source file and one unmodified and dependent source file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -2569,12 +2618,12 @@ public interface QubBuildCompileTests
 
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2583,7 +2632,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(aJavaFile, bJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -2595,24 +2644,24 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - Last modified: 1970-01-01T00:00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - Last modified: 1970-01-01T00:00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/B.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 2 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2640,11 +2689,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one unmodified source file and another modified and dependant source file", (Test test) ->
+                runner.test("with one unmodified source file and another modified and dependant source file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -2677,12 +2728,12 @@ public interface QubBuildCompileTests
 
                     bJavaFile.setContentsAsString("B.java source, depends on A").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2691,7 +2742,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(bJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -2703,24 +2754,24 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/B.java - Last modified: 1970-01-01T00:00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/B.java - Last modified: 1970-01-01T00:00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/B.java",
+                            "VERBOSE: /sources/B.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2748,11 +2799,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one deleted source file and another unmodified and dependant source file", (Test test) ->
+                runner.test("with one deleted source file and another unmodified and dependant source file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -2783,12 +2836,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.seconds(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2797,7 +2850,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(bJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -2809,26 +2862,26 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/B.java - No changes or issues",
                             "VERBOSE: Deleted source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Source files with deleted dependencies:",
-                            "VERBOSE: /current/folder/sources/B.java",
+                            "VERBOSE: /sources/B.java",
                             "VERBOSE: Source files with modified dependencies:",
-                            "VERBOSE: /current/folder/sources/B.java",
+                            "VERBOSE: /sources/B.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2851,11 +2904,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with one new source file and another unmodified and independent source file", (Test test) ->
+                runner.test("with one new source file and another unmodified and independent source file",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -2883,12 +2938,12 @@ public interface QubBuildCompileTests
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -2897,7 +2952,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -2909,23 +2964,23 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - New file",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - New file",
+                            "VERBOSE: /sources/B.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Added source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -2953,11 +3008,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("N depends on nothing, A depends on B, B depends on C, C.java is modified: A, B, and C should be compiled", (Test test) ->
+                runner.test("N depends on nothing, A depends on B, B depends on C, C.java is modified: A, B, and C should be compiled",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -3005,12 +3062,12 @@ public interface QubBuildCompileTests
 
                     cJavaFile.setContentsAsString("C.java source").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -3019,7 +3076,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(cJavaFile, bJavaFile, aJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -3031,26 +3088,26 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/C.java - Last modified: 1970-01-01T00:00:01Z",
-                            "VERBOSE:                                - Last built:    1970-01-01T00:00Z",
-                            "VERBOSE: /current/folder/sources/N.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/C.java - Last modified: 1970-01-01T00:00:01Z",
+                            "VERBOSE:                 - Last built:    1970-01-01T00:00Z",
+                            "VERBOSE: /sources/N.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Modified source files:",
-                            "VERBOSE: /current/folder/sources/C.java",
+                            "VERBOSE: /sources/C.java",
                             "Compiling 3 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/C.java sources/B.java sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/C.java sources/B.java sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -3089,11 +3146,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("N depends on nothing, A depends on B, B depends on C, C.java is deleted: A and B should be compiled", (Test test) ->
+                runner.test("N depends on nothing, A depends on B, B depends on C, C.java is deleted: A and B should be compiled",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -3139,12 +3198,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.seconds(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -3155,7 +3214,7 @@ public interface QubBuildCompileTests
                                     new JavaCompilerIssue(bJavaFile.relativeTo(currentFolder), 1, 25, Issue.Type.Error, "Missing definition for C."))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -3169,24 +3228,24 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/N.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/N.java - No changes or issues",
                             "VERBOSE: Deleted source files:",
-                            "VERBOSE: /current/folder/sources/C.java",
+                            "VERBOSE: /sources/C.java",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Source files with deleted dependencies:",
-                            "VERBOSE: /current/folder/sources/B.java",
+                            "VERBOSE: /sources/B.java",
                             "VERBOSE: Source files with modified dependencies:",
-                            "VERBOSE: /current/folder/sources/B.java",
+                            "VERBOSE: /sources/B.java",
                             "Compiling 2 files...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/B.java sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/B.java sources/A.java...",
                             "VERBOSE: sources/B.java:1: error: Missing definition for C.",
                             "VERBOSE: Fake code line",
                             "VERBOSE:                         ^",
@@ -3195,7 +3254,7 @@ public interface QubBuildCompileTests
                             "sources/B.java (Line 1): Missing definition for C.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -3230,11 +3289,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("N depends on nothing, A depends on B, B depends on C, C.class is deleted: C should be compiled", (Test test) ->
+                runner.test("N depends on nothing, A depends on B, B depends on C, C.class is deleted: C should be compiled",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     outputsFolder.create().await();
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
@@ -3280,12 +3341,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.seconds(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -3294,7 +3355,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(cJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -3306,25 +3367,25 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/C.java - No changes or issues",
-                            "VERBOSE: /current/folder/sources/N.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/C.java - No changes or issues",
+                            "VERBOSE: /sources/N.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Source files with missing class files:",
-                            "VERBOSE: /current/folder/sources/C.java",
+                            "VERBOSE: /sources/C.java",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/C.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/C.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -3364,48 +3425,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with no QUB_HOME environment variable specified", (Test test) ->
+                runner.test("nothing gets compiled when project.json publisher changes",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create();
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
-                    final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
-                    final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-
-                    QubBuildCompileTests.getProjectJsonFile(currentFolder)
-                        .setContentsAsString(
-                            ProjectJSON.create()
-                                .setJava(ProjectJSONJava.create())
-                                .toString())
-                        .await();
-
-                    final File aJavaFile = sourcesFolder.getFile("A.java").await();
-                    aJavaFile.setContentsAsString("A.java source").await();
-
-                    clock.advance(Duration.seconds(1));
-
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, environmentVariables);
-
-                    test.assertEqual(1, QubBuildCompile.run(parameters));
-                    test.assertFalse(output.isDisposed());
-                    test.assertEqual(
-                        Iterable.create(
-                            "ERROR: A QUB_HOME folder path environment variable must be specified."),
-                        QubBuildCompileTests.getOutputLines(output));
-                    test.assertEqual(
-                        Iterable.create(
-                            "ERROR: A QUB_HOME folder path environment variable must be specified."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
-
-                    test.assertFalse(outputsFolder.exists().await());
-                });
-
-                runner.test("nothing gets compiled when project.json publisher changes", (Test test) ->
-                {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -3433,13 +3459,13 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -3451,10 +3477,10 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -3462,7 +3488,7 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -3488,11 +3514,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("nothing gets compiled when project.json project changes", (Test test) ->
+                runner.test("nothing gets compiled when project.json project changes",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -3520,13 +3548,13 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -3538,10 +3566,10 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -3549,7 +3577,7 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -3575,11 +3603,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("nothing gets compiled when project.json version changes", (Test test) ->
+                runner.test("nothing gets compiled when project.json version changes",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -3607,13 +3637,13 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -3625,10 +3655,10 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -3636,7 +3666,7 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -3662,20 +3692,21 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("everything gets compiled when project.json java version changes from 11 to 1.8", (Test test) ->
+                runner.test("everything gets compiled when project.json java version changes from 11 to 1.8",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
                     final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
-                        .set("JAVA_HOME", jdk11Folder.toString())
-                        .set("QUB_HOME", "/qub/");
+                    process.getEnvironmentVariables()
+                        .set("JAVA_HOME", jdk11Folder.toString());
 
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
@@ -3701,12 +3732,12 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -3718,7 +3749,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile.relativeTo(currentFolder))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -3730,21 +3761,21 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -source 1.8 -target 1.8 -bootclasspath /java/jre1.8.0_192/lib/rt.jar -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -source 1.8 -target 1.8 -bootclasspath /java/jre1.8.0_192/lib/rt.jar -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -3769,20 +3800,21 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("everything gets compiled when project.json java version changes from 11 to 8", (Test test) ->
+                runner.test("everything gets compiled when project.json java version changes from 11 to 8",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
                     final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
-                        .set("JAVA_HOME", jdk11Folder.toString())
-                        .set("QUB_HOME", "/qub/");
+                    process.getEnvironmentVariables()
+                        .set("JAVA_HOME", jdk11Folder.toString());
 
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
@@ -3808,12 +3840,12 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -3825,7 +3857,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile.relativeTo(currentFolder))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -3837,21 +3869,21 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -source 8 -target 8 -bootclasspath /java/jre1.8.0_192/lib/rt.jar -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -source 8 -target 8 -bootclasspath /java/jre1.8.0_192/lib/rt.jar -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -3876,20 +3908,21 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("nothing gets compiled when project.json java version changes from 1.8 to 8", (Test test) ->
+                runner.test("nothing gets compiled when project.json java version changes from 1.8 to 8",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
-                    final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
+                    javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
-                        .set("JAVA_HOME", jdk11Folder.toString())
-                        .set("QUB_HOME", "/qub/");
+                    process.getEnvironmentVariables()
+                        .set("JAVA_HOME", jdk11Folder.toString());
 
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
@@ -3905,7 +3938,7 @@ public interface QubBuildCompileTests
                                         .setVersion("1.8")))
                             .setSourceFiles(Iterable.create(
                                 BuildJSONSourceFile.create(aJavaFile.relativeTo(currentFolder))
-                                    .setLastModified(clock.getCurrentDateTime())))
+                                    .setLastModified(aJavaFile.getLastModified().await())))
                             .toString());
                     QubBuildCompileTests.getProjectJsonFile(currentFolder)
                         .setContentsAsString(
@@ -3915,28 +3948,23 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
-                    test.assertFalse(output.isDisposed());
-                    test.assertEqual(
-                        Iterable.create(
-                            "No files need to be compiled."),
-                        QubBuildCompileTests.getOutputLines(output));
                     test.assertEqual(
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -3944,7 +3972,12 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
+                    test.assertFalse(output.isDisposed());
+                    test.assertEqual(
+                        Iterable.create(
+                            "No files need to be compiled."),
+                        QubBuildCompileTests.getOutputLines(output));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -3970,20 +4003,21 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("nothing gets compiled when project.json java version changes from 8 to 1.8", (Test test) ->
+                runner.test("nothing gets compiled when project.json java version changes from 8 to 1.8",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
                     final Folder javaFolder = currentFolder.getFileSystem().createFolder("/java/").await();
                     final Folder jdk11Folder = javaFolder.createFolder("jdk-11.0.1").await();
                     final Folder jre8Folder = javaFolder.createFolder("jre1.8.0_192").await();
 
-                    final EnvironmentVariables environmentVariables = EnvironmentVariables.create()
-                        .set("JAVA_HOME", jdk11Folder.toString())
-                        .set("QUB_HOME", "/qub/");
+                    process.getEnvironmentVariables()
+                        .set("JAVA_HOME", jdk11Folder.toString());
 
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
@@ -4009,13 +4043,13 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -4027,10 +4061,10 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -4038,7 +4072,7 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -4064,14 +4098,16 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("nothing gets compiled when project.json java dependency is added", (Test test) ->
+                runner.test("nothing gets compiled when project.json java dependency is added",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
                     final QubProjectVersionFolder projectVersionFolder = qubFolder.getProjectVersionFolder("a", "b", "c").await();
                     projectVersionFolder.getCompiledSourcesFile().await().create().await();
 
@@ -4101,13 +4137,13 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
                             .setVersionFunctionAutomatically("javac 14.0.1\r\n"));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -4119,10 +4155,10 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -4130,7 +4166,7 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -4157,14 +4193,16 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("everything gets compiled when project.json java dependency is removed", (Test test) ->
+                runner.test("everything gets compiled when project.json java dependency is removed",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
                     final QubProjectVersionFolder projectVersionFolder = qubFolder.getProjectVersionFolder("a", "b", "c").await();
 
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
@@ -4193,12 +4231,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -4207,9 +4245,9 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile.relativeTo(currentFolder))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
-                    test.assertEqual(0, QubBuildCompile.run(parameters));
+                    final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
@@ -4219,21 +4257,22 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
+                    test.assertEqual(0, exitCode);
 
                     test.assertEqual(
                         Iterable.create(
@@ -4257,14 +4296,16 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("everything gets compiled when project.json java dependency version is changed", (Test test) ->
+                runner.test("everything gets compiled when project.json java dependency version is changed",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
                     final QubProjectFolder projectFolder = qubFolder.getProjectFolder("a", "b").await();
                     final QubProjectVersionFolder cVersionFolder = projectFolder.getProjectVersionFolder("c").await();
                     cVersionFolder.getCompiledSourcesFile().await().create().await();
@@ -4299,12 +4340,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -4313,9 +4354,9 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile.relativeTo(currentFolder))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
-                    test.assertEqual(0, QubBuildCompile.run(parameters));
+                    int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
                     test.assertEqual(
                         Iterable.create(
@@ -4325,21 +4366,22 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/A.java - No changes or issues",
+                            "VERBOSE: /sources/A.java - No changes or issues",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/;/qub/a/b/versions/d/b.jar sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/;/qub/a/b/versions/d/b.jar sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
+                    test.assertEqual(0, exitCode);
 
                     test.assertEqual(
                         Iterable.create(
@@ -4365,11 +4407,13 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with deleted source file with anonymous classes", (Test test) ->
+                runner.test("with deleted source file with anonymous classes",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -4403,12 +4447,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.seconds(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -4417,7 +4461,7 @@ public interface QubBuildCompileTests
                             .addSourceFiles(bJavaFile)
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(0, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -4429,12 +4473,12 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Parsing outputs/build.json...",
-                            "VERBOSE: /current/folder/sources/B.java - No changes or issues",
+                            "VERBOSE: /sources/B.java - No changes or issues",
                             "VERBOSE: Deleted source files:",
-                            "VERBOSE: /current/folder/sources/A.java",
+                            "VERBOSE: /sources/A.java",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
                             "VERBOSE: Setting source files...",
@@ -4442,7 +4486,7 @@ public interface QubBuildCompileTests
                             "No files need to be compiled.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertEqual(
                         Iterable.create(
@@ -4464,14 +4508,15 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with project.json dependency with publisher that doesn't exist", (Test test) ->
+                runner.test("with project.json dependency with publisher that doesn't exist",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
                     final QubProjectFolder projectFolder = qubFolder.getProjectFolder("a", "b").await();
                     final QubProjectVersionFolder cVersionFolder = projectFolder.getProjectVersionFolder("c").await();
 
@@ -4486,7 +4531,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -4498,19 +4543,20 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "ERROR: No publisher folder named \"a\" found in the Qub folder (/qub/)."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertFalse(outputsFolder.exists().await());
                 });
 
-                runner.test("with project.json dependency with project that doesn't exist", (Test test) ->
+                runner.test("with project.json dependency with project that doesn't exist",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
                     final QubProjectFolder projectFolder = qubFolder.getProjectFolder("a", "b").await();
                     final QubProjectVersionFolder cVersionFolder = projectFolder.getProjectVersionFolder("c").await();
                     cVersionFolder.getPublisherFolder().await().create().await();
@@ -4526,7 +4572,7 @@ public interface QubBuildCompileTests
                                 .toString())
                         .await();
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     test.assertEqual(1, QubBuildCompile.run(parameters));
                     test.assertFalse(output.isDisposed());
@@ -4538,19 +4584,21 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "ERROR: No project folder named \"b\" found in the \"a\" publisher folder (/qub/a/)."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
 
                     test.assertFalse(outputsFolder.exists().await());
                 });
 
-                runner.test("with one-hop transitive dependency", (Test test) ->
+                runner.test("with one-hop transitive dependency",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
 
                     final QubProjectVersionFolder bProjectVersionFolder = qubFolder.getProjectVersionFolder("a", "b", "1").await();
                     bProjectVersionFolder.getCompiledSourcesFile().await().create().await();
@@ -4581,12 +4629,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -4598,7 +4646,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile.relativeTo(currentFolder))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -4610,7 +4658,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -4618,11 +4666,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/;/qub/a/c/versions/2/c.jar;/qub/a/b/versions/1/b.jar sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/;/qub/a/c/versions/2/c.jar;/qub/a/b/versions/1/b.jar sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -4651,14 +4699,16 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with two-hop transitive dependency", (Test test) ->
+                runner.test("with two-hop transitive dependency",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
 
                     final QubProjectVersionFolder bProjectVersionFolder = qubFolder.getProjectVersionFolder("a", "b", "1").await();
                     bProjectVersionFolder.getCompiledSourcesFile().await().create().await();
@@ -4702,12 +4752,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -4720,7 +4770,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile.relativeTo(currentFolder))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -4732,7 +4782,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -4740,11 +4790,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/;/qub/d/e/versions/3/e.jar;/qub/a/c/versions/2/c.jar;/qub/a/b/versions/1/b.jar sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/;/qub/d/e/versions/3/e.jar;/qub/a/c/versions/2/c.jar;/qub/a/b/versions/1/b.jar sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -4773,14 +4823,16 @@ public interface QubBuildCompileTests
                     test.assertEqual(clock.getCurrentDateTime(), buildJsonFile.getLastModified().await());
                 });
 
-                runner.test("with multiple versions of same project dependency", (Test test) ->
+                runner.test("with multiple versions of same project dependency",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
-                    final QubFolder qubFolder = QubBuildCompileTests.getQubFolder(currentFolder);
+                    final QubFolder qubFolder = process.getQubFolder().await();
 
                     final QubProjectVersionFolder b1ProjectVersionFolder = qubFolder.getProjectVersionFolder("a", "b", "1").await();
                     b1ProjectVersionFolder.getCompiledSourcesFile().await().create().await();
@@ -4828,12 +4880,12 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -4846,7 +4898,7 @@ public interface QubBuildCompileTests
                             .addSourceFile(aJavaFile.relativeTo(currentFolder))
                             .setCompileFunctionAutomatically());
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -4870,17 +4922,19 @@ public interface QubBuildCompileTests
                             "2. a/b@2",
                             "    from d/e@3",
                             ""),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(1, exitCode);
 
                     test.assertFalse(outputsFolder.exists().await());
                 });
 
-                runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder", (Test test) ->
+                runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryCharacterToByteStream output = QubBuildCompileTests.getOutput();
-                    final ManualClock clock = QubBuildCompileTests.getManualClock(test);
-                    final Folder currentFolder = QubBuildCompileTests.getCurrentFolder(clock);
+                    final InMemoryCharacterToByteStream output = process.getOutputWriteStream();
+                    final ManualClock clock = process.getClock();
+                    final Folder currentFolder = process.getCurrentFolder();
                     final Folder outputsFolder = QubBuildCompileTests.getOutputsFolder(currentFolder);
                     final Folder sourcesFolder = QubBuildCompileTests.getSourcesFolder(currentFolder);
 
@@ -4894,12 +4948,12 @@ public interface QubBuildCompileTests
                     aJavaFile.setContentsAsString("A.java source").await();
                     final File aClassFile = outputsFolder.getFile("A.class").await();
 
-                    final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create(
-                        new FakeJavacProcessRun()
+                    process.getProcessFactory()
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addVersion()
-                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"),
-                        new FakeJavacProcessRun()
+                            .setVersionFunctionAutomatically("javac 14.0.1\r\n"))
+                        .add(new FakeJavacProcessRun()
                             .setWorkingFolder(currentFolder)
                             .addOutputFolder(outputsFolder)
                             .addXlintUnchecked()
@@ -4915,7 +4969,7 @@ public interface QubBuildCompileTests
 
                     clock.advance(Duration.minutes(1));
 
-                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns);
+                    final QubBuildCompileParameters parameters = QubBuildCompileTests.getParameters(process);
 
                     final int exitCode = QubBuildCompile.run(parameters);
                     test.assertFalse(output.isDisposed());
@@ -4927,7 +4981,7 @@ public interface QubBuildCompileTests
                         Iterable.create(
                             "VERBOSE: Parsing project.json...",
                             "VERBOSE: Getting javac version...",
-                            "VERBOSE: Running /current/folder/: javac --version...",
+                            "VERBOSE: Running /: javac --version...",
                             "VERBOSE: javac 14.0.1",
                             "VERBOSE: Updating outputs/build.json...",
                             "VERBOSE: Setting project.json...",
@@ -4935,11 +4989,11 @@ public interface QubBuildCompileTests
                             "VERBOSE: Detecting java source files to compile...",
                             "VERBOSE: Compiling all source files.",
                             "Compiling 1 file...",
-                            "VERBOSE: Running /current/folder/: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /current/folder/outputs/ sources/A.java...",
+                            "VERBOSE: Running /: javac -d outputs -Xlint:unchecked -Xlint:deprecation -classpath /outputs/ sources/A.java...",
                             "VERBOSE: Compilation finished.",
                             "VERBOSE: Writing build.json file...",
                             "VERBOSE: Done writing build.json file."),
-                        QubBuildCompileTests.getLogFileContentLines(currentFolder));
+                        QubBuildCompileTests.getLogFileContentLines(process));
                     test.assertEqual(0, exitCode);
 
                     test.assertEqual(
@@ -4966,31 +5020,6 @@ public interface QubBuildCompileTests
         });
     }
 
-    static InMemoryCharacterToByteStream getOutput()
-    {
-        return InMemoryCharacterToByteStream.create();
-    }
-
-    static InMemoryFileSystem getInMemoryFileSystem(Clock clock)
-    {
-        PreCondition.assertNotNull(clock, "clock");
-
-        final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(clock);
-        fileSystem.createRoot("/").await();
-        return fileSystem;
-    }
-
-    static Folder getCurrentFolder(Test test)
-    {
-        return QubBuildCompileTests.getCurrentFolder(test.getClock());
-    }
-
-    static Folder getCurrentFolder(Clock clock)
-    {
-        final InMemoryFileSystem fileSystem = QubBuildCompileTests.getInMemoryFileSystem(clock);
-        return fileSystem.getFolder("/current/folder/").await();
-    }
-
     static File getProjectJsonFile(Folder currentFolder)
     {
         return currentFolder.getFile("project.json").await();
@@ -5011,49 +5040,15 @@ public interface QubBuildCompileTests
         return currentFolder.getFolder("tests").await();
     }
 
-    static QubFolder getQubFolder(Folder currentFolder)
+    static QubBuildCompileParameters getParameters(FakeDesktopProcess process)
     {
-        final FileSystem fileSystem = currentFolder.getFileSystem();
-        return QubFolder.get(fileSystem.getFolder("/qub/").await());
-    }
-
-    static Folder getProjectDataFolder(Folder currentFolder)
-    {
-        return currentFolder.getFileSystem().getFolder("/qub/publisher/project/data/").await();
-    }
-
-    static QubBuildCompileParameters getParameters(Test test, CharacterToByteWriteStream output, Folder currentFolder)
-    {
-        return QubBuildCompileTests.getParameters(test, output, currentFolder, Iterable.create());
-    }
-
-    static EnvironmentVariables getEnvironmentVariables()
-    {
-        return EnvironmentVariables.create().set("QUB_HOME", "/qub/");
-    }
-
-    static QubBuildCompileParameters getParameters(Test test, CharacterToByteWriteStream output, Folder currentFolder, EnvironmentVariables environmentVariables)
-    {
-        final Iterable<FakeProcessRun> fakeProcessRuns = Iterable.create();
-        return QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
-    }
-
-    static QubBuildCompileParameters getParameters(Test test, CharacterToByteWriteStream output, Folder currentFolder, Iterable<FakeProcessRun> fakeProcessRuns)
-    {
-        final EnvironmentVariables environmentVariables = QubBuildCompileTests.getEnvironmentVariables();
-        return QubBuildCompileTests.getParameters(test, output, currentFolder, fakeProcessRuns, environmentVariables);
-    }
-
-    static QubBuildCompileParameters getParameters(Test test, CharacterToByteWriteStream output, Folder currentFolder, Iterable<FakeProcessRun> fakeProcessRuns, EnvironmentVariables environmentVariables)
-    {
-        final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder);
-        for (final FakeProcessRun fakeProcessRun : fakeProcessRuns)
-        {
-            processFactory.add(fakeProcessRun);
-        }
-        final FileSystem fileSystem = currentFolder.getFileSystem();
-        final Folder projectDataFolder = fileSystem.getFolder("/qub/publisher/project/data/").await();
-        return new QubBuildCompileParameters(output, currentFolder, environmentVariables, processFactory, projectDataFolder);
+        final CharacterToByteWriteStream output = process.getOutputWriteStream();
+        final Folder currentFolder = process.getCurrentFolder();
+        final EnvironmentVariables environmentVariables = process.getEnvironmentVariables();
+        final FakeProcessFactory processFactory = process.getProcessFactory();
+        final QubFolder qubFolder = process.getQubFolder().await();
+        final Folder projectDataFolder = process.getQubProjectDataFolder().await();
+        return new QubBuildCompileParameters(output, currentFolder, environmentVariables, processFactory, qubFolder, projectDataFolder);
     }
 
     static Iterable<String> getOutputLines(InMemoryCharacterStream output)
@@ -5061,9 +5056,9 @@ public interface QubBuildCompileTests
         return Strings.getLines(output.getText().await());
     }
 
-    static Iterable<String> getLogFileContentLines(Folder currentFolder)
+    static Iterable<String> getLogFileContentLines(DesktopProcess process)
     {
-        final Folder projectDataFolder = QubBuildCompileTests.getProjectDataFolder(currentFolder);
+        final Folder projectDataFolder = process.getQubProjectDataFolder().await();
         return Strings.getLines(projectDataFolder.getFile("logs/1.log").await().getContentsAsString().await());
     }
 
@@ -5081,35 +5076,5 @@ public interface QubBuildCompileTests
     static String getBuildJSONFileContent(Folder outputsFolder)
     {
         return QubBuildCompileTests.getBuildJSONFile(outputsFolder).getContentsAsString().await();
-    }
-
-    static ManualClock getManualClock(Test test)
-    {
-        PreCondition.assertNotNull(test, "test");
-
-        return ManualClock.create(DateTime.epoch, test.getMainAsyncRunner());
-    }
-
-    static InMemoryCharacterToByteStream getInMemoryCharacterToByteStream(Test test)
-    {
-        return InMemoryCharacterToByteStream.create();
-    }
-
-    static void setFileContents(File file, String contents)
-    {
-        final byte[] byteContents = Strings.isNullOrEmpty(contents)
-            ? new byte[0]
-            : CharacterEncoding.UTF_8.encodeCharacters(contents).await();
-        file.setContents(byteContents).await();
-    }
-
-    static String getFileContents(Result<File> file)
-    {
-        return getFileContents(file.await());
-    }
-
-    static String getFileContents(File file)
-    {
-        return file.getContentsAsString().await();
     }
 }

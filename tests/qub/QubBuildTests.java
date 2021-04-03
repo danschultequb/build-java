@@ -98,7 +98,7 @@ public interface QubBuildTests
 
                 runner.test("with null projectJsonJava", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = null;
@@ -108,7 +108,7 @@ public interface QubBuildTests
 
                 runner.test("with non-existing projectFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
@@ -118,7 +118,7 @@ public interface QubBuildTests
 
                 runner.test("with empty projectFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
@@ -128,7 +128,7 @@ public interface QubBuildTests
 
                 runner.test("with Java file at root of projectFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final File javaFile = projectFolder.createFile("A.java").await();
@@ -139,7 +139,7 @@ public interface QubBuildTests
 
                 runner.test("with Java file in subfolder of projectFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final File javaFile = projectFolder.createFile("subfolder/A.java").await();
@@ -150,7 +150,7 @@ public interface QubBuildTests
 
                 runner.test("with Java file that doesn't match source pattern", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final File javaFile = projectFolder.createFile("subfolder/B.java").await();
@@ -162,7 +162,7 @@ public interface QubBuildTests
 
                 runner.test("with Java file that matches source pattern", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final File javaFile = projectFolder.createFile("subfolder/A.java").await();
@@ -185,7 +185,7 @@ public interface QubBuildTests
 
                 runner.test("with null projectJsonJava", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = null;
@@ -195,7 +195,7 @@ public interface QubBuildTests
 
                 runner.test("with non-existing projectFolder and no outputs folder specified", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
@@ -205,7 +205,7 @@ public interface QubBuildTests
 
                 runner.test("with no outputs folder specified", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
@@ -215,7 +215,7 @@ public interface QubBuildTests
 
                 runner.test("with outputs folder specified", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create()
@@ -236,7 +236,7 @@ public interface QubBuildTests
 
                 runner.test("with non-existing outputsFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder outputsFolder = fileSystem.getFolder("/project/folder/outputs/").await();
                     test.assertThrows(() -> QubBuild.getJavaClassFiles(outputsFolder).await(),
@@ -245,7 +245,7 @@ public interface QubBuildTests
 
                 runner.test("with empty outputsFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder outputsFolder = fileSystem.createFolder("/project/folder/outputs/").await();
                     test.assertEqual(Iterable.create(), QubBuild.getJavaClassFiles(outputsFolder).await());
@@ -253,7 +253,7 @@ public interface QubBuildTests
 
                 runner.test("with non-empty outputsFolder", (Test test) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder outputsFolder = fileSystem.createFolder("/project/folder/outputs/").await();
                     final File aClassFile = outputsFolder.createFile("A.class").await();

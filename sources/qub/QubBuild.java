@@ -31,7 +31,7 @@ public interface QubBuild
         PreCondition.assertNotNull(projectFolder, "projectFolder");
         PreCondition.assertNotNull(projectJsonJava, "projectJsonJava");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
             Function1<File,Boolean> sourceFileMatcher;
             final Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFiles();
@@ -61,7 +61,7 @@ public interface QubBuild
         PreCondition.assertNotNull(projectFolder, "projectFolder");
         PreCondition.assertNotNull(projectJsonJava, "projectJsonJava");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
             String outputFolderName = projectJsonJava.getOutputFolder();
             if (Strings.isNullOrEmpty(outputFolderName))
@@ -81,7 +81,7 @@ public interface QubBuild
     {
         PreCondition.assertNotNull(outputsFolder, "outputsFolder");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
             return outputsFolder.getFilesRecursively().await()
                 .where((File file) -> ".class".equalsIgnoreCase(file.getFileExtension()))

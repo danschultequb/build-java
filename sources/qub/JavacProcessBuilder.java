@@ -34,7 +34,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
     {
         PreCondition.assertNotNull(processFactory, "processFactory");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
             return new JavacProcessBuilder(processFactory.getProcessBuilder(JavacProcessBuilder.executablePathString).await());
         });
@@ -48,9 +48,9 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
     {
         PreCondition.assertNotNull(verbose, "verbose");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
-            final SpinMutex verboseMutex = new SpinMutex();
+            final SpinMutex verboseMutex = SpinMutex.create();
             final InMemoryCharacterToByteStream stdout = InMemoryCharacterToByteStream.create();
             this.redirectOutputLines((String outputLine) ->
             {
@@ -99,9 +99,9 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
         PreCondition.assertNotNull(warnings, "warnings");
         PreCondition.assertNotNull(verbose, "verbose");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
-            final SpinMutex verboseMutex = new SpinMutex();
+            final SpinMutex verboseMutex = SpinMutex.create();
             final InMemoryCharacterToByteStream stdout = InMemoryCharacterToByteStream.create();
             this.redirectOutputLines((String outputLine) ->
             {
@@ -210,7 +210,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
         PreCondition.assertNotNullAndNotEmpty(javaVersion, "javaVersion");
         PreCondition.assertNotNull(javaHomeFolder, "javaHomeFolder");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
             File result;
             if (QubBuildCompile.isJava8(javaVersion))

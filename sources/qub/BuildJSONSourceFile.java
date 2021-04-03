@@ -44,7 +44,7 @@ public class BuildJSONSourceFile
     {
         PreCondition.assertNotNull(sourceFileProperty, "sourceFileProperty");
 
-        return Result.create(() ->
+        return Result.create2(() ->
         {
             return new BuildJSONSourceFile(sourceFileProperty);
         });

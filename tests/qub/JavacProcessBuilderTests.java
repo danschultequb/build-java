@@ -35,12 +35,13 @@ public interface JavacProcessBuilderTests
                         new PreConditionFailure("processFactory cannot be null."));
                 });
 
-                runner.test("with non-null ProcessFactory", (Test test) ->
+                runner.test("with non-null ProcessFactory",
+                    (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
+                    (Test test, FakeDesktopProcess process) ->
                 {
-                    final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
-                    fileSystem.createRoot("/").await();
+                    final InMemoryFileSystem fileSystem = process.getFileSystem();
                     final Folder workingFolder = fileSystem.getFolder("/fake/working/folder/").await();
-                    final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), workingFolder);
+                    final FakeProcessFactory processFactory = FakeProcessFactory.create(process.getParallelAsyncRunner(), workingFolder);
                     final JavacProcessBuilder builder = JavacProcessBuilder.get(processFactory).await();
                     test.assertNotNull(builder);
                     test.assertEqual(Path.parse("javac"), builder.getExecutablePath());
@@ -332,7 +333,7 @@ public interface JavacProcessBuilderTests
                     try (final FakeDesktopProcess process = FakeDesktopProcess.create())
                     {
                         final JavacProcessBuilder builder = JavacProcessBuilder.get(process).await();
-                        final InMemoryFileSystem fileSystem = InMemoryFileSystem.create(test.getClock());
+                        final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                         final File bootClasspath = fileSystem.getFile("/folder/file").await();
 
                         test.assertSame(builder, builder.addBootClasspath(bootClasspath));
@@ -772,7 +773,7 @@ public interface JavacProcessBuilderTests
                         final JavacProcessBuilder javacProcessBuilder = JavacProcessBuilder.get(process).await();
 
                         final VersionNumber result = javacProcessBuilder.getVersion(verbose).await();
-                        test.assertEqual(VersionNumber.parse("15.0.1").await(), result);
+                        test.assertEqual(VersionNumber.parse("15.0.2").await(), result);
                     }
                 });
             });

@@ -27,7 +27,7 @@ public interface BuildJSONSourceFileTests
                 runner.test("with non-null", (Test test) ->
                 {
                     final BuildJSONSourceFile sourceFile = BuildJSONSourceFile.create("a");
-                    final DateTime now = test.getClock().getCurrentDateTime();
+                    final DateTime now = DateTime.create(2020, 3, 17, 12, 40);
                     final BuildJSONSourceFile setLastModifiedResult = sourceFile.setLastModified(now);
                     test.assertSame(sourceFile, setLastModifiedResult);
                     test.assertEqual(now, sourceFile.getLastModified());

@@ -63,8 +63,9 @@ public interface QubBuildCompile
             final Warnings warnings = warningsParameter.getValue().await();
             final Boolean buildJson = buildJsonParameter.getValue().await();
             final VerboseCharacterToByteWriteStream verbose = verboseParameter.getVerboseCharacterToByteWriteStream().await();
+            final QubFolder qubFolder = process.getQubFolder().await();
             final Folder projectDataFolder = process.getQubProjectDataFolder().await();
-            result = new QubBuildCompileParameters(output, folderToBuild, environmentVariables, processFactory, projectDataFolder)
+            result = new QubBuildCompileParameters(output, folderToBuild, environmentVariables, processFactory, qubFolder, projectDataFolder)
                 .setWarnings(warnings)
                 .setBuildJson(buildJson)
                 .setVerbose(verbose);
@@ -81,200 +82,182 @@ public interface QubBuildCompile
         final EnvironmentVariables environmentVariables = parameters.getEnvironmentVariables();
         final Warnings warnings = parameters.getWarnings();
         final boolean useBuildJson = parameters.getBuildJson();
+        final QubFolder qubFolder = parameters.getQubFolder();
         final Folder qubBuildDataFolder = parameters.getQubBuildDataFolder();
 
-        final LogStreams logStreams = CommandLineLogsAction.addLogStreamFromDataFolder(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose());
-        final CharacterWriteStream output = logStreams.getOutput();
-        final VerboseCharacterToByteWriteStream verbose = logStreams.getVerbose();
-
         int exitCode = 0;
-        try
+        try (final LogStreams logStreams = CommandLineLogsAction.getLogStreamsFromDataFolder(qubBuildDataFolder, parameters.getOutputWriteStream(), parameters.getVerbose()))
         {
-            final JavacProcessBuilder javac = JavacProcessBuilder.get(parameters.getProcessFactory()).await();
+            final CharacterWriteStream output = logStreams.getOutput();
+            final VerboseCharacterToByteWriteStream verbose = logStreams.getVerbose();
 
-            final String qubHome = environmentVariables.get("QUB_HOME")
-                .convertError(() -> new NotFoundException("A QUB_HOME folder path environment variable must be specified."))
-                .await();
-
-            final File projectJsonFile = folderToBuild.getFile("project.json").await();
-            final FileSystem fileSystem = folderToBuild.getFileSystem();
-
-            verbose.writeLine("Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...").await();
-            final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile).await();
-
-            final ProjectJSONJava projectJsonJava = projectJson.getJava();
-            if (projectJsonJava == null)
+            try
             {
-                throw new NotFoundException("No language specified in project.json. Nothing to compile.");
-            }
+                final JavacProcessBuilder javac = JavacProcessBuilder.get(parameters.getProcessFactory()).await();
 
-            final Folder outputsFolder = QubBuild.getJavaOutputsFolder(folderToBuild, projectJsonJava).await();
-            javac.addOutputFolder(outputsFolder);
-            javac.addXlintUnchecked();
-            javac.addXlintDeprecation();
+                final File projectJsonFile = folderToBuild.getFile("project.json").await();
+                final FileSystem fileSystem = folderToBuild.getFileSystem();
 
-            final String javaVersion = projectJsonJava.getVersion();
-            if (!Strings.isNullOrEmpty(javaVersion))
-            {
-                final String javaHomeFolderPathString = environmentVariables.get("JAVA_HOME")
-                    .catchError(NotFoundException.class)
-                    .await();
-                if (Strings.isNullOrEmpty(javaHomeFolderPathString))
+                verbose.writeLine("Parsing " + projectJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile).await();
+
+                final ProjectJSONJava projectJsonJava = projectJson.getJava();
+                if (projectJsonJava == null)
                 {
-                    throw new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified.");
+                    throw new NotFoundException("No language specified in project.json. Nothing to compile.");
                 }
-                final Folder javaHomeFolder = fileSystem.getFolder(javaHomeFolderPathString).await();
-                final File bootClasspath = JavacProcessBuilder.findBootClasspathFromJavaHomeFolder(javaVersion, javaHomeFolder).await();
-                if (bootClasspath != null)
+
+                final Folder outputsFolder = QubBuild.getJavaOutputsFolder(folderToBuild, projectJsonJava).await();
+                javac.addOutputFolder(outputsFolder);
+                javac.addXlintUnchecked();
+                javac.addXlintDeprecation();
+
+                final String javaVersion = projectJsonJava.getVersion();
+                if (!Strings.isNullOrEmpty(javaVersion))
                 {
-                    javac.addJavaSourceVersion(javaVersion);
-                    javac.addJavaTargetVersion(javaVersion);
-                    javac.addBootClasspath(bootClasspath);
-                }
-            }
-
-            final Integer maximumErrors = projectJsonJava.getMaximumErrors();
-            if (maximumErrors != null)
-            {
-                javac.addMaximumErrors(maximumErrors);
-            }
-
-            final Integer maximumWarnings = projectJsonJava.getMaximumWarnings();
-            if (maximumWarnings != null)
-            {
-                javac.addMaximumWarnings(maximumWarnings);
-            }
-
-            final List<String> classPaths = List.create();
-            classPaths.add(outputsFolder.toString());
-            Iterable<ProjectSignature> dependencies = projectJsonJava.getDependencies();
-            if (!Iterable.isNullOrEmpty(dependencies))
-            {
-                final QubFolder qubFolder = QubFolder.get(fileSystem.getFolder(qubHome).await());
-
-                final Map<ProjectSignature,Iterable<ProjectSignature>> dependencyMap = projectJsonJava.getTransitiveDependencyPaths(qubFolder);
-                dependencies = dependencyMap.getKeys();
-
-                final Set<ProjectSignature> errorDependencies = Set.create();
-                for (final ProjectSignature dependency : dependencies)
-                {
-                    if (!errorDependencies.contains(dependency))
+                    final String javaHomeFolderPathString = environmentVariables.get("JAVA_HOME")
+                        .catchError(NotFoundException.class)
+                        .await();
+                    if (Strings.isNullOrEmpty(javaHomeFolderPathString))
                     {
-                        final Iterable<ProjectSignature> matchingDependencies = dependencies.where(dependency::equalsIgnoreVersion).toList();
-                        if (matchingDependencies.getCount() > 1)
+                        throw new NotFoundException("Can't compile for a specific Java version if the JAVA_HOME environment variable is not specified.");
+                    }
+                    final Folder javaHomeFolder = fileSystem.getFolder(javaHomeFolderPathString).await();
+                    final File bootClasspath = JavacProcessBuilder.findBootClasspathFromJavaHomeFolder(javaVersion, javaHomeFolder).await();
+                    if (bootClasspath != null)
+                    {
+                        javac.addJavaSourceVersion(javaVersion);
+                        javac.addJavaTargetVersion(javaVersion);
+                        javac.addBootClasspath(bootClasspath);
+                    }
+                }
+
+                final Integer maximumErrors = projectJsonJava.getMaximumErrors();
+                if (maximumErrors != null)
+                {
+                    javac.addMaximumErrors(maximumErrors);
+                }
+
+                final Integer maximumWarnings = projectJsonJava.getMaximumWarnings();
+                if (maximumWarnings != null)
+                {
+                    javac.addMaximumWarnings(maximumWarnings);
+                }
+
+                final List<String> classPaths = List.create();
+                classPaths.add(outputsFolder.toString());
+                Iterable<ProjectSignature> dependencies = projectJsonJava.getDependencies();
+                if (!Iterable.isNullOrEmpty(dependencies))
+                {
+                    final Map<ProjectSignature, Iterable<ProjectSignature>> dependencyMap = projectJsonJava.getTransitiveDependencyPaths(qubFolder);
+                    dependencies = dependencyMap.getKeys();
+
+                    final Set<ProjectSignature> errorDependencies = Set.create();
+                    for (final ProjectSignature dependency : dependencies)
+                    {
+                        if (!errorDependencies.contains(dependency))
                         {
-                            errorDependencies.addAll(matchingDependencies);
-                            final InMemoryCharacterToByteStream errorMessage = InMemoryCharacterToByteStream.create();
-                            final IndentedCharacterWriteStream indentedErrorMessage = IndentedCharacterWriteStream.create(errorMessage)
-                                .setSingleIndent(" ");
-                            indentedErrorMessage.writeLine("Found more than one required version for package " + dependency.toStringIgnoreVersion() + ":").await();
-                            int number = 0;
-                            for (final ProjectSignature matchingProjectSignature : matchingDependencies)
+                            final Iterable<ProjectSignature> matchingDependencies = dependencies.where(dependency::equalsIgnoreVersion).toList();
+                            if (matchingDependencies.getCount() > 1)
                             {
-                                ++number;
-                                final String numberString = number + ". ";
-                                indentedErrorMessage.setCurrentIndent("");
-                                errorMessage.writeLine(numberString + matchingProjectSignature).await();
-                                indentedErrorMessage.setCurrentIndent(Strings.repeat(' ', numberString.length()));
-                                final Iterable<ProjectSignature> path = dependencyMap.get(matchingProjectSignature).await();
-                                for (final ProjectSignature pathProjectSignature : path)
+                                errorDependencies.addAll(matchingDependencies);
+                                final InMemoryCharacterToByteStream errorMessage = InMemoryCharacterToByteStream.create();
+                                final IndentedCharacterWriteStream indentedErrorMessage = IndentedCharacterWriteStream.create(errorMessage)
+                                    .setSingleIndent(" ");
+                                indentedErrorMessage.writeLine("Found more than one required version for package " + dependency.toStringIgnoreVersion() + ":").await();
+                                int number = 0;
+                                for (final ProjectSignature matchingProjectSignature : matchingDependencies)
                                 {
-                                    indentedErrorMessage.increaseIndent();
-                                    indentedErrorMessage.writeLine("from " + pathProjectSignature).await();
+                                    ++number;
+                                    final String numberString = number + ". ";
+                                    indentedErrorMessage.setCurrentIndent("");
+                                    errorMessage.writeLine(numberString + matchingProjectSignature).await();
+                                    indentedErrorMessage.setCurrentIndent(Strings.repeat(' ', numberString.length()));
+                                    final Iterable<ProjectSignature> path = dependencyMap.get(matchingProjectSignature).await();
+                                    for (final ProjectSignature pathProjectSignature : path)
+                                    {
+                                        indentedErrorMessage.increaseIndent();
+                                        indentedErrorMessage.writeLine("from " + pathProjectSignature).await();
+                                    }
                                 }
+                                throw new RuntimeException(errorMessage.getText().await());
                             }
-                            throw new RuntimeException(errorMessage.getText().await());
                         }
                     }
-                }
 
-                for (final ProjectSignature dependency : dependencies)
-                {
-                    final QubPublisherFolder publisherFolder = qubFolder.getPublisherFolder(dependency.getPublisher()).await();
-                    if (!publisherFolder.exists().await())
+                    for (final ProjectSignature dependency : dependencies)
                     {
-                        throw new NotFoundException("No publisher folder named " + Strings.escapeAndQuote(dependency.getPublisher()) + " found in the Qub folder (" + qubFolder + ").");
-                    }
-                    else
-                    {
-                        final QubProjectFolder projectFolder = publisherFolder.getProjectFolder(dependency.getProject()).await();
-                        if (!projectFolder.exists().await())
+                        final QubPublisherFolder publisherFolder = qubFolder.getPublisherFolder(dependency.getPublisher()).await();
+                        if (!publisherFolder.exists().await())
                         {
-                            throw new NotFoundException("No project folder named " + Strings.escapeAndQuote(dependency.getProject()) + " found in the " + Strings.escapeAndQuote(dependency.getPublisher()) + " publisher folder (" + publisherFolder + ").");
+                            throw new NotFoundException("No publisher folder named " + Strings.escapeAndQuote(dependency.getPublisher()) + " found in the Qub folder (" + qubFolder + ").");
                         }
                         else
                         {
-                            QubProjectVersionFolder versionFolder = projectFolder.getProjectVersionFolder(dependency.getVersion()).await();
-                            if (!versionFolder.exists().await())
+                            final QubProjectFolder projectFolder = publisherFolder.getProjectFolder(dependency.getProject()).await();
+                            if (!projectFolder.exists().await())
                             {
-                                throw new NotFoundException("No version folder named " + Strings.escapeAndQuote(dependency.getVersion()) + " found in the " + Strings.escapeAndQuote(dependency.getProject()) + " project folder (" + projectFolder + ").");
+                                throw new NotFoundException("No project folder named " + Strings.escapeAndQuote(dependency.getProject()) + " found in the " + Strings.escapeAndQuote(dependency.getPublisher()) + " publisher folder (" + publisherFolder + ").");
                             }
                             else
                             {
-                                final File dependencyFile = versionFolder.getCompiledSourcesFile().await();
-                                if (!dependencyFile.exists().await())
+                                QubProjectVersionFolder versionFolder = projectFolder.getProjectVersionFolder(dependency.getVersion()).await();
+                                if (!versionFolder.exists().await())
                                 {
-                                    throw new NotFoundException("No dependency file named " + Strings.escapeAndQuote(dependencyFile.getName()) + " found in the " + Strings.escapeAndQuote(dependency.getVersion()) + " version folder (" + versionFolder + ").");
+                                    throw new NotFoundException("No version folder named " + Strings.escapeAndQuote(dependency.getVersion()) + " found in the " + Strings.escapeAndQuote(dependency.getProject()) + " project folder (" + projectFolder + ").");
                                 }
                                 else
                                 {
-                                    classPaths.add(dependencyFile.toString());
+                                    final File dependencyFile = versionFolder.getCompiledSourcesFile().await();
+                                    if (!dependencyFile.exists().await())
+                                    {
+                                        throw new NotFoundException("No dependency file named " + Strings.escapeAndQuote(dependencyFile.getName()) + " found in the " + Strings.escapeAndQuote(dependency.getVersion()) + " version folder (" + versionFolder + ").");
+                                    }
+                                    else
+                                    {
+                                        classPaths.add(dependencyFile.toString());
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            javac.addClasspath(classPaths);
+                javac.addClasspath(classPaths);
 
-            final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(folderToBuild, projectJsonJava).await();
-            if (!javaSourceFiles.any())
-            {
-                throw new NotFoundException("No java source files found in " + folderToBuild + ".");
-            }
+                final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(folderToBuild, projectJsonJava).await();
+                if (!javaSourceFiles.any())
+                {
+                    throw new NotFoundException("No java source files found in " + folderToBuild + ".");
+                }
 
-            final File buildJsonFile = outputsFolder.getFile("build.json").await();
-            final List<File> newJavaSourceFiles = List.create();
-            final List<File> deletedJavaSourceFiles = List.create();
-            final List<File> modifiedJavaSourceFiles = List.create();
-            final List<File> nonModifiedJavaSourceFiles = List.create();
-            final List<File> javaSourceFilesWithErrors = List.create();
-            final List<JavaCompilerIssue> nonModifiedJavaSourceFileWarnings = List.create();
-            final List<BuildJSONSourceFile> buildJsonSourceFiles = List.create();
-            boolean compileEverything;
-            final BuildJSON updatedBuildJson = BuildJSON.create();
-            boolean updateBuildJsonFile = false;
-            if (!useBuildJson)
-            {
-                compileEverything = true;
-                outputsFolder.delete()
-                    .catchError(FolderNotFoundException.class)
-                    .await();
-                outputsFolder.create().await();
-            }
-            else
-            {
-                verbose.writeLine("Getting javac version...").await();
-
-                final JavacProcessBuilder javacVersionProcessBuilder = JavacProcessBuilder.get(parameters.getProcessFactory()).await();
-                final VersionNumber javacVersion = javacVersionProcessBuilder.getVersion(verbose).await();
-                updatedBuildJson.setJavacVersion(javacVersion);
-
-                if (!outputsFolder.exists().await())
+                final File buildJsonFile = outputsFolder.getFile("build.json").await();
+                final List<File> newJavaSourceFiles = List.create();
+                final List<File> deletedJavaSourceFiles = List.create();
+                final List<File> modifiedJavaSourceFiles = List.create();
+                final List<File> nonModifiedJavaSourceFiles = List.create();
+                final List<File> javaSourceFilesWithErrors = List.create();
+                final List<JavaCompilerIssue> nonModifiedJavaSourceFileWarnings = List.create();
+                final List<BuildJSONSourceFile> buildJsonSourceFiles = List.create();
+                boolean compileEverything;
+                final BuildJSON updatedBuildJson = BuildJSON.create();
+                boolean updateBuildJsonFile = false;
+                if (!useBuildJson)
                 {
                     compileEverything = true;
-                    newJavaSourceFiles.addAll(javaSourceFiles);
-                    buildJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
+                    outputsFolder.delete()
+                        .catchError(FolderNotFoundException.class)
+                        .await();
+                    outputsFolder.create().await();
                 }
                 else
                 {
-                    verbose.writeLine("Parsing " + buildJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                    verbose.writeLine("Getting javac version...").await();
 
-                    final BuildJSON buildJson = BuildJSON.parse(buildJsonFile)
-                        .catchError(FileNotFoundException.class)
-                        .await();
+                    final JavacProcessBuilder javacVersionProcessBuilder = JavacProcessBuilder.get(parameters.getProcessFactory()).await();
+                    final VersionNumber javacVersion = javacVersionProcessBuilder.getVersion(verbose).await();
+                    updatedBuildJson.setJavacVersion(javacVersion);
 
-                    if (buildJson == null || !javacVersion.equals(buildJson.getJavacVersion()))
+                    if (!outputsFolder.exists().await())
                     {
                         compileEverything = true;
                         newJavaSourceFiles.addAll(javaSourceFiles);
@@ -282,232 +265,228 @@ public interface QubBuildCompile
                     }
                     else
                     {
-                        final ProjectJSON buildJsonProjectJson = buildJson.getProjectJson();
-                        updateBuildJsonFile = !Comparer.equal(buildJsonProjectJson, projectJson);
-                        compileEverything = QubBuildCompile.shouldCompileEverything(buildJson.getProjectJson(), projectJson);
+                        verbose.writeLine("Parsing " + buildJsonFile.relativeTo(folderToBuild).toString() + "...").await();
 
-                        for (final File javaSourceFile : javaSourceFiles)
+                        final BuildJSON buildJson = BuildJSON.parse(buildJsonFile)
+                            .catchError(FileNotFoundException.class)
+                            .await();
+
+                        if (buildJson == null || !javacVersion.equals(buildJson.getJavacVersion()))
                         {
-                            final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
-
-                            final BuildJSONSourceFile buildJsonSource = buildJson.getSourceFile(javaSourceFileRelativePath)
-                                .catchError(NotFoundException.class)
-                                .await();
-                            if (buildJsonSource == null || buildJsonSource.getLastModified() == null)
-                            {
-                                verbose.writeLine(javaSourceFile + " - New file").await();
-                                newJavaSourceFiles.add(javaSourceFile);
-                                buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
-                            }
-                            else if (!javaSourceFile.getLastModified().await().equals(buildJsonSource.getLastModified()))
-                            {
-                                verbose.writeLine(javaSourceFile + " - Last modified: " + javaSourceFile.getLastModified().await()).await();
-                                verbose.writeLine(Strings.repeat(' ', javaSourceFile.toString().length()) + " - Last built:    " + buildJsonSource.getLastModified()).await();
-
-                                modifiedJavaSourceFiles.add(javaSourceFile);
-                                buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
-                            }
-                            else if (!Iterable.isNullOrEmpty(buildJsonSource.getIssues()))
-                            {
-                                final Iterable<JavaCompilerIssue> sourceErrors = buildJsonSource.getIssues().where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error).toList();
-                                if (!Iterable.isNullOrEmpty(sourceErrors))
-                                {
-                                    verbose.writeLine(javaSourceFile + " - Has errors").await();
-                                    javaSourceFilesWithErrors.add(javaSourceFile);
-                                }
-
-                                final Iterable<JavaCompilerIssue> sourceWarnings = buildJsonSource.getIssues().where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning).toList();
-                                if (!Iterable.isNullOrEmpty(sourceWarnings))
-                                {
-                                    verbose.writeLine(javaSourceFile + " - Has warnings").await();
-                                    nonModifiedJavaSourceFileWarnings.addAll(sourceWarnings);
-                                }
-
-                                buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
-                            }
-                            else
-                            {
-                                verbose.writeLine(javaSourceFile + " - No changes or issues").await();
-
-                                nonModifiedJavaSourceFiles.add(javaSourceFile);
-                                buildJsonSourceFiles.add(buildJsonSource);
-                            }
+                            compileEverything = true;
+                            newJavaSourceFiles.addAll(javaSourceFiles);
+                            buildJsonSourceFiles.addAll(BuildJSONSourceFile.create(javaSourceFiles, folderToBuild));
                         }
-
-                        for (final BuildJSONSourceFile buildJsonSource : buildJson.getSourceFiles())
+                        else
                         {
-                            final Path buildJsonSourceFilePath = buildJsonSource.getRelativePath();
-                            final File buildJsonSourceFile = folderToBuild.getFile(buildJsonSourceFilePath).await();
-                            if (!javaSourceFiles.contains(buildJsonSourceFile))
+                            final ProjectJSON buildJsonProjectJson = buildJson.getProjectJson();
+                            updateBuildJsonFile = !Comparer.equal(buildJsonProjectJson, projectJson);
+                            compileEverything = QubBuildCompile.shouldCompileEverything(buildJson.getProjectJson(), projectJson);
+
+                            for (final File javaSourceFile : javaSourceFiles)
                             {
-                                deletedJavaSourceFiles.add(buildJsonSourceFile);
+                                final Path javaSourceFileRelativePath = javaSourceFile.relativeTo(folderToBuild);
+
+                                final BuildJSONSourceFile buildJsonSource = buildJson.getSourceFile(javaSourceFileRelativePath)
+                                    .catchError(NotFoundException.class)
+                                    .await();
+                                if (buildJsonSource == null || buildJsonSource.getLastModified() == null)
+                                {
+                                    verbose.writeLine(javaSourceFile + " - New file").await();
+                                    newJavaSourceFiles.add(javaSourceFile);
+                                    buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                }
+                                else if (!javaSourceFile.getLastModified().await().equals(buildJsonSource.getLastModified()))
+                                {
+                                    verbose.writeLine(javaSourceFile + " - Last modified: " + javaSourceFile.getLastModified().await()).await();
+                                    verbose.writeLine(Strings.repeat(' ', javaSourceFile.toString().length()) + " - Last built:    " + buildJsonSource.getLastModified()).await();
+
+                                    modifiedJavaSourceFiles.add(javaSourceFile);
+                                    buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                }
+                                else if (!Iterable.isNullOrEmpty(buildJsonSource.getIssues()))
+                                {
+                                    final Iterable<JavaCompilerIssue> sourceErrors = buildJsonSource.getIssues().where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error).toList();
+                                    if (!Iterable.isNullOrEmpty(sourceErrors))
+                                    {
+                                        verbose.writeLine(javaSourceFile + " - Has errors").await();
+                                        javaSourceFilesWithErrors.add(javaSourceFile);
+                                    }
+
+                                    final Iterable<JavaCompilerIssue> sourceWarnings = buildJsonSource.getIssues().where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning).toList();
+                                    if (!Iterable.isNullOrEmpty(sourceWarnings))
+                                    {
+                                        verbose.writeLine(javaSourceFile + " - Has warnings").await();
+                                        nonModifiedJavaSourceFileWarnings.addAll(sourceWarnings);
+                                    }
+
+                                    buildJsonSourceFiles.add(BuildJSONSourceFile.create(javaSourceFile, folderToBuild, javaSourceFiles));
+                                }
+                                else
+                                {
+                                    verbose.writeLine(javaSourceFile + " - No changes or issues").await();
+
+                                    nonModifiedJavaSourceFiles.add(javaSourceFile);
+                                    buildJsonSourceFiles.add(buildJsonSource);
+                                }
                             }
-                        }
 
-                        writeFileList(verbose, deletedJavaSourceFiles, "Deleted source files").await();
-                        for (final File deletedSourceFile : deletedJavaSourceFiles)
-                        {
-                            final Iterable<File> classFilesToDelete = QubBuildCompile.getExistingClassFiles(deletedSourceFile, folderToBuild, outputsFolder);
-                            for (final File classFileToDelete : classFilesToDelete)
+                            for (final BuildJSONSourceFile buildJsonSource : buildJson.getSourceFiles())
                             {
-                                classFileToDelete.delete().await();
+                                final Path buildJsonSourceFilePath = buildJsonSource.getRelativePath();
+                                final File buildJsonSourceFile = folderToBuild.getFile(buildJsonSourceFilePath).await();
+                                if (!javaSourceFiles.contains(buildJsonSourceFile))
+                                {
+                                    deletedJavaSourceFiles.add(buildJsonSourceFile);
+                                }
+                            }
+
+                            writeFileList(verbose, deletedJavaSourceFiles, "Deleted source files").await();
+                            for (final File deletedSourceFile : deletedJavaSourceFiles)
+                            {
+                                final Iterable<File> classFilesToDelete = QubBuildCompile.getExistingClassFiles(deletedSourceFile, folderToBuild, outputsFolder);
+                                for (final File classFileToDelete : classFilesToDelete)
+                                {
+                                    classFileToDelete.delete().await();
+                                }
                             }
                         }
                     }
+
+                    verbose.writeLine("Updating " + buildJsonFile.relativeTo(folderToBuild).toString() + "...").await();
+                    verbose.writeLine("Setting project.json...").await();
+                    updatedBuildJson.setProjectJson(projectJson);
+                    verbose.writeLine("Setting source files...").await();
+                    updatedBuildJson.setSourceFiles(buildJsonSourceFiles);
                 }
 
-                verbose.writeLine("Updating " + buildJsonFile.relativeTo(folderToBuild).toString() + "...").await();
-                verbose.writeLine("Setting project.json...").await();
-                updatedBuildJson.setProjectJson(projectJson);
-                verbose.writeLine("Setting source files...").await();
-                updatedBuildJson.setSourceFiles(buildJsonSourceFiles);
-            }
-
-            verbose.writeLine("Detecting java source files to compile...").await();
-            final Set<File> javaSourceFilesToCompile = Set.create();
-            if (compileEverything)
-            {
-                verbose.writeLine("Compiling all source files.").await();
-                javaSourceFilesToCompile.addAll(javaSourceFiles);
-            }
-            else
-            {
-                QubBuildCompile.writeFileList(verbose, newJavaSourceFiles, "Added source files").await();
-                javaSourceFilesToCompile.addAll(newJavaSourceFiles);
-
-                QubBuildCompile.writeFileList(verbose, modifiedJavaSourceFiles, "Modified source files").await();
-                javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
-
-                QubBuildCompile.writeFileList(verbose, javaSourceFilesWithErrors, "Source files that previously contained errors").await();
-                javaSourceFilesToCompile.addAll(javaSourceFilesWithErrors);
-
-                final List<File> javaSourceFilesWithDeletedDependencies = List.create();
-                for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
+                verbose.writeLine("Detecting java source files to compile...").await();
+                final Set<File> javaSourceFilesToCompile = Set.create();
+                if (compileEverything)
                 {
-                    final Path relativePath = nonModifiedJavaSourceFile.relativeTo(folderToBuild);
-                    final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(relativePath).await();
-                    final Iterable<Path> sourceFileProjectSignaturePaths = sourceFile.getDependencies();
-                    if (!Iterable.isNullOrEmpty(sourceFileProjectSignaturePaths))
-                    {
-                        final Iterable<File> sourceFileProjectSignatureFiles = sourceFileProjectSignaturePaths
-                            .map((Path sourceFileProjectSignaturePath) -> folderToBuild.getFile(sourceFileProjectSignaturePath).await());
-                        for (final File sourceFileProjectSignatureFile : sourceFileProjectSignatureFiles)
-                        {
-                            if (deletedJavaSourceFiles.contains(sourceFileProjectSignatureFile))
-                            {
-                                javaSourceFilesWithDeletedDependencies.add(nonModifiedJavaSourceFile);
-                                javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
-                                break;
-                            }
-                        }
-                    }
+                    verbose.writeLine("Compiling all source files.").await();
+                    javaSourceFilesToCompile.addAll(javaSourceFiles);
                 }
-                writeFileList(verbose, javaSourceFilesWithDeletedDependencies, "Source files with deleted dependencies").await();
-
-                final List<File> javaSourceFilesWithModifiedDependencies = List.create();
-                final List<File> filesToNotCompile = List.create(nonModifiedJavaSourceFiles);
-                boolean filesToNotCompileChanged = true;
-                while (filesToNotCompileChanged && filesToNotCompile.any())
+                else
                 {
-                    filesToNotCompileChanged = false;
-                    for (final File fileToNotCompile : List.create(filesToNotCompile))
+                    QubBuildCompile.writeFileList(verbose, newJavaSourceFiles, "Added source files").await();
+                    javaSourceFilesToCompile.addAll(newJavaSourceFiles);
+
+                    QubBuildCompile.writeFileList(verbose, modifiedJavaSourceFiles, "Modified source files").await();
+                    javaSourceFilesToCompile.addAll(modifiedJavaSourceFiles);
+
+                    QubBuildCompile.writeFileList(verbose, javaSourceFilesWithErrors, "Source files that previously contained errors").await();
+                    javaSourceFilesToCompile.addAll(javaSourceFilesWithErrors);
+
+                    final List<File> javaSourceFilesWithDeletedDependencies = List.create();
+                    for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
                     {
-                        final Path relativePath = fileToNotCompile.relativeTo(folderToBuild);
+                        final Path relativePath = nonModifiedJavaSourceFile.relativeTo(folderToBuild);
                         final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(relativePath).await();
                         final Iterable<Path> sourceFileProjectSignaturePaths = sourceFile.getDependencies();
                         if (!Iterable.isNullOrEmpty(sourceFileProjectSignaturePaths))
                         {
                             final Iterable<File> sourceFileProjectSignatureFiles = sourceFileProjectSignaturePaths
                                 .map((Path sourceFileProjectSignaturePath) -> folderToBuild.getFile(sourceFileProjectSignaturePath).await());
-                            for (final File dependencyFile : sourceFileProjectSignatureFiles)
+                            for (final File sourceFileProjectSignatureFile : sourceFileProjectSignatureFiles)
                             {
-                                if (javaSourceFilesToCompile.contains(dependencyFile))
+                                if (deletedJavaSourceFiles.contains(sourceFileProjectSignatureFile))
                                 {
-                                    filesToNotCompileChanged = true;
-                                    javaSourceFilesWithModifiedDependencies.add(fileToNotCompile);
-                                    javaSourceFilesToCompile.add(fileToNotCompile);
-                                    filesToNotCompile.remove(fileToNotCompile);
+                                    javaSourceFilesWithDeletedDependencies.add(nonModifiedJavaSourceFile);
+                                    javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
                                     break;
                                 }
                             }
                         }
                     }
-                }
-                writeFileList(verbose, javaSourceFilesWithDeletedDependencies, "Source files with modified dependencies").await();
+                    writeFileList(verbose, javaSourceFilesWithDeletedDependencies, "Source files with deleted dependencies").await();
 
-                final List<File> javaSourceFilesWithMissingClassFiles = List.create();
-                for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
-                {
-                    final File classFile = QubBuildCompile.getClassFile(nonModifiedJavaSourceFile, folderToBuild, outputsFolder);
-                    if (!classFile.exists().await() && !javaSourceFilesToCompile.contains(nonModifiedJavaSourceFile))
+                    final List<File> javaSourceFilesWithModifiedDependencies = List.create();
+                    final List<File> filesToNotCompile = List.create(nonModifiedJavaSourceFiles);
+                    boolean filesToNotCompileChanged = true;
+                    while (filesToNotCompileChanged && filesToNotCompile.any())
                     {
-                        javaSourceFilesWithMissingClassFiles.add(nonModifiedJavaSourceFile);
-                        javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
+                        filesToNotCompileChanged = false;
+                        for (final File fileToNotCompile : List.create(filesToNotCompile))
+                        {
+                            final Path relativePath = fileToNotCompile.relativeTo(folderToBuild);
+                            final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(relativePath).await();
+                            final Iterable<Path> sourceFileProjectSignaturePaths = sourceFile.getDependencies();
+                            if (!Iterable.isNullOrEmpty(sourceFileProjectSignaturePaths))
+                            {
+                                final Iterable<File> sourceFileProjectSignatureFiles = sourceFileProjectSignaturePaths
+                                    .map((Path sourceFileProjectSignaturePath) -> folderToBuild.getFile(sourceFileProjectSignaturePath).await());
+                                for (final File dependencyFile : sourceFileProjectSignatureFiles)
+                                {
+                                    if (javaSourceFilesToCompile.contains(dependencyFile))
+                                    {
+                                        filesToNotCompileChanged = true;
+                                        javaSourceFilesWithModifiedDependencies.add(fileToNotCompile);
+                                        javaSourceFilesToCompile.add(fileToNotCompile);
+                                        filesToNotCompile.remove(fileToNotCompile);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    writeFileList(verbose, javaSourceFilesWithDeletedDependencies, "Source files with modified dependencies").await();
+
+                    final List<File> javaSourceFilesWithMissingClassFiles = List.create();
+                    for (final File nonModifiedJavaSourceFile : nonModifiedJavaSourceFiles)
+                    {
+                        final File classFile = QubBuildCompile.getClassFile(nonModifiedJavaSourceFile, folderToBuild, outputsFolder);
+                        if (!classFile.exists().await() && !javaSourceFilesToCompile.contains(nonModifiedJavaSourceFile))
+                        {
+                            javaSourceFilesWithMissingClassFiles.add(nonModifiedJavaSourceFile);
+                            javaSourceFilesToCompile.add(nonModifiedJavaSourceFile);
+                        }
+                    }
+                    writeFileList(verbose, javaSourceFilesWithMissingClassFiles, "Source files with missing class files").await();
+                }
+
+                if (!javaSourceFilesToCompile.any())
+                {
+                    output.writeLine("No files need to be compiled.").await();
+
+                    if (nonModifiedJavaSourceFileWarnings.any())
+                    {
+                        nonModifiedJavaSourceFileWarnings.sort((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
+
+                        final int unmodifiedWarningCount = nonModifiedJavaSourceFileWarnings.getCount();
+                        output.writeLine(unmodifiedWarningCount + " Unmodified Warning" + (unmodifiedWarningCount == 1 ? "" : "s") + ":").await();
+                        for (final JavaCompilerIssue warning : nonModifiedJavaSourceFileWarnings)
+                        {
+                            output.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
+                            final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
+                            sourceFile.addIssue(warning);
+                        }
                     }
                 }
-                writeFileList(verbose, javaSourceFilesWithMissingClassFiles, "Source files with missing class files").await();
-            }
-
-            if (!javaSourceFilesToCompile.any())
-            {
-                output.writeLine("No files need to be compiled.").await();
-
-                if (nonModifiedJavaSourceFileWarnings.any())
+                else
                 {
-                    nonModifiedJavaSourceFileWarnings.sort((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
+                    updateBuildJsonFile = true;
 
-                    final int unmodifiedWarningCount = nonModifiedJavaSourceFileWarnings.getCount();
-                    output.writeLine(unmodifiedWarningCount + " Unmodified Warning" + (unmodifiedWarningCount == 1 ? "" : "s") + ":").await();
-                    for (final JavaCompilerIssue warning : nonModifiedJavaSourceFileWarnings)
+                    javac.addSourceFilePaths(javaSourceFilesToCompile
+                        .map((File javaSourceFile) -> javaSourceFile.getPath().relativeTo(folderToBuild)));
+
+                    final int filesToCompileCount = javaSourceFilesToCompile.getCount();
+                    output.writeLine("Compiling " + filesToCompileCount + " file" + (filesToCompileCount == 1 ? "" : "s") + "...").await();
+                    final JavaCompilationResult compilationResult = javac.compile(warnings, verbose).await();
+                    exitCode = compilationResult.exitCode;
+
+                    verbose.writeLine("Compilation finished.").await();
+
+                    final List<JavaCompilerIssue> nonModifiedNonCompiledJavaSourceFileWarnings = nonModifiedJavaSourceFileWarnings
+                        .where((JavaCompilerIssue warning) -> !javaSourceFilesToCompile.contains((File fileToCompile) -> fileToCompile.relativeTo(folderToBuild).equals(Path.parse(warning.sourceFilePath))))
+                        .toList();
+                    if (nonModifiedNonCompiledJavaSourceFileWarnings.any())
                     {
-                        output.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
-                        final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
-                        sourceFile.addIssue(warning);
-                    }
-                }
-            }
-            else
-            {
-                updateBuildJsonFile = true;
+                        nonModifiedNonCompiledJavaSourceFileWarnings.sort((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
 
-                javac.addSourceFilePaths(javaSourceFilesToCompile
-                    .map((File javaSourceFile) -> javaSourceFile.getPath().relativeTo(folderToBuild)));
-
-                final int filesToCompileCount = javaSourceFilesToCompile.getCount();
-                output.writeLine("Compiling " + filesToCompileCount + " file" + (filesToCompileCount == 1 ? "" : "s") + "...").await();
-                final JavaCompilationResult compilationResult = javac.compile(warnings, verbose).await();
-                exitCode = compilationResult.exitCode;
-
-                verbose.writeLine("Compilation finished.").await();
-
-                final List<JavaCompilerIssue> nonModifiedNonCompiledJavaSourceFileWarnings = nonModifiedJavaSourceFileWarnings
-                    .where((JavaCompilerIssue warning) -> !javaSourceFilesToCompile.contains((File fileToCompile) -> fileToCompile.relativeTo(folderToBuild).equals(Path.parse(warning.sourceFilePath))))
-                    .toList();
-                if (nonModifiedNonCompiledJavaSourceFileWarnings.any())
-                {
-                    nonModifiedNonCompiledJavaSourceFileWarnings.sort((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
-
-                    final int unmodifiedWarningCount = nonModifiedNonCompiledJavaSourceFileWarnings.getCount();
-                    output.writeLine(unmodifiedWarningCount + " Unmodified Warning" + (unmodifiedWarningCount == 1 ? "" : "s") + ":").await();
-                    for (final JavaCompilerIssue warning : nonModifiedNonCompiledJavaSourceFileWarnings)
-                    {
-                        output.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
-                        final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
-                        sourceFile.addIssue(warning);
-                    }
-                }
-
-                if (!Iterable.isNullOrEmpty(compilationResult.issues))
-                {
-                    final Iterable<JavaCompilerIssue> sortedIssues = compilationResult.issues
-                        .order((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
-
-                    final Iterable<JavaCompilerIssue> warningIssues = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning);
-                    final int warningCount = warningIssues.getCount();
-                    if (warningCount > 0 && warnings == Warnings.Show)
-                    {
-                        output.writeLine(warningCount + " Warning" + (warningCount == 1 ? "" : "s") + ":").await();
-                        for (final JavaCompilerIssue warning : warningIssues)
+                        final int unmodifiedWarningCount = nonModifiedNonCompiledJavaSourceFileWarnings.getCount();
+                        output.writeLine(unmodifiedWarningCount + " Unmodified Warning" + (unmodifiedWarningCount == 1 ? "" : "s") + ":").await();
+                        for (final JavaCompilerIssue warning : nonModifiedNonCompiledJavaSourceFileWarnings)
                         {
                             output.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
                             final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
@@ -515,46 +494,61 @@ public interface QubBuildCompile
                         }
                     }
 
-                    final Iterable<JavaCompilerIssue> errors = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error);
-                    final int errorCount = errors.getCount();
-                    if (errorCount > 0)
+                    if (!Iterable.isNullOrEmpty(compilationResult.issues))
                     {
-                        output.writeLine(errorCount + " Error" + (errorCount == 1 ? "" : "s") + ":").await();
-                        for (final JavaCompilerIssue error : errors)
-                        {
-                            output.writeLine(error.sourceFilePath + " (Line " + error.lineNumber + "): " + error.message).await();
-                            final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(error.sourceFilePath)).await();
+                        final Iterable<JavaCompilerIssue> sortedIssues = compilationResult.issues
+                            .order((JavaCompilerIssue lhs, JavaCompilerIssue rhs) -> lhs.sourceFilePath.compareTo(rhs.sourceFilePath) < 0);
 
-                            sourceFile.addIssue(error);
+                        final Iterable<JavaCompilerIssue> warningIssues = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Warning);
+                        final int warningCount = warningIssues.getCount();
+                        if (warningCount > 0 && warnings == Warnings.Show)
+                        {
+                            output.writeLine(warningCount + " Warning" + (warningCount == 1 ? "" : "s") + ":").await();
+                            for (final JavaCompilerIssue warning : warningIssues)
+                            {
+                                output.writeLine(warning.sourceFilePath + " (Line " + warning.lineNumber + "): " + warning.message).await();
+                                final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(warning.sourceFilePath)).await();
+                                sourceFile.addIssue(warning);
+                            }
+                        }
+
+                        final Iterable<JavaCompilerIssue> errors = sortedIssues.where((JavaCompilerIssue issue) -> issue.type == Issue.Type.Error);
+                        final int errorCount = errors.getCount();
+                        if (errorCount > 0)
+                        {
+                            output.writeLine(errorCount + " Error" + (errorCount == 1 ? "" : "s") + ":").await();
+                            for (final JavaCompilerIssue error : errors)
+                            {
+                                output.writeLine(error.sourceFilePath + " (Line " + error.lineNumber + "): " + error.message).await();
+                                final BuildJSONSourceFile sourceFile = updatedBuildJson.getSourceFile(Path.parse(error.sourceFilePath)).await();
+
+                                sourceFile.addIssue(error);
+                            }
                         }
                     }
                 }
-            }
 
-            if (useBuildJson && updateBuildJsonFile)
-            {
-                verbose.writeLine("Writing build.json file...").await();
-                try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentsByteWriteStream().await())))
+                if (useBuildJson && updateBuildJsonFile)
                 {
-                    writeStream.write(updatedBuildJson.toString(JSONFormat.pretty)).await();
+                    verbose.writeLine("Writing build.json file...").await();
+                    try (final CharacterWriteStream writeStream = CharacterWriteStream.create(ByteWriteStream.buffer(buildJsonFile.getContentsByteWriteStream().await())))
+                    {
+                        writeStream.write(updatedBuildJson.toString(JSONFormat.pretty)).await();
+                    }
+                    verbose.writeLine("Done writing build.json file.").await();
                 }
-                verbose.writeLine("Done writing build.json file.").await();
             }
-        }
-        catch (Throwable error)
-        {
-            final Throwable unwrappedError = Exceptions.unwrap(error);
-            if (Types.instanceOf(unwrappedError, Iterable.create(PreConditionFailure.class, PostConditionFailure.class, NullPointerException.class)))
+            catch (Throwable error)
             {
-                throw error;
+                final Throwable unwrappedError = Exceptions.unwrap(error);
+                if (Types.instanceOf(unwrappedError, Iterable.create(PreConditionFailure.class, PostConditionFailure.class, NullPointerException.class)))
+                {
+                    throw error;
+                }
+                final String message = unwrappedError.getMessage();
+                output.writeLine("ERROR: " + message).await();
+                ++exitCode;
             }
-            final String message = unwrappedError.getMessage();
-            output.writeLine("ERROR: " + message).await();
-            ++exitCode;
-        }
-        finally
-        {
-            logStreams.getLogStream().dispose().await();
         }
 
         return exitCode;
@@ -562,7 +556,7 @@ public interface QubBuildCompile
 
     static Result<Void> writeFileList(CharacterWriteStream verbose, Iterable<File> files, String description)
     {
-        return Result.create(() ->
+        return Result.create2(() ->
         {
             if (!Iterable.isNullOrEmpty(files))
             {
