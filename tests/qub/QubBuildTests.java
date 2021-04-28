@@ -86,13 +86,13 @@ public interface QubBuildTests
                 });
             });
 
-            runner.testGroup("getJavaSourceFiles(Folder,ProjectJSONJava)", () ->
+            runner.testGroup("iterateJavaSourceFiles(Folder,ProjectJSONJava)", () ->
             {
                 runner.test("with null projectFolder", (Test test) ->
                 {
                     final Folder projectFolder = null;
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
-                    test.assertThrows(() -> QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava),
+                    test.assertThrows(() -> QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava),
                         new PreConditionFailure("projectFolder cannot be null."));
                 });
 
@@ -102,7 +102,7 @@ public interface QubBuildTests
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = null;
-                    test.assertThrows(() -> QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava),
+                    test.assertThrows(() -> QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava),
                         new PreConditionFailure("projectJsonJava cannot be null."));
                 });
 
@@ -112,7 +112,7 @@ public interface QubBuildTests
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.getFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
-                    test.assertThrows(() -> QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava).await(),
+                    test.assertThrows(() -> QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava).toList(),
                         new FolderNotFoundException(projectFolder));
                 });
 
@@ -122,7 +122,7 @@ public interface QubBuildTests
                     fileSystem.createRoot("/").await();
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
-                    final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava).await();
+                    final Iterable<File> javaSourceFiles = QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava).toList();
                     test.assertEqual(Iterable.create(), javaSourceFiles);
                 });
 
@@ -133,7 +133,7 @@ public interface QubBuildTests
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final File javaFile = projectFolder.createFile("A.java").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
-                    final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava).await();
+                    final Iterable<File> javaSourceFiles = QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava).toList();
                     test.assertEqual(Iterable.create(javaFile), javaSourceFiles);
                 });
 
@@ -144,7 +144,7 @@ public interface QubBuildTests
                     final Folder projectFolder = fileSystem.createFolder("/project/folder/").await();
                     final File javaFile = projectFolder.createFile("subfolder/A.java").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create();
-                    final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava).await();
+                    final Iterable<File> javaSourceFiles = QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava).toList();
                     test.assertEqual(Iterable.create(javaFile), javaSourceFiles);
                 });
 
@@ -156,7 +156,7 @@ public interface QubBuildTests
                     final File javaFile = projectFolder.createFile("subfolder/B.java").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create()
                         .setSourceFiles(PathPattern.parse("**/A*.java"));
-                    final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava).await();
+                    final Iterable<File> javaSourceFiles = QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava).toList();
                     test.assertEqual(Iterable.create(), javaSourceFiles);
                 });
 
@@ -168,7 +168,7 @@ public interface QubBuildTests
                     final File javaFile = projectFolder.createFile("subfolder/A.java").await();
                     final ProjectJSONJava projectJsonJava = ProjectJSONJava.create()
                         .setSourceFiles(PathPattern.parse("**/A*.java"));
-                    final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(projectFolder, projectJsonJava).await();
+                    final Iterable<File> javaSourceFiles = QubBuild.iterateJavaSourceFiles(projectFolder, projectJsonJava).toList();
                     test.assertEqual(Iterable.create(javaFile), javaSourceFiles);
                 });
             });
@@ -225,12 +225,12 @@ public interface QubBuildTests
                 });
             });
 
-            runner.testGroup("getJavaClassFiles(Folder)", () ->
+            runner.testGroup("iterateJavaClassFiles(Folder)", () ->
             {
                 runner.test("with null outputsFolder", (Test test) ->
                 {
                     final Folder outputsFolder = null;
-                    test.assertThrows(() -> QubBuild.getJavaClassFiles(outputsFolder),
+                    test.assertThrows(() -> QubBuild.iterateJavaClassFiles(outputsFolder),
                         new PreConditionFailure("outputsFolder cannot be null."));
                 });
 
@@ -239,7 +239,7 @@ public interface QubBuildTests
                     final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder outputsFolder = fileSystem.getFolder("/project/folder/outputs/").await();
-                    test.assertThrows(() -> QubBuild.getJavaClassFiles(outputsFolder).await(),
+                    test.assertThrows(() -> QubBuild.iterateJavaClassFiles(outputsFolder).toList(),
                         new FolderNotFoundException(outputsFolder));
                 });
 
@@ -248,7 +248,7 @@ public interface QubBuildTests
                     final InMemoryFileSystem fileSystem = InMemoryFileSystem.create();
                     fileSystem.createRoot("/").await();
                     final Folder outputsFolder = fileSystem.createFolder("/project/folder/outputs/").await();
-                    test.assertEqual(Iterable.create(), QubBuild.getJavaClassFiles(outputsFolder).await());
+                    test.assertEqual(Iterable.create(), QubBuild.iterateJavaClassFiles(outputsFolder).toList());
                 });
 
                 runner.test("with non-empty outputsFolder", (Test test) ->
@@ -257,7 +257,7 @@ public interface QubBuildTests
                     fileSystem.createRoot("/").await();
                     final Folder outputsFolder = fileSystem.createFolder("/project/folder/outputs/").await();
                     final File aClassFile = outputsFolder.createFile("A.class").await();
-                    test.assertEqual(Iterable.create(aClassFile), QubBuild.getJavaClassFiles(outputsFolder).await());
+                    test.assertEqual(Iterable.create(aClassFile), QubBuild.iterateJavaClassFiles(outputsFolder).toList());
                 });
             });
         });

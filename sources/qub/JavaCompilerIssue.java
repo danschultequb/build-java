@@ -87,7 +87,7 @@ public class JavaCompilerIssue
     {
         PreCondition.assertNotNull(json, "json");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             final String sourceFilePath = json.getString(JavaCompilerIssue.sourceFilePathPropertyName).await();
             final int lineNumber = json.getNumber(JavaCompilerIssue.lineNumberPropertyName).await().intValue();

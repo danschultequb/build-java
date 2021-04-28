@@ -26,28 +26,24 @@ public interface QubBuild
      * @param projectJsonJava The ProjectJSON Java configuration object.
      * @return The matching Java source files.
      */
-    static Result<Iterable<File>> getJavaSourceFiles(Folder projectFolder, ProjectJSONJava projectJsonJava)
+    static Iterator<File> iterateJavaSourceFiles(Folder projectFolder, ProjectJSONJava projectJsonJava)
     {
         PreCondition.assertNotNull(projectFolder, "projectFolder");
         PreCondition.assertNotNull(projectJsonJava, "projectJsonJava");
 
-        return Result.create2(() ->
+        Function1<File,Boolean> sourceFileMatcher;
+        final Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFiles();
+        if (!Iterable.isNullOrEmpty(sourceFilePatterns))
         {
-            Function1<File,Boolean> sourceFileMatcher;
-            final Iterable<PathPattern> sourceFilePatterns = projectJsonJava.getSourceFiles();
-            if (!Iterable.isNullOrEmpty(sourceFilePatterns))
-            {
-                sourceFileMatcher = (File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(projectFolder)));
-            }
-            else
-            {
-                sourceFileMatcher = (File file) -> ".java".equalsIgnoreCase(file.getFileExtension());
-            }
+            sourceFileMatcher = (File file) -> sourceFilePatterns.contains((PathPattern pattern) -> pattern.isMatch(file.getPath().relativeTo(projectFolder)));
+        }
+        else
+        {
+            sourceFileMatcher = (File file) -> ".java".equalsIgnoreCase(file.getFileExtension());
+        }
 
-            return projectFolder.getFilesRecursively().await()
-                .where(sourceFileMatcher)
-                .toList();
-        });
+        return projectFolder.iterateFilesRecursively()
+            .where(sourceFileMatcher);
     }
 
     /**
@@ -61,7 +57,7 @@ public interface QubBuild
         PreCondition.assertNotNull(projectFolder, "projectFolder");
         PreCondition.assertNotNull(projectJsonJava, "projectJsonJava");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             String outputFolderName = projectJsonJava.getOutputFolder();
             if (Strings.isNullOrEmpty(outputFolderName))
@@ -77,15 +73,11 @@ public interface QubBuild
      * @param outputsFolder The outputsFolder where class files are written to.
      * @return The existing class files in the provided outputs folder.
      */
-    static Result<Iterable<File>> getJavaClassFiles(Folder outputsFolder)
+    static Iterator<File> iterateJavaClassFiles(Folder outputsFolder)
     {
         PreCondition.assertNotNull(outputsFolder, "outputsFolder");
 
-        return Result.create2(() ->
-        {
-            return outputsFolder.getFilesRecursively().await()
-                .where((File file) -> ".class".equalsIgnoreCase(file.getFileExtension()))
-                .toList();
-        });
+        return outputsFolder.iterateFilesRecursively()
+            .where((File file) -> ".class".equalsIgnoreCase(file.getFileExtension()));
     }
 }

@@ -34,7 +34,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
     {
         PreCondition.assertNotNull(processFactory, "processFactory");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             return new JavacProcessBuilder(processFactory.getProcessBuilder(JavacProcessBuilder.executablePathString).await());
         });
@@ -48,7 +48,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
     {
         PreCondition.assertNotNull(verbose, "verbose");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             final SpinMutex verboseMutex = SpinMutex.create();
             final InMemoryCharacterToByteStream stdout = InMemoryCharacterToByteStream.create();
@@ -99,7 +99,7 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
         PreCondition.assertNotNull(warnings, "warnings");
         PreCondition.assertNotNull(verbose, "verbose");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             final SpinMutex verboseMutex = SpinMutex.create();
             final InMemoryCharacterToByteStream stdout = InMemoryCharacterToByteStream.create();
@@ -210,14 +210,14 @@ public class JavacProcessBuilder extends ProcessBuilderDecorator<JavacProcessBui
         PreCondition.assertNotNullAndNotEmpty(javaVersion, "javaVersion");
         PreCondition.assertNotNull(javaHomeFolder, "javaHomeFolder");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             File result;
             if (QubBuildCompile.isJava8(javaVersion))
             {
                 final Folder javaFolder = javaHomeFolder.getParentFolder().await();
-                final Iterable<Folder> jreAndJdkFolders = javaFolder.getFolders().await();
-                final Iterable<Folder> jre18Folders = jreAndJdkFolders.where((Folder jreOrJdkFolder) -> jreOrJdkFolder.getName().startsWith("jre1.8.0_"));
+                final Iterator<Folder> jreAndJdkFolders = javaFolder.iterateFolders();
+                final Iterator<Folder> jre18Folders = jreAndJdkFolders.where((Folder jreOrJdkFolder) -> jreOrJdkFolder.getName().startsWith("jre1.8.0_"));
                 if (!jre18Folders.any())
                 {
                     throw new NotFoundException("No installed JREs found for Java version " + Strings.escapeAndQuote(javaVersion) + ".");

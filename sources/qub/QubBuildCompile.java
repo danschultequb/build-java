@@ -224,7 +224,7 @@ public interface QubBuildCompile
                 }
                 javac.addClasspath(classPaths);
 
-                final Iterable<File> javaSourceFiles = QubBuild.getJavaSourceFiles(folderToBuild, projectJsonJava).await();
+                final Iterable<File> javaSourceFiles = QubBuild.iterateJavaSourceFiles(folderToBuild, projectJsonJava).toList();
                 if (!javaSourceFiles.any())
                 {
                     throw new NotFoundException("No java source files found in " + folderToBuild + ".");
@@ -556,7 +556,7 @@ public interface QubBuildCompile
 
     static Result<Void> writeFileList(CharacterWriteStream verbose, Iterable<File> files, String description)
     {
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             if (!Iterable.isNullOrEmpty(files))
             {
@@ -640,7 +640,7 @@ public interface QubBuildCompile
     {
         final File classFile = QubBuildCompile.getClassFile(sourceFile, rootFolder, outputFolder);
         final List<File> result = classFile.getParentFolder().await()
-            .getFiles().await()
+            .iterateFiles()
             .where((File file) -> file.getName().startsWith(classFile.getNameWithoutFileExtension() + "$"))
             .toList();
         if (classFile.exists().await())

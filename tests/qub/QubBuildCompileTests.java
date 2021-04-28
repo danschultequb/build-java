@@ -5064,8 +5064,9 @@ public interface QubBuildCompileTests
 
     static Iterable<String> getOutputsFolderFilePathStrings(Folder outputsFolder)
     {
-        return outputsFolder.getFilesRecursively().await()
-            .map((File entry) -> entry.getPath().relativeTo(outputsFolder).toString());
+        return outputsFolder.iterateFilesRecursively()
+            .map((File entry) -> entry.getPath().relativeTo(outputsFolder).toString())
+            .toList();
     }
 
     static File getBuildJSONFile(Folder outputsFolder)

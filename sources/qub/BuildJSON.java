@@ -20,7 +20,7 @@ public class BuildJSON extends JSONObjectWrapperBase
     {
         PreCondition.assertNotNull(parseJSONFile, "parseJSONFile");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             return BuildJSON.parse(JSON.parseObject(parseJSONFile).await()).await();
         });
@@ -31,7 +31,7 @@ public class BuildJSON extends JSONObjectWrapperBase
         PreCondition.assertNotNull(readStream, "readStream");
         PreCondition.assertNotDisposed(readStream, "readStream");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             return BuildJSON.parse(JSON.parseObject(readStream).await()).await();
         });
@@ -42,7 +42,7 @@ public class BuildJSON extends JSONObjectWrapperBase
         PreCondition.assertNotNull(readStream, "readStream");
         PreCondition.assertNotDisposed(readStream, "readStream");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             return BuildJSON.parse(JSON.parseObject(readStream).await()).await();
         });
@@ -52,7 +52,7 @@ public class BuildJSON extends JSONObjectWrapperBase
     {
         PreCondition.assertNotNull(characters, "character");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             return BuildJSON.parse(JSON.parseObject(characters).await()).await();
         });
@@ -62,7 +62,7 @@ public class BuildJSON extends JSONObjectWrapperBase
     {
         PreCondition.assertNotNull(json, "json");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             return new BuildJSON(json);
         });
@@ -159,7 +159,7 @@ public class BuildJSON extends JSONObjectWrapperBase
         PreCondition.assertNotNull(relativePath, "relativePath");
         PreCondition.assertFalse(relativePath.isRooted(), "relativePath.isRooted()");
 
-        return Result.create2(() ->
+        return Result.create(() ->
         {
             BuildJSONSourceFile result = null;
             final Iterable<BuildJSONSourceFile> sourceFiles = this.getSourceFiles();
