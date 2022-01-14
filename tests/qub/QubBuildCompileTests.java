@@ -4928,7 +4928,7 @@ public interface QubBuildCompileTests
                     test.assertFalse(outputsFolder.exists().await());
                 });
 
-                runner.test("with non-empty \"sources\" folder and with existing and empty \"outputs\" folder",
+                runner.test("with source code file modified after compilation but before build.json file updated",
                     (TestResources resources) -> Tuple.create(resources.createFakeDesktopProcess()),
                     (Test test, FakeDesktopProcess process) ->
                 {
